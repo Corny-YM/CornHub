@@ -2,12 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-html,
-body,
-:root {
-  height: 100%;
-}
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -79,4 +73,31 @@ body,
   body {
     @apply bg-background text-foreground;
   }
+}
+
+html,
+body,
+:root {
+  height: 100%;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  @apply dark:bg-primary/20 bg-[#f1f1f1];
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 8px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
