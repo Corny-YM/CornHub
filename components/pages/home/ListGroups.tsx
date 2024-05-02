@@ -9,7 +9,10 @@ const ListGroups = () => {
   return (
     <div className="w-full flex flex-col">
       {itemsArray.map((item) => (
-        <div className="px-2 flex justify-center items-center min-h-11">
+        <div
+          key={item}
+          className="px-2 flex justify-center items-center min-h-11"
+        >
           <div className="w-full flex items-center px-2 rounded-md transition select-none cursor-pointer dark:hover:bg-primary/20 hover:bg-primary/70">
             <div className="relative flex justify-center items-center w-9 h-9 my-2 mr-3 overflow-hidden rounded-full">
               <Image

@@ -1,6 +1,7 @@
 import Header from "@/components/header";
-import SidebarRight from "./components/SidebarRight";
-import SidebarLeft from "./components/SidebarLeft";
+import NewFeeds from "@/components/pages/home/NewFeeds";
+import SidebarLeft from "@/components/pages/home/SidebarLeft";
+import SidebarRight from "@/components/pages/home/SidebarRight";
 
 const HomePage = () => {
   return (
@@ -12,7 +13,7 @@ const HomePage = () => {
 
         {/* Content */}
         <div className="h-full flex flex-col items-center flex-1 flex-shrink px-8">
-          theanh
+          <NewFeeds />
         </div>
 
         <SidebarLeft />

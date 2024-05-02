@@ -1,16 +1,20 @@
 import "@/app/globals.css";
 import type { Metadata } from "next";
-import { Inter as FontSans, Baloo_Bhaijaan_2 } from "next/font/google";
+import { Inter, Kodchasan, Baloo_Bhaijaan_2 } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/providers/theme-provider";
 
-// const font = FontSans({
+// const font = Inter({
 //   subsets: ["vietnamese"],
 //   variable: "--font-sans",
 // });
-const font = Baloo_Bhaijaan_2({
+// const font = Baloo_Bhaijaan_2({
+//   subsets: ["latin"],
+// });
+const font = Kodchasan({
+  weight: "500",
   subsets: ["vietnamese"],
 });
 
