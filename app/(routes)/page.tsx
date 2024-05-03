@@ -5,18 +5,18 @@ import SidebarRight from "@/components/pages/home/SidebarRight";
 
 const HomePage = () => {
   return (
-    <div className="w-full h-full flex items-center pt-14">
+    <div className="relative w-full flex items-center">
       <Header />
 
-      <div className="w-full h-full flex relative pt-4">
-        <SidebarRight />
+      <div className="w-full  flex relative pt-4">
+        <SidebarLeft />
 
         {/* Content */}
-        <div className="h-full flex flex-col items-center flex-1 flex-shrink px-8">
+        <div className="flex-1 h-full px-8 pt-14">
           <NewFeeds />
         </div>
 
-        <SidebarLeft />
+        <SidebarRight />
       </div>
     </div>
   );

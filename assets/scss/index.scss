@@ -1,0 +1,28 @@
+.side-bar {
+  @apply sticky top-14 h-[calc(100vh-56px)] basis-80 flex flex-col overflow-hidden overflow-y-auto py-4;
+
+  /* width */
+  &::-webkit-scrollbar {
+    display: none !important;
+  }
+}
+
+.post-item {
+  @apply flex flex-col w-full justify-center;
+  @apply rounded-lg overflow-hidden;
+  @apply dark:bg-neutral-800 bg-[#f0f2f5];
+
+  & + & {
+    @apply mt-4;
+  }
+}
+
+.emotions {
+  @apply flex justify-center items-center w-5 h-5;
+  @apply rounded-full overflow-hidden;
+  @apply border border-solid border-slate-800;
+
+  & + & {
+    @apply -ml-1;
+  }
+}
