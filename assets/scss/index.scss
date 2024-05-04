@@ -26,3 +26,13 @@
     @apply -ml-1;
   }
 }
+
+.friends-icon {
+  @apply flex justify-center items-center w-8 h-8;
+  @apply relative rounded-full overflow-hidden;
+  @apply border border-solid border-slate-800;
+
+  & + & {
+    @apply -ml-1;
+  }
+}

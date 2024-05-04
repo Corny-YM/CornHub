@@ -12,7 +12,7 @@ const Love = ({ className }: Props) => {
       viewBox="0 0 16 16"
       className={cn("w-full h-full", className)}
     >
-      <g clip-path="url(#love1)">
+      <g clipPath="url(#love1)">
         <path
           d="M15.9982 7.9998c0 4.4181-3.5815 7.9996-7.9996 7.9996-4.418 0-7.9996-3.5815-7.9996-7.9996 0-4.418 3.5816-7.9996 7.9996-7.9996 4.4181 0 7.9996 3.5816 7.9996 7.9996Z"
           fill="url(#love2)"
