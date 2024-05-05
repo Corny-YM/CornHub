@@ -8,11 +8,11 @@ const HomePage = () => {
     <div className="relative w-full flex items-center">
       <Header />
 
-      <div className="w-full flex relative pt-4">
+      <div className="w-full h-full flex relative pt-14">
         <SidebarLeft />
 
         {/* Content */}
-        <div className="flex-1 h-full px-8 pt-14">
+        <div className="flex-1 h-full px-8 pt-4">
           <NewFeeds />
         </div>
 
