@@ -1,5 +1,5 @@
 import PostItem from "@/components/post";
-import Posting from "./Posting";
+import Posting from "@/components/posting";
 
 const NewFeeds = () => {
   return (

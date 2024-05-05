@@ -16,7 +16,7 @@ const Header = () => {
   return (
     <div
       className={cn(
-        "z-[9999] w-full fixed top-0 left-0 right-0 dark:bg-[#2c2c2c]",
+        "z-[9999] w-full fixed top-0 left-0 right-0 dark:bg-[#2c2c2c] bg-gray-50 shadow",
         "flex items-center justify-between h-14 px-4",
         "border-b border-solid dark:border-neutral-600/50 border-neutral-200/50"
       )}

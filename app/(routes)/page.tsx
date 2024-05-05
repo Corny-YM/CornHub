@@ -8,7 +8,7 @@ const HomePage = () => {
     <div className="relative w-full flex items-center">
       <Header />
 
-      <div className="w-full  flex relative pt-4">
+      <div className="w-full flex relative pt-4">
         <SidebarLeft />
 
         {/* Content */}

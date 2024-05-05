@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Pencil } from "lucide-react";
+import { Camera, Pencil } from "lucide-react";
 import { useMemo } from "react";
 import { useUser } from "@clerk/nextjs";
 
@@ -35,6 +35,11 @@ const Info = () => {
             alt="avatar"
             fill
           />
+        </div>
+        <div className="absolute bottom-1 right-1">
+          <Button className="rounded-full" variant="secondary" size="icon">
+            <Camera size={20} />
+          </Button>
         </div>
       </div>
       <div className="w-40 mr-4"></div>
