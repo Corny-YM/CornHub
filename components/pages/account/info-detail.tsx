@@ -1,4 +1,4 @@
-import { GraduationCap } from "lucide-react";
+import { GraduationCap, Home } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -26,7 +26,7 @@ const InfoDetail = () => {
           </div>
           <div className="flex items-center">
             <div className="min-w-8 h-8 flex justify-center items-center mr-2">
-              <GraduationCap size={20} />
+              <Home size={20} />
             </div>
             <div className="line-clamp-1 text-sm">Sống tại Hà Nội</div>
           </div>

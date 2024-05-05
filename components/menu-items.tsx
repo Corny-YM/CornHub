@@ -1,7 +1,8 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { MonitorPlay, UsersRound, Warehouse } from "lucide-react";
+
+import { cn } from "@/lib/utils";
 
 interface Props {}
 
