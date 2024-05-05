@@ -1,18 +1,12 @@
 "use client";
 
 import { Separator } from "@/components/ui/separator";
-import UserInfo from "./UserInfo";
 import UserActions from "./UserActions";
 import ListGroups from "./ListGroups";
 
 const SidebarLeft = () => {
   return (
-    <div
-      className="side-bar"
-    >
-      {/* User Info */}
-      <UserInfo />
-
+    <div className="side-bar">
       <UserActions />
 
       <Separator className="mx-4 my-2" />
