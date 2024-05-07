@@ -1,10 +1,8 @@
-"use client";
-
 import Image from "next/image";
 import { Ellipsis } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import FriendButtonActions from "./friend-button-actions";
+import FriendButtonActions from "@/components/pages/account/friend-button-actions";
 
 const fakeFriends = [
   "https://i.pravatar.cc/150?img=1",
@@ -14,7 +12,7 @@ const fakeFriends = [
   "https://i.pravatar.cc/150?img=5",
 ];
 
-const Friends = () => {
+const UserFriendsPage = () => {
   return (
     <div className="mt-4 flex w-full pb-4 relative">
       <div className="w-full h-full flex flex-col p-4 rounded-lg dark:bg-neutral-800 bg-gray-100">
@@ -71,4 +69,4 @@ const Friends = () => {
   );
 };
 
-export default Friends;
+export default UserFriendsPage;

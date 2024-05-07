@@ -1,35 +1,52 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { useAccountContext } from "@/providers/account-provider";
 import { useCallback } from "react";
+import { useRouter } from "next/navigation";
+
+import { useAccountContext } from "@/providers/account-provider";
+import { cn, isUndefined } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@clerk/nextjs";
 
 const Tabs = () => {
-  const { tabs, selectedTab, onSelectedTab } = useAccountContext();
+  const router = useRouter();
+  const { userId } = useAuth();
+  const { tabs, pathname } = useAccountContext();
+  console.log(pathname);
 
-  const handleClickTab = useCallback((e: React.MouseEvent) => {
-    const target = e.currentTarget as HTMLButtonElement;
-    const id = target.dataset.id;
-    if (!id) return;
-    onSelectedTab(id);
-  }, []);
+  const handleClickTab = useCallback(
+    (e: React.MouseEvent) => {
+      const target = e.currentTarget as HTMLButtonElement;
+      const url = target.dataset.url;
+      if (isUndefined(url) || !userId) return;
+      router.push(`/account/${userId}/${url}`);
+    },
+    [router, userId]
+  );
+  const hasSelected = useCallback(
+    (url: string) => {
+      const isRoot = pathname?.split("/")?.length === 3;
+      if (url === "/") return isRoot;
+      return pathname?.includes(url);
+    },
+    [pathname]
+  );
 
   return (
     <div className="w-full flex items-center gap-x-2">
-      {tabs.map((tab) => (
+      {tabs.map(({ url, label }) => (
         <Button
-          key={tab.id}
-          data-id={tab.id}
+          key={url}
+          data-url={url}
           className={cn(
             "transition ",
-            selectedTab === tab.id &&
+            hasSelected(url) &&
               "bg-primary/50 dark:hover:bg-primary/20 hover:bg-primary/70"
           )}
           variant="outline"
           onClick={handleClickTab}
         >
-          {tab.label}
+          {label}
         </Button>
       ))}
     </div>

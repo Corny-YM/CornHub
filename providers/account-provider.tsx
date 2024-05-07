@@ -1,42 +1,32 @@
 "use client";
 
-import { createContext, useCallback, useContext, useState } from "react";
+import { usePathname } from "next/navigation";
+import { useState, useEffect, useContext, createContext } from "react";
 
 interface Props {
   children: React.ReactNode;
 }
 
 type Context = {
-  tabs: Array<{ id: string; label: string }>;
-  selectedTab?: string | null;
-  onSelectedTab: (id: string) => void;
+  tabs: Array<{ url: string; label: string }>;
+  pathname?: string;
 };
 
 const tabs = [
-  { id: "posts", label: "Bài viết" },
-  { id: "introduction", label: "Giới thiệu" },
-  { id: "friends", label: "Bạn bè" },
-  { id: "images", label: "Ảnh" },
-  { id: "videos", label: "Video" },
+  { url: "/", label: "Bài viết" },
+  { url: "/about", label: "Giới thiệu" },
+  { url: "/friends", label: "Bạn bè" },
+  { url: "/images", label: "Ảnh" },
+  { url: "/videos", label: "Video" },
 ];
 
-const AccountContext = createContext<Context>({
-  tabs,
-  selectedTab: null,
-  onSelectedTab: () => {},
-});
+const AccountContext = createContext<Context>({ tabs });
 
 export const AccountProvider = ({ children }: Props) => {
-  const [selectedTab, setSelectedTab] = useState<string | null>("posts");
-
-  const onSelectedTab = useCallback((id: string) => {
-    const existedTab = tabs.find((item) => item.id === id);
-    if (!existedTab) return;
-    setSelectedTab(id);
-  }, []);
+  const pathname = usePathname();
 
   return (
-    <AccountContext.Provider value={{ tabs, selectedTab, onSelectedTab }}>
+    <AccountContext.Provider value={{ tabs, pathname }}>
       {children}
     </AccountContext.Provider>
   );

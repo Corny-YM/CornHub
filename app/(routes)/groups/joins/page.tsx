@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-
 import GroupCard from "@/components/pages/groups/group-card";
 
 const GroupJoinPage = () => {

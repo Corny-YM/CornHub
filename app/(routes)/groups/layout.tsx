@@ -1,3 +1,4 @@
+import { GroupProvider } from "@/providers/groups-provider";
 import Header from "@/components/header";
 import SidebarLeft from "@/components/pages/groups/sidebar-left";
 
@@ -10,12 +11,14 @@ const GroupLayout = ({ children }: Props) => {
     <div className="relative w-full h-full flex items-center">
       <Header />
 
-      <div className="w-full h-full flex relative pt-14">
-        <SidebarLeft />
+      <GroupProvider>
+        <div className="w-full h-full flex relative pt-14">
+          <SidebarLeft />
 
-        {/* Content */}
-        {children}
-      </div>
+          {/* Content */}
+          {children}
+        </div>
+      </GroupProvider>
     </div>
   );
 };

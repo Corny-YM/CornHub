@@ -1,25 +1,30 @@
-import { AccountProvider } from "@/providers/account-provider";
-import { Separator } from "@/components/ui/separator";
-import Info from "@/components/pages/account/info";
-import Tabs from "@/components/pages/account/tabs";
-import Banner from "@/components/pages/account/banner";
-import TabItem from "@/components/pages/account/tab-item";
+import PostItem from "@/components/post";
+import Posting from "@/components/posting";
+import InfoDetail from "@/components/pages/account/info-detail";
 
 const UserPage = () => {
   return (
-    <AccountProvider>
-      <div className="w-full h-full max-w-[1250px] flex flex-col items-center">
-        <Banner />
-
-        <Info />
-
-        <Separator className="my-4" />
-
-        <Tabs />
-
-        <TabItem />
+    <div className="mt-4 flex w-full pb-4 relative">
+      {/* Info Detail */}
+      <div className="w-1/3 flex-shrink relative">
+        <div className="w-full h-0"></div>
+        <InfoDetail />
       </div>
-    </AccountProvider>
+
+      {/* Posts */}
+      <div className="flex-1 flex flex-col ml-4">
+        <Posting />
+
+        {/* List Posts */}
+        <div className="w-full flex flex-col mt-4">
+          <PostItem />
+          <PostItem />
+          <PostItem />
+          <PostItem />
+          <PostItem />
+        </div>
+      </div>
+    </div>
   );
 };
 
