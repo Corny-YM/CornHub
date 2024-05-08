@@ -1,3 +1,7 @@
+a {
+  @apply text-blue-400 hover:underline;
+}
+
 .side-bar {
   @apply sticky top-14 h-[calc(100vh-56px)] basis-80 flex flex-col overflow-hidden overflow-y-auto py-4;
 
