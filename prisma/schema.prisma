@@ -1,0 +1,128 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  password     String?
+  first_name   String?
+  last_name    String?
+  full_name    String?
+  avatar       String?
+  cover        String?
+  birth_year   Int?
+  birth_month  Int?
+  birth_day    Int?
+  verified     Boolean  @default(false)
+  last_sign_in DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // 
+  // groups Group[] @relation("UserToGroup")
+  posts    Post[]     @relation("UserToPost")
+  comments Comment[]  @relation("UserToComment")
+  reacts   Reaction[] @relation("UserToReaction")
+
+  @@map("users")
+}
+
+model Group {
+  id              Int      @id @default(autoincrement())
+  group_name      String
+  cover           String
+  status          Boolean  @default(true) // public or private
+  quantity        Int      @default(0)
+  approve_members Boolean  @default(false) // active feat confirm members
+  approve_posts   Boolean  @default(false) // active feat confirm posts
+  description     String   @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // relation
+  // user_id String // created user
+  // user    User   @relation("UserToGroup", fields: [user_id], references: [id])
+  posts Post[] @relation("GroupToPost")
+
+  @@map("groups")
+}
+
+model Post {
+  id         Int      @id @default(autoincrement())
+  type       Int      @db.TinyInt // 1: personal - 2: group
+  content    String?  @db.Text
+  file       String?
+  file_type  Int?     @db.TinyInt
+  background String?
+  status     Boolean  @default(true)
+  approve    Boolean?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // relation
+  user_id  String
+  user     User   @relation("UserToPost", fields: [user_id], references: [id])
+  group_id Int
+  group    Group  @relation("GroupToPost", fields: [group_id], references: [id])
+
+  comments  Comment[]  @relation("PostToComment")
+  reactions Reaction[] @relation("PostToReaction")
+
+  @@map("posts")
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  file      String?
+  file_type Int?     @db.TinyInt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relation
+  comment_id Int?
+
+  post_id Int
+  post    Post @relation("PostToComment", fields: [post_id], references: [id])
+
+  user_id String
+  user    User   @relation("UserToComment", fields: [user_id], references: [id])
+
+  // 
+  reacts Reaction[] @relation("CommentToReaction")
+
+  @@map("comments")
+}
+
+model Reaction {
+  id        Int      @id @default(autoincrement())
+  type      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relation
+  comment_id Int?
+  comment    Comment? @relation("CommentToReaction", fields: [comment_id], references: [id])
+
+  post_id Int
+  post    Post @relation("PostToReaction", fields: [post_id], references: [id])
+
+  user_id String
+  user    User   @relation("UserToReaction", fields: [user_id], references: [id])
+
+  @@map("reactions")
+}
+
+// TODO: continue to make models
