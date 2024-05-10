@@ -14,8 +14,8 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
+  id           String    @id @default(uuid())
+  email        String    @unique
   password     String?
   first_name   String?
   last_name    String?
@@ -25,16 +25,29 @@ model User {
   birth_year   Int?
   birth_month  Int?
   birth_day    Int?
-  verified     Boolean  @default(false)
-  last_sign_in DateTime
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  verified     Boolean   @default(false)
+  last_sign_in DateTime?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
 
   // 
   // groups Group[] @relation("UserToGroup")
-  posts    Post[]     @relation("UserToPost")
-  comments Comment[]  @relation("UserToComment")
-  reacts   Reaction[] @relation("UserToReaction")
+  groups                Group[]         @relation("UserToGroup")
+  posts                 Post[]          @relation("UserToPost")
+  comments              Comment[]       @relation("UserToComment")
+  reacts                Reaction[]      @relation("UserToReaction")
+  senderNotifications   Notification[]  @relation("SenderToNotification")
+  receiverNotifications Notification[]  @relation("ReceiverToNotification")
+  senderReports         Report[]        @relation("SenderToReport")
+  userReports           Report[]        @relation("UserToReport")
+  friends               Friend[]        @relation("UserToFriend")
+  friendUserInfo        Friend[]
+  senderFriendRequest   FriendRequest[] @relation("SenderToFriendRequest")
+  receiverFriendRequest FriendRequest[] @relation("ReceiverToFriendRequest")
+  followerUserInfo      Follower[]
+  followers             Follower[]      @relation("UserToFollower")
+  groupMembers          GroupMember[]   @relation("MemberToGroupMember")
+  groupFollowers        GroupFollower[]
 
   @@map("users")
 }
@@ -48,13 +61,18 @@ model Group {
   approve_members Boolean  @default(false) // active feat confirm members
   approve_posts   Boolean  @default(false) // active feat confirm posts
   description     String   @db.Text
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
 
   // relation
-  // user_id String // created user
-  // user    User   @relation("UserToGroup", fields: [user_id], references: [id])
-  posts Post[] @relation("GroupToPost")
+  owner_id String // created user
+  owner    User   @relation("UserToGroup", fields: [owner_id], references: [id])
+
+  posts         Post[]          @relation("GroupToPost")
+  notifications Notification[]  @relation("GroupToNotification")
+  reports       Report[]        @relation("GroupToReport")
+  groupMembers  GroupMember[]   @relation("GroupToGroupMember")
+  groupFollower GroupFollower[]
 
   @@map("groups")
 }
@@ -68,8 +86,8 @@ model Post {
   background String?
   status     Boolean  @default(true)
   approve    Boolean?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   // relation
   user_id  String
@@ -77,19 +95,21 @@ model Post {
   group_id Int
   group    Group  @relation("GroupToPost", fields: [group_id], references: [id])
 
-  comments  Comment[]  @relation("PostToComment")
-  reactions Reaction[] @relation("PostToReaction")
+  comments      Comment[]      @relation("PostToComment")
+  reactions     Reaction[]     @relation("PostToReaction")
+  notifications Notification[] @relation("PostToNotification")
+  reports       Report[]       @relation("PostToReport")
 
   @@map("posts")
 }
 
 model Comment {
-  id        Int      @id @default(autoincrement())
-  content   String
-  file      String?
-  file_type Int?     @db.TinyInt
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         Int      @id @default(autoincrement())
+  content    String
+  file       String?
+  file_type  Int?     @db.TinyInt
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   // relation
   comment_id Int?
@@ -101,16 +121,18 @@ model Comment {
   user    User   @relation("UserToComment", fields: [user_id], references: [id])
 
   // 
-  reacts Reaction[] @relation("CommentToReaction")
+  reacts        Reaction[]     @relation("CommentToReaction")
+  notifications Notification[] @relation("CommentToNotification")
+  reports       Report[]       @relation("CommentToReport")
 
   @@map("comments")
 }
 
 model Reaction {
-  id        Int      @id @default(autoincrement())
-  type      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         Int      @id @default(autoincrement())
+  type       String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   // relation
   comment_id Int?
@@ -125,4 +147,138 @@ model Reaction {
   @@map("reactions")
 }
 
-// TODO: continue to make models
+model Notification {
+  id          Int      @id @default(autoincrement())
+  type        String
+  url         String
+  description String
+  read        Boolean  @default(false)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  // relation
+  sender_id String
+  sender    User   @relation("SenderToNotification", fields: [sender_id], references: [id])
+
+  receiver_id String
+  receiver    User   @relation("ReceiverToNotification", fields: [receiver_id], references: [id])
+
+  post_id Int?
+  post    Post? @relation("PostToNotification", fields: [post_id], references: [id])
+
+  comment_id Int?
+  comment    Comment? @relation("CommentToNotification", fields: [comment_id], references: [id])
+
+  group_id Int?
+  group    Group? @relation("GroupToNotification", fields: [group_id], references: [id])
+
+  @@map("notifications")
+}
+
+model Report {
+  id         Int      @id @default(autoincrement())
+  status     Int      @default(0) @db.TinyInt
+  report_to  String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // relation
+  post_id Int?
+  post    Post? @relation("PostToReport", fields: [post_id], references: [id])
+
+  sender_id String
+  sender    User   @relation("SenderToReport", fields: [sender_id], references: [id])
+
+  user_id String?
+  user    User?   @relation("UserToReport", fields: [user_id], references: [id])
+
+  comment_id Int?
+  comment    Comment? @relation("CommentToReport", fields: [comment_id], references: [id])
+
+  group_id Int?
+  group    Group? @relation("GroupToReport", fields: [group_id], references: [id])
+
+  @@map("reports")
+}
+
+model Friend {
+  id         Int      @id @default(autoincrement())
+  status     Int      @default(0) @db.TinyInt
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // relation
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id])
+
+  friend_id String
+  friend    User   @relation("UserToFriend", fields: [friend_id], references: [id])
+
+  @@unique([user_id, friend_id])
+  @@map("friends")
+}
+
+model FriendRequest {
+  id         Int      @id @default(autoincrement())
+  denied     Boolean  @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // relation
+  sender_id String
+  sender    User   @relation("SenderToFriendRequest", fields: [sender_id], references: [id])
+
+  receiver_id String
+  receiver    User   @relation("ReceiverToFriendRequest", fields: [receiver_id], references: [id])
+
+  @@unique([sender_id, receiver_id])
+  @@map("friend_request")
+}
+
+model Follower {
+  id         Int      @id @default(autoincrement())
+  denied     Boolean  @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // relation
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id])
+
+  follower_id String
+  follower    User   @relation("UserToFollower", fields: [follower_id], references: [id])
+
+  @@unique([user_id, follower_id])
+  @@map("followers")
+}
+
+model GroupMember {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // relation
+  member_id String
+  member    User   @relation("MemberToGroupMember", fields: [member_id], references: [id])
+
+  group_id Int
+  group    Group @relation("GroupToGroupMember", fields: [group_id], references: [id])
+
+  @@unique([member_id, group_id])
+  @@map("group_members")
+}
+
+model GroupFollower {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  follower_id String
+  follower    User   @relation(fields: [follower_id], references: [id])
+
+  group_id Int
+  group    Group @relation(fields: [group_id], references: [id])
+
+  @@unique([follower_id, group_id])
+  @@map("group_followers")
+}

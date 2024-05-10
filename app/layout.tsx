@@ -5,6 +5,7 @@ import { Inter, Kodchasan, Baloo_Bhaijaan_2 } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 
 import { cn } from "@/lib/utils";
+import { AppProvider } from "@/providers/app-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 
 // const font = Inter({
@@ -39,7 +40,7 @@ export default function RootLayout({
           )}
         >
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-            {children}
+            <AppProvider>{children}</AppProvider>
           </ThemeProvider>
         </body>
       </html>
