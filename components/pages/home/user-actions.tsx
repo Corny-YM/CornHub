@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { useCallback, useMemo } from "react";
 import { useUser } from "@clerk/nextjs";

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useUser } from "@clerk/nextjs";
 import { Podcast, Image as ImageIcon, Laugh } from "lucide-react";
 
+import CustomEditor from "@/components/custom-editor";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -68,6 +69,8 @@ const Posting = () => {
             </Button>
           </div>
         </div>
+
+        <CustomEditor data="theanh" />
       </div>
     </div>
   );

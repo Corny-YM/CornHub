@@ -1,5 +1,7 @@
 import "@/app/globals.css";
 import "@/assets/scss/index.scss";
+import "@/assets/scss/editor.scss";
+
 import type { Metadata } from "next";
 import { Inter, Kodchasan, Baloo_Bhaijaan_2 } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";

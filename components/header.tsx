@@ -1,15 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
 import { Search } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ToggleMode } from "@/components/toggle-mode";
-import MenuItems from "@/components/menu-items";
 import Logo from "@/components/icons/logo";
+import MenuItems from "@/components/menu-items";
 import Message from "@/components/icons/message";
+import UserButton from "@/components/user-button";
 import Notification from "@/components/icons/notification";
 
 const Header = () => {
@@ -57,13 +57,7 @@ const Header = () => {
         >
           <Notification />
         </Button>
-        <Button
-          className="flex justify-center items-center w-10 h-10 p-2 rounded-full outline-none"
-          variant="outline"
-          size="icon"
-        >
-          <UserButton afterSignOutUrl="/" />
-        </Button>
+        <UserButton />
       </div>
     </div>
   );

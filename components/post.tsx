@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import PostFooter from "@/components/post-footer";
 import PostHeader from "@/components/post-header";
