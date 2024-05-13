@@ -1,41 +1,57 @@
 "use client";
 
 import Image from "next/image";
-import { useUser } from "@clerk/nextjs";
+import { useCallback } from "react";
 import { Podcast, Image as ImageIcon, Laugh } from "lucide-react";
 
-import CustomEditor from "@/components/custom-editor";
-import { Input } from "@/components/ui/input";
+import { useToggle } from "@/hooks/useToggle";
+import { useAppContext } from "@/providers/app-provider";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import PostingModal from "@/components/posting-modal";
 
 const Posting = () => {
-  const { user } = useUser();
+  const { currentUser, toastFeatureUpdating } = useAppContext();
 
-  if (!user) return null;
+  const [modalEditor, toggleModalEditor] = useToggle(false);
+
+  const handleClickLiveStream = useCallback(() => {
+    toastFeatureUpdating();
+  }, []);
+  const handleClickUpload = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    toggleModalEditor(true);
+  }, []);
+
   return (
     <div className="w-full flex justify-center items-center">
       <div className="w-full flex flex-col justify-center items-center px-4 py-3 overflow-hidden rounded-lg dark:bg-neutral-800 bg-[#f0f2f5]">
         <div className="w-full flex items-center">
           {/* User Info */}
-          <div className="flex justify-between items-center">
-            <div className="relative flex justify-center items-center w-9 h-9 mr-3 overflow-hidden rounded-full">
-              <Image
-                className="absolute w-full h-full aspect-square"
-                priority
-                src={user?.imageUrl || ""}
-                alt={user?.fullName || ""}
-                fill
-              />
+          {currentUser && (
+            <div className="flex justify-between items-center">
+              <div className="relative flex justify-center items-center w-9 h-9 mr-3 overflow-hidden rounded-full">
+                <Image
+                  className="absolute w-full h-full aspect-square"
+                  priority
+                  src={currentUser.avatar || "/no-avatar.jpg"}
+                  alt={currentUser.full_name || "user-avatar"}
+                  fill
+                />
+              </div>
             </div>
-          </div>
+          )}
           {/* Input */}
           <div className="flex-1 flex items-center">
-            <Input
-              className="focus-visible:ring-0 focus-visible:ring-offset-0 rounded-3xl px-5 text-base !cursor-pointer dark:hover:bg-primary/50 hover:bg-primary/40 transition"
-              placeholder="Corny ơi, bạn đang nghĩ gì thế?"
-              disabled
-            />
+            <Button
+              className="w-full flex items-center justify-start focus-visible:ring-0 focus-visible:ring-offset-0 rounded-3xl px-5 text-base !cursor-pointer dark:hover:bg-primary/50 hover:bg-primary/40 transition"
+              variant="outline"
+              onClick={handleClickUpload}
+            >
+              <div className="opacity-60 text-sm">
+                Corny ơi, bạn đang nghĩ gì thế?
+              </div>
+            </Button>
           </div>
         </div>
 
@@ -45,6 +61,7 @@ const Posting = () => {
             <Button
               className="w-full rounded-lg hover:bg-primary/50"
               variant="outline"
+              onClick={handleClickLiveStream}
             >
               <Podcast className="mr-1 text-rose-500" />
               Video trực tiếp
@@ -54,6 +71,7 @@ const Posting = () => {
             <Button
               className="w-full rounded-lg hover:bg-primary/50"
               variant="outline"
+              onClick={handleClickUpload}
             >
               <ImageIcon className="mr-1 text-green-500/80" />
               Ảnh/video
@@ -63,15 +81,16 @@ const Posting = () => {
             <Button
               className="w-full rounded-lg hover:bg-primary/50"
               variant="outline"
+              onClick={handleClickUpload}
             >
               <Laugh className="mr-1 text-orange-300" />
               Cảm xúc/hoạt động
             </Button>
           </div>
         </div>
-
-        <CustomEditor data="theanh" />
       </div>
+
+      <PostingModal open={modalEditor} toggleOpen={toggleModalEditor} />
     </div>
   );
 };

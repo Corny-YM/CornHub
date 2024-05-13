@@ -27,7 +27,7 @@ const Info = () => {
           Học lập trình web (F8 - Fullstack.edu.vn)
         </div>
         <div>
-          <a className="hover:underline w-fit" href="#">
+          <a className="hover:underline w-fit" href="/">
             224 thành viên
           </a>
         </div>

@@ -1,9 +1,17 @@
 "use client";
 
+import toast, { Toaster } from "react-hot-toast";
+import { Info } from "lucide-react";
 import { User } from "@prisma/client";
 import { useSession, useUser } from "@clerk/nextjs";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useContext, createContext, useEffect, useState } from "react";
+import {
+  useContext,
+  createContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 
 import { store } from "@/actions/user";
 
@@ -13,11 +21,15 @@ interface Props {
 
 type Context = {
   currentUser?: User | null;
+  toastFeatureUpdating: () => void;
 };
 
 const queryClient = new QueryClient();
 
-const AppContext = createContext<Context>({});
+const AppContext = createContext<Context>({
+  currentUser: null,
+  toastFeatureUpdating: () => {},
+});
 
 export const AppProvider = ({ children }: Props) => {
   const { user } = useUser();
@@ -52,9 +64,19 @@ export const AppProvider = ({ children }: Props) => {
     fetch();
   }, [session, isSignedIn, user]);
 
+  const toastFeatureUpdating = useCallback(() => {
+    toast(<div className="text-sm font-semibold">Coming soon!</div>, {
+      icon: <Info className="text-blue-400" />,
+      position: "bottom-right",
+    });
+  }, []);
+
   return (
-    <AppContext.Provider value={{ currentUser }}>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <AppContext.Provider value={{ currentUser, toastFeatureUpdating }}>
+      <QueryClientProvider client={queryClient}>
+        <Toaster />
+        {children}
+      </QueryClientProvider>
     </AppContext.Provider>
   );
 };

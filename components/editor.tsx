@@ -4,9 +4,10 @@ import { useCallback } from "react";
 
 interface Props {
   data: string;
+  placeholder?: string;
 }
 
-const Editor = ({ data }: Props) => {
+const Editor = ({ data, placeholder }: Props) => {
   const onReady = useCallback((e: any) => {
     // console.log(e);
   }, []);
@@ -18,6 +19,7 @@ const Editor = ({ data }: Props) => {
     <div className="flex items-center w-full">
       <CKEditor
         editor={EditorBuild}
+        config={{ placeholder }}
         data={data}
         onReady={onReady}
         onChange={onChange}
