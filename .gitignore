@@ -39,3 +39,7 @@ next-env.d.ts
 
 # dependencies
 package-lock.json
+yarn.lock
+
+/ckeditor5/package-lock.json
+/ckeditor5/yarn.lock

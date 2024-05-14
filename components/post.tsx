@@ -1,25 +1,33 @@
 "use client";
 
+import { Group, Post, User } from "@prisma/client";
+
 import { cn } from "@/lib/utils";
 import PostFooter from "@/components/post-footer";
 import PostHeader from "@/components/post-header";
-import PostContent from "@/components/post-content";
 
 interface Props {
   className?: string;
+  data: Post & { user: User; group: Group | null };
 }
 
-const PostItem = ({ className }: Props) => {
+const PostItem = ({ className, data }: Props) => {
+  console.log(data);
   return (
     <div className={cn("post-item", className)}>
       {/* Header */}
-      <PostHeader />
+      <PostHeader data={data} />
 
       {/* Content */}
-      <PostContent />
+      <div className="flex flex-col w-full text-sm">
+        <div
+          className="px-4 pb-4 pt-1"
+          dangerouslySetInnerHTML={{ __html: data.content || "" }}
+        />
+      </div>
 
       {/* Footer */}
-      <PostFooter />
+      <PostFooter data={data} />
     </div>
   );
 };

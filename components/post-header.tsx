@@ -1,34 +1,54 @@
 import Image from "next/image";
+import { useMemo } from "react";
 import { Ellipsis, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Group, Post, User } from "@prisma/client";
 
-const PostHeader = () => {
+import { Button } from "@/components/ui/button";
+import AvatarImg from "@/components/avatar-img";
+import { cn } from "@/lib/utils";
+
+interface Props {
+  data: Post & { user: User; group: Group | null };
+}
+
+const PostHeader = ({ data }: Props) => {
+  const { id, user, group, group_id } = data;
+  const avatar = useMemo(() => {
+    if (group_id && group) return group.cover;
+    return user.avatar;
+  }, [data]);
   return (
     <div className="flex w-full items-center px-4 pt-3 mb-3">
       {/* Image */}
       <div className="relative flex justify-center items-center">
         <div className="relative flex justify-center items-center w-9 h-9 rounded-lg overflow-hidden">
-          <Image
+          <AvatarImg
             className="absolute w-full h-full"
-            src="https://i.pravatar.cc/150?img=47"
-            fill
-            alt="avatar"
+            src={avatar}
+            alt={`post-avatar-${id}`}
           />
         </div>
-        <div className="absolute -bottom-1 -right-2 flex justify-center items-center">
-          <div className="relative w-7 h-7 flex justify-center items-center rounded-full overflow-hidden border-slate-800 border border-solid shadow-lg">
-            <Image
-              className="absolute w-full h-full"
-              src="https://i.pravatar.cc/150?img=4"
-              fill
-              alt="avatar"
-            />
+        {group_id && (
+          <div className="absolute -bottom-1 -right-2 flex justify-center items-center">
+            <div className="relative w-7 h-7 flex justify-center items-center rounded-full overflow-hidden border-slate-800 border border-solid shadow-lg">
+              <AvatarImg
+                className="absolute w-full h-full"
+                src={user.avatar}
+                alt={user.full_name}
+                fallback={user.first_name?.[0]}
+              />
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Identify */}
-      <div className="flex flex-col flex-1 justify-center mx-5">
+      <div
+        className={cn(
+          "flex flex-col flex-1 justify-center",
+          group_id ? "mx-5" : "ml-2 mr-5"
+        )}
+      >
         <div className="flex-1 text-sm">
           <div className="font-semibold">Tuyển dụng thực tập IT</div>
         </div>

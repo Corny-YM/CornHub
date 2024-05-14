@@ -21,6 +21,7 @@ interface Props {
   className?: string;
   placeholder?: string;
   actions: ISelectAction[];
+  onChange?: (val: string) => void;
 }
 
 const SelectActions = ({
@@ -28,9 +29,10 @@ const SelectActions = ({
   placeholder = "Select lists",
   className,
   actions,
+  onChange,
 }: Props) => {
   return (
-    <Select defaultValue={defaultValue}>
+    <Select defaultValue={defaultValue} onValueChange={onChange}>
       <SelectTrigger
         className={cn("w-[180px] py-1 outline-none focus:ring-0", className)}
       >

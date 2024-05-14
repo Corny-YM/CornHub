@@ -1,3 +1,4 @@
+import { Group, Post, User } from "@prisma/client";
 import { Forward, MessageCircle, ThumbsUp } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,11 @@ import Love from "@/components/icons/love";
 const fakeEmotions = [Like, Heart, Love];
 const length = fakeEmotions.length;
 
-const PostFooter = () => {
+interface Props {
+  data: Post & { user: User; group: Group | null };
+}
+
+const PostFooter = ({ data }: Props) => {
   return (
     <div className="w-full flex flex-col justify-center text-sm px-4">
       <div className="w-full flex items-center py-3">

@@ -79,12 +79,12 @@ model Group {
 
 model Post {
   id         Int      @id @default(autoincrement())
-  type       Int      @db.TinyInt // 1: personal - 2: group
+  type       Int      @default(0) @db.TinyInt // 0: personal - 1: group
   content    String?  @db.Text
   file       String?
   file_type  Int?     @db.TinyInt
   background String?
-  status     Boolean  @default(true)
+  status     String   @default("friends") @db.VarChar(10) // friends, public, hide
   approve    Boolean?
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -92,8 +92,8 @@ model Post {
   // relation
   user_id  String
   user     User   @relation("UserToPost", fields: [user_id], references: [id])
-  group_id Int
-  group    Group  @relation("GroupToPost", fields: [group_id], references: [id])
+  group_id Int?
+  group    Group? @relation("GroupToPost", fields: [group_id], references: [id])
 
   comments      Comment[]      @relation("PostToComment")
   reactions     Reaction[]     @relation("PostToReaction")

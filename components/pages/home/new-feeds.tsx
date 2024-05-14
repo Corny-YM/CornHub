@@ -9,7 +9,10 @@ interface Props {
 export const revalidate = 0;
 
 const NewFeeds = async ({ userId }: Props) => {
-  const userPosts = await prisma.post.findMany({ where: { user_id: userId } });
+  const userPosts = await prisma.post.findMany({
+    include: { user: true, group: true },
+    where: { user_id: userId },
+  });
   const userFriends = await prisma.friend.findMany({
     where: {
       OR: [{ user_id: userId }, { friend_id: userId }],
@@ -23,6 +26,7 @@ const NewFeeds = async ({ userId }: Props) => {
 
   // Retrieve posts of user's friends
   const friendsPosts = await prisma.post.findMany({
+    include: { user: true, group: true },
     where: { user_id: { in: friendIds } },
   });
 
@@ -48,7 +52,7 @@ const NewFeeds = async ({ userId }: Props) => {
             </div>
           )}
           {posts.map((post) => (
-            <PostItem key={post.id} />
+            <PostItem key={post.id} data={post} />
           ))}
         </div>
       </div>

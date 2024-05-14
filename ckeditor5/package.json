@@ -14,7 +14,7 @@
     "@ckeditor/ckeditor5-block-quote": "41.3.1",
     "@ckeditor/ckeditor5-cloud-services": "41.3.1",
     "@ckeditor/ckeditor5-code-block": "41.3.1",
-    "@ckeditor/ckeditor5-editor-balloon": "41.3.1",
+    "@ckeditor/ckeditor5-editor-classic": "41.3.1",
     "@ckeditor/ckeditor5-essentials": "41.3.1",
     "@ckeditor/ckeditor5-find-and-replace": "41.3.1",
     "@ckeditor/ckeditor5-font": "41.3.1",
@@ -28,8 +28,7 @@
     "@ckeditor/ckeditor5-paste-from-office": "41.3.1",
     "@ckeditor/ckeditor5-remove-format": "41.3.1",
     "@ckeditor/ckeditor5-restricted-editing": "41.3.1",
-    "@ckeditor/ckeditor5-select-all": "41.3.1",
-    "@ckeditor/ckeditor5-source-editing": "41.3.1",
+    "@ckeditor/ckeditor5-show-blocks": "41.3.1",
     "@ckeditor/ckeditor5-typing": "41.3.1",
     "@ckeditor/ckeditor5-undo": "41.3.1"
   },

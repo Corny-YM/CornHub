@@ -1,4 +1,4 @@
-BalloonEditor
+ClassicEditor
 	.create( document.querySelector( '.editor' ), {
 		// Editor configuration.
 	} )
@@ -12,7 +12,7 @@ function handleSampleError( error ) {
 
 	const message = [
 		'Oops, something went wrong!',
-		`Please, report the following error on ${ issueUrl } with the build id "w02t45yrwm4r-z92ated3bvc1" and the error stack trace:`
+		`Please, report the following error on ${ issueUrl } with the build id "xekk20buft44-wyf0167w1fw6" and the error stack trace:`
 	].join( '\n' );
 
 	console.error( message );

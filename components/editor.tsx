@@ -5,24 +5,26 @@ import { useCallback } from "react";
 interface Props {
   data: string;
   placeholder?: string;
+  onChange?: (val: string) => void;
 }
 
-const Editor = ({ data, placeholder }: Props) => {
-  const onReady = useCallback((e: any) => {
+const Editor = ({ data, placeholder, onChange }: Props) => {
+  const handleReady = useCallback((e: any) => {
     // console.log(e);
   }, []);
-  const onChange = useCallback((e: any, editor: EditorBuild) => {
-    // const data = editor.getData();
+  const handleChange = useCallback((e: any, editor: EditorBuild) => {
+    const data = editor.getData();
+    onChange?.(data);
   }, []);
 
   return (
-    <div className="flex items-center w-full">
+    <div className="flex items-center flex-shrink flex-grow">
       <CKEditor
         editor={EditorBuild}
-        config={{ placeholder }}
+        config={{ placeholder, removePlugins: ["Heading"] }}
         data={data}
-        onReady={onReady}
-        onChange={onChange}
+        onReady={handleReady}
+        onChange={handleChange}
       />
     </div>
   );
