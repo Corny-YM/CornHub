@@ -24,6 +24,15 @@ const config = {
         sans: ["var(--font-sans)", ...fontFamily.sans],
       },
       colors: {
+        // emotions
+        like: "#0866ff",
+        heart: "#f33e58",
+        love: "#f7b125",
+        laugh: "#f7b125",
+        wow: "#f7b125",
+        sad: "#f7b125",
+        angry: "#e9710f",
+
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

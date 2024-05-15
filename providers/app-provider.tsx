@@ -24,7 +24,9 @@ type Context = {
   toastFeatureUpdating: () => void;
 };
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: false } },
+});
 
 const AppContext = createContext<Context>({
   currentUser: null,

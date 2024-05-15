@@ -14,7 +14,11 @@ const AvatarImg = ({ className, src, alt, fallback }: Props) => {
   return (
     <Avatar className={cn(className)}>
       <AvatarImage src={src!} alt={alt!} />
-      <AvatarFallback>{fallback || "CH"}</AvatarFallback>
+      <AvatarFallback>
+        <div className="w-full h-full dark:bg-primary/50 bg-slate-400/50 flex justify-center items-center select-none">
+          {fallback || "CH"}
+        </div>
+      </AvatarFallback>
     </Avatar>
   );
 };

@@ -1,22 +1,86 @@
-import Image from "next/image";
 import { useMemo } from "react";
-import { Ellipsis, X } from "lucide-react";
+import {
+  BellOff,
+  Ellipsis,
+  MessageSquareWarning,
+  Pencil,
+  ShieldAlert,
+  Trash2,
+  UserX,
+  X,
+} from "lucide-react";
 import { Group, Post, User } from "@prisma/client";
 
+import { cn, getRelativeTime } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import AvatarImg from "@/components/avatar-img";
-import { cn } from "@/lib/utils";
+import { useAuth } from "@clerk/nextjs";
+import DropdownActions from "./dropdown-actions";
 
 interface Props {
   data: Post & { user: User; group: Group | null };
 }
 
 const PostHeader = ({ data }: Props) => {
-  const { id, user, group, group_id } = data;
+  const { userId } = useAuth();
+  const { id, user, group, group_id, created_at } = data;
+
+  const isOwner = useMemo(() => userId === user.id, [data, userId]);
+
   const avatar = useMemo(() => {
     if (group_id && group) return group.cover;
     return user.avatar;
   }, [data]);
+
+  const name = useMemo(() => {
+    if (!group_id || !group) return user.full_name;
+    return group.group_name;
+  }, [data]);
+
+  const actions = useMemo(() => {
+    const groupActions = [];
+    if (group_id && group) {
+      groupActions.push({
+        label: `Bỏ theo dõi nhóm ${group.group_name}`,
+        icon: <BellOff className="mr-2" size={20} />,
+      });
+      if (!isOwner) {
+        groupActions.push({
+          label: "Báo cáo bài viết với quản trị viên nhóm",
+          icon: <ShieldAlert className="mr-2" size={20} />,
+        });
+      }
+    }
+
+    const userActions = [];
+    if (isOwner) {
+      userActions.push(
+        {
+          label: "Chỉnh sửa bài viết",
+          icon: <Pencil className="mr-2" size={20} />,
+        },
+        {
+          label: "Xóa bài viết",
+          icon: <Trash2 className="mr-2" size={20} />,
+          destructive: true,
+        }
+      );
+    } else {
+      userActions.push(
+        {
+          label: "Báo cáo bài viết",
+          icon: <MessageSquareWarning className="mr-2" size={20} />,
+        },
+        {
+          label: `Chặn trang cá nhân của ${user.full_name}}`,
+          icon: <UserX className="mr-2" size={20} />,
+        }
+      );
+    }
+
+    return [...groupActions, ...userActions];
+  }, [data, isOwner]);
+
   return (
     <div className="flex w-full items-center px-4 pt-3 mb-3">
       {/* Image */}
@@ -50,31 +114,35 @@ const PostHeader = ({ data }: Props) => {
         )}
       >
         <div className="flex-1 text-sm">
-          <div className="font-semibold">Tuyển dụng thực tập IT</div>
+          <div className="font-semibold">{name}</div>
         </div>
         <div className="flex items-center flex-1 text-xs">
-          <div className="">Người tham gia ẩn danh</div>
-          <div className="mx-2">•</div>
-          <div className="">8 giờ</div>
+          {group && (
+            <>
+              <div className="">{user.full_name}</div>
+              <div className="mx-2">•</div>
+            </>
+          )}
+          <div className="">{getRelativeTime(created_at)}</div>
         </div>
       </div>
 
       {/* Actions */}
       <div className="flex items-center justify-center gap-x-1">
-        <Button
-          className="rounded-full hover:bg-primary/50"
-          variant="outline"
-          size="icon"
-        >
-          <Ellipsis size={20} />
-        </Button>
-        <Button
-          className="rounded-full hover:bg-primary/50"
-          variant="outline"
-          size="icon"
-        >
-          <X size={20} />
-        </Button>
+        <DropdownActions
+          className="hover:bg-primary/50"
+          actions={actions}
+          icon={<Ellipsis size={20} />}
+        />
+        {!isOwner && (
+          <Button
+            className="rounded-full hover:bg-primary/50"
+            variant="outline"
+            size="icon"
+          >
+            <X size={20} />
+          </Button>
+        )}
       </div>
     </div>
   );

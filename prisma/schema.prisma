@@ -144,6 +144,8 @@ model Reaction {
   user_id String
   user    User   @relation("UserToReaction", fields: [user_id], references: [id])
 
+  @@unique([user_id, post_id])
+  @@unique([user_id, post_id, comment_id])
   @@map("reactions")
 }
 

@@ -12,7 +12,6 @@ interface Props {
 }
 
 const PostItem = ({ className, data }: Props) => {
-  console.log(data);
   return (
     <div className={cn("post-item", className)}>
       {/* Header */}
