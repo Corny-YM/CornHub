@@ -1,8 +1,13 @@
+import { User } from "@prisma/client";
 import { GraduationCap, Home } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
-const InfoDetail = () => {
+interface Props {
+  data?: User | null;
+}
+
+const InfoDetail = ({ data }: Props) => {
   return (
     <div className="sticky top-0" style={{ position: "-webkit-sticky" }}>
       <div className="w-full h-full flex flex-col p-4 rounded-lg dark:bg-neutral-800 bg-gray-100">

@@ -126,7 +126,7 @@ const PostFooter = ({ data }: Props) => {
         onClick={handleClickReaction}
       >
         <div className="w-5 h-5 flex justify-center items-center mr-1">
-          <Icon />
+          {dataCurrentUserReaction ? <Icon /> : <ThumbsUp size={20} />}
         </div>
         <div className="font-medium">{label}</div>
       </Button>

@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import { useCallback } from "react";
-import { useRouter } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
 import { DoorOpen } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { SignOutButton, useUser } from "@clerk/nextjs";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -77,15 +77,18 @@ const UserButton = ({ className }: Props) => {
         </DropdownMenuItem>
 
         <DropdownMenuItem className={cn("cursor-pointer p-0", className)}>
-          <Button
-            className="w-full flex items-center justify-start px-2"
-            variant="ghost"
-          >
-            <div className="flex justify-center items-center w-9 h-9 overflow-hidden rounded-full mr-2">
-              <DoorOpen />
-            </div>
-            <div>Đăng xuất</div>
-          </Button>
+          <SignOutButton>
+            <Button
+              className="w-full flex items-center justify-start px-2"
+              variant="ghost"
+            >
+              <div className="flex justify-center items-center w-9 h-9 overflow-hidden rounded-full mr-2">
+                <DoorOpen />
+              </div>
+
+              <div>Đăng xuất</div>
+            </Button>
+          </SignOutButton>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

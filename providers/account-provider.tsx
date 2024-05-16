@@ -1,15 +1,20 @@
 "use client";
 
+import { useAuth } from "@clerk/nextjs";
+import { User } from "@prisma/client";
 import { usePathname } from "next/navigation";
-import { useState, useEffect, useContext, createContext } from "react";
+import { useState, useEffect, useContext, createContext, useMemo } from "react";
 
 interface Props {
   children: React.ReactNode;
+  accountData: User;
 }
 
 type Context = {
   tabs: Array<{ url: string; label: string }>;
   pathname?: string;
+  accountData: User;
+  isOwner: boolean;
 };
 
 const tabs = [
@@ -20,13 +25,22 @@ const tabs = [
   { url: "/videos", label: "Video" },
 ];
 
-const AccountContext = createContext<Context>({ tabs });
+const AccountContext = createContext<Context>({
+  tabs,
+  isOwner: false,
+  accountData: {} as User,
+});
 
-export const AccountProvider = ({ children }: Props) => {
+export const AccountProvider = ({ children, accountData }: Props) => {
   const pathname = usePathname();
+  const { userId } = useAuth();
+
+  const isOwner = useMemo(() => {
+    return userId === accountData.id;
+  }, [accountData]);
 
   return (
-    <AccountContext.Provider value={{ tabs, pathname }}>
+    <AccountContext.Provider value={{ tabs, pathname, accountData, isOwner }}>
       {children}
     </AccountContext.Provider>
   );
