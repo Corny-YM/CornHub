@@ -21,9 +21,15 @@ interface Props {
   icon: React.ReactNode;
   actions: IDropdownAction[];
   className?: string;
+  disabled?: boolean;
 }
 
-export const DropdownActions = ({ className, actions, icon }: Props) => {
+export const DropdownActions = ({
+  icon,
+  actions,
+  disabled,
+  className,
+}: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -32,6 +38,7 @@ export const DropdownActions = ({ className, actions, icon }: Props) => {
             "flex justify-center items-center rounded-full",
             className
           )}
+          disabled={disabled}
           variant="outline"
           size="icon"
         >

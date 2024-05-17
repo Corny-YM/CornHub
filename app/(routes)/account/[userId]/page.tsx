@@ -7,6 +7,8 @@ import { getPosts } from "@/actions/user";
 import { useAccountContext } from "@/providers/account-provider";
 import PostItem from "@/components/post";
 import Posting from "@/components/posting";
+import EmptyData from "@/components/empty-data";
+import Loading from "@/components/icons/loading";
 import InfoDetail from "@/components/pages/account/info-detail";
 
 interface Props {
@@ -22,8 +24,13 @@ const UserPage = ({ params }: Props) => {
   });
 
   const content = useMemo(() => {
-    if (isLoading) return null;
-    if (!dataPosts || !dataPosts.length) return <div></div>;
+    if (isLoading)
+      return (
+        <div className="w-full flex items-center justify-center">
+          <Loading />
+        </div>
+      );
+    if (!dataPosts || !dataPosts.length) return <EmptyData />;
     return dataPosts.map((post) => <PostItem key={post.id} data={post} />);
   }, [isLoading, dataPosts]);
 
@@ -40,7 +47,7 @@ const UserPage = ({ params }: Props) => {
         {isOwner && <Posting />}
 
         {/* List Posts */}
-        <div className="w-full flex flex-col mt-4">{content}</div>
+        <div className="w-full flex flex-col mb-4">{content}</div>
       </div>
     </div>
   );
