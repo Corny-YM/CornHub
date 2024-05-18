@@ -239,7 +239,7 @@ model FriendRequest {
 
 model Follower {
   id         Int      @id @default(autoincrement())
-  denied     Boolean  @default(false)
+  status     Boolean  @default(true) // true: follow - false: unfollow
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 

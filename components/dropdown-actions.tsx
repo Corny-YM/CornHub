@@ -14,6 +14,7 @@ export interface IDropdownAction {
   className?: string;
   icon?: React.ReactNode;
   destructive?: boolean;
+  disabled?: boolean;
   onClick?: (e: React.MouseEvent) => void;
 }
 
@@ -22,10 +23,12 @@ interface Props {
   actions: IDropdownAction[];
   className?: string;
   disabled?: boolean;
+  size?: "icon" | "default" | "sm" | "lg" | null;
 }
 
 export const DropdownActions = ({
   icon,
+  size = "icon",
   actions,
   disabled,
   className,
@@ -35,12 +38,13 @@ export const DropdownActions = ({
       <DropdownMenuTrigger asChild>
         <Button
           className={cn(
-            "flex justify-center items-center rounded-full",
+            "flex justify-center items-center",
+            size === "icon" && "rounded-full",
             className
           )}
           disabled={disabled}
           variant="outline"
-          size="icon"
+          size={size}
         >
           {icon}
         </Button>
@@ -50,7 +54,10 @@ export const DropdownActions = ({
         align="end"
       >
         {actions.map(
-          ({ icon, label, className, destructive, onClick }, index) => (
+          (
+            { icon, label, className, destructive, disabled, onClick },
+            index
+          ) => (
             <DropdownMenuItem
               key={index}
               className={cn(
@@ -58,6 +65,7 @@ export const DropdownActions = ({
                 destructive && "bg-rose-800 hover:!bg-rose-900",
                 className
               )}
+              disabled={disabled}
               onClick={onClick}
             >
               <div className="flex items-center justify-start w-full">

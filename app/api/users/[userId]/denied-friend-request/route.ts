@@ -16,26 +16,14 @@ export async function POST(
       return new NextResponse("Authenticated", { status: 401 });
     }
 
-    const friend = await prisma.friend.deleteMany({
-      where: {
-        OR: [
-          { friend_id: friendId, user_id: userId },
-          { friend_id: userId, user_id: friendId },
-        ],
-      },
-    });
-    await prisma.follower.deleteMany({
-      where: {
-        OR: [
-          { follower_id: friendId, user_id: userId },
-          { follower_id: userId, user_id: friendId },
-        ],
-      },
+    // remove the friend request
+    const res = await prisma.friendRequest.deleteMany({
+      where: { receiver_id: userId, sender_id: friendId },
     });
 
-    return NextResponse.json(friend);
+    return NextResponse.json(res);
   } catch (err) {
-    console.log("[USERS_UNFRIEND_POST]", err);
+    console.log("[USERS_DENIED_FRIEND_REQUEST_POST]", err);
     return new NextResponse("Internal error", { status: 500 });
   }
 }

@@ -1,42 +1,19 @@
 "use client";
 
 import Image from "next/image";
-import toast from "react-hot-toast";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { User } from "@prisma/client";
+import { Camera } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
-import {
-  UserX,
-  Pencil,
-  Camera,
-  BellOff,
-  UserPlus,
-  UserCheck,
-  MessageCircle,
-} from "lucide-react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
-import { ILucideIcon } from "@/types";
 import { formatAmounts } from "@/lib/utils";
+import { getFriends } from "@/actions/user";
 import { useAccountContext } from "@/providers/account-provider";
-import {
-  sendFriendRequest,
-  getFriends,
-  isAddedFriend,
-  unFriend,
-} from "@/actions/user";
 import { Button } from "@/components/ui/button";
 import NoAvatar from "@/public/no-avatar.jpg";
 import AvatarImg from "@/components/avatar-img";
-import DropdownActions from "@/components/dropdown-actions";
-
-interface IAction {
-  id: string;
-  label: string;
-  primary: boolean;
-  icon: ILucideIcon;
-  onClick?: () => void;
-}
+import InfoActions from "./info-actions";
 
 const Info = () => {
   const { userId } = useAuth();
@@ -48,52 +25,6 @@ const Info = () => {
     queryKey: ["account", "friends", accountData.id],
     queryFn: () => getFriends(accountData.id),
   });
-  const { data: dataFriendAdded } = useQuery({
-    enabled: !!accountData.id && !!userId,
-    queryKey: ["account", "friends", "added", userId, accountData.id],
-    queryFn: () =>
-      isAddedFriend({
-        userId: userId!,
-        friendId: accountData.id,
-      }),
-  });
-
-  // useMutation
-  const {
-    mutate: mutateSendFriendRequest,
-    isPending: isPendingSendFriendRequest,
-  } = useMutation({
-    mutationKey: ["account", "add-friend", userId, accountData.id],
-    mutationFn: sendFriendRequest,
-    onSuccess() {
-      toast.success(`Đã gửi yêu cầu kết bạn tới "${accountData.full_name}"`);
-    },
-    onError() {
-      toast.error("Gửi yêu cầu thất bại. Vui lòng thử lại sau");
-    },
-  });
-  const { mutate: mutateUnfriend, isPending: isPendingUnFriend } = useMutation({
-    mutationKey: ["account", "unfriend", userId, accountData.id],
-    mutationFn: unFriend,
-    onSuccess() {
-      toast.success(`Đã hủy kết bạn tới "${accountData.full_name}"`);
-    },
-    onError() {
-      toast.error("Hủy kết bạn thất bại. Vui lòng thử lại sau");
-    },
-  });
-
-  const handleClickSendFriendRequest = useCallback(() => {
-    console.log("add friend");
-    console.log(userId, accountData);
-    if (!userId || !accountData) return;
-    mutateSendFriendRequest({ userId, friendId: accountData.id });
-  }, [userId, accountData]);
-  const handleClickUnfriend = useCallback(() => {
-    if (!dataFriendAdded || !userId || !accountData) return;
-    mutateUnfriend({ userId, friendId: accountData.id });
-  }, [userId, accountData, dataFriendAdded]);
-  const handleClickUnFollow = useCallback(() => {}, []);
 
   const totalFriends = useMemo(() => {
     if (!dataFriends) return 0;
@@ -119,32 +50,6 @@ const Info = () => {
       </div>
     ));
   }, [dataFriends, isLoadingFriends, accountFriends]);
-
-  const btnActions = useMemo(() => {
-    const actions = isOwner
-      ? [{ id: "edit", label: "Chỉnh sửa trang cá nhân", icon: Pencil }]
-      : [
-          {
-            id: dataFriendAdded ? "friend" : "stranger",
-            label: dataFriendAdded ? "Bạn bè" : "Thêm bạn bè",
-            icon: dataFriendAdded ? UserCheck : UserPlus,
-            disabled: dataFriendAdded ? false : isPendingSendFriendRequest,
-            onClick: handleClickSendFriendRequest,
-          },
-          {
-            id: "message",
-            label: "Nhắn tin",
-            icon: MessageCircle,
-            primary: !!dataFriendAdded,
-          },
-        ];
-    return actions as IAction[];
-  }, [
-    isOwner,
-    dataFriendAdded,
-    isPendingSendFriendRequest,
-    handleClickSendFriendRequest,
-  ]);
 
   return (
     <div className="w-full relative flex items-center px-4">
@@ -181,44 +86,7 @@ const Info = () => {
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-x-1">
-        {btnActions.map(({ id, label, primary, icon: Icon, onClick }) => {
-          if (id !== "friend")
-            return (
-              <Button
-                key={id}
-                variant={primary ? "default" : "outline"}
-                onClick={onClick}
-              >
-                <Icon className="mr-2" size={20} />
-                {label}
-              </Button>
-            );
-          return (
-            <DropdownActions
-              icon={
-                <>
-                  <Icon className="mr-2" size={20} />
-                  {label}
-                </>
-              }
-              actions={[
-                {
-                  label: "Bỏ theo dõi",
-                  icon: <BellOff className="mr-2" size={20} />,
-                  onClick: handleClickUnFollow,
-                },
-                {
-                  label: "Hủy kết bạn",
-                  destructive: true,
-                  icon: <UserX className="mr-2" size={20} />,
-                  onClick: handleClickUnfriend,
-                },
-              ]}
-            />
-          );
-        })}
-      </div>
+      <InfoActions />
     </div>
   );
 };

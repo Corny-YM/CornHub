@@ -3,7 +3,10 @@ import { auth } from "@clerk/nextjs/server";
 
 import prisma from "@/lib/prisma";
 
-export async function POST(req: Request, params: { userId: string }) {
+export async function POST(
+  req: Request,
+  { params }: { params: { userId: string } }
+) {
   try {
     const body = await req.json();
     const { userId } = auth();
@@ -24,6 +27,11 @@ export async function POST(req: Request, params: { userId: string }) {
     });
     await prisma.follower.create({
       data: { user_id: friendId, follower_id: userId },
+    });
+
+    // remove the friend request
+    await prisma.friendRequest.deleteMany({
+      where: { receiver_id: userId, sender_id: friendId },
     });
 
     return NextResponse.json(friend);
