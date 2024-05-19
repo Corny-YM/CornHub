@@ -4,25 +4,31 @@ import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 
 import { cn, isUndefined } from "@/lib/utils";
-import { useAccountContext } from "@/providers/account-provider";
 import { Button } from "@/components/ui/button";
+import { useAccountContext } from "@/providers/account-provider";
+
+const tabs = [
+  { url: "/", label: "Tất cả bạn bè" },
+  { url: "/followers", label: "Người theo dõi" },
+  { url: "/following", label: "Đang theo dõi" },
+];
 
 const Tabs = () => {
   const router = useRouter();
-  const { tabs, pathname, accountData } = useAccountContext();
+  const { accountData, pathname } = useAccountContext();
 
   const handleClickTab = useCallback(
     (e: React.MouseEvent) => {
       const target = e.currentTarget as HTMLButtonElement;
       const url = target.dataset.url;
       if (isUndefined(url) || !accountData.id) return;
-      router.push(`/account/${accountData.id}/${url}`);
+      router.push(`/account/${accountData.id}/friends/${url}`);
     },
-    [router, accountData.id]
+    [router, accountData]
   );
   const hasSelected = useCallback(
     (url: string) => {
-      const isRoot = pathname?.split("/")?.length === 3;
+      const isRoot = pathname?.split("/")?.length === 4;
       if (url === "/") return isRoot;
       return pathname?.includes(url);
     },
@@ -36,7 +42,7 @@ const Tabs = () => {
           key={url}
           data-url={url}
           className={cn(
-            "transition ",
+            "transition hover:bg-primary/50",
             hasSelected(url) &&
               "bg-primary/50 dark:hover:bg-primary/20 hover:bg-primary/70"
           )}

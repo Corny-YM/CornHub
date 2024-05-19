@@ -1,9 +1,12 @@
 "use client";
 
 import { useAuth } from "@clerk/nextjs";
-import { User } from "@prisma/client";
 import { usePathname } from "next/navigation";
-import { useState, useEffect, useContext, createContext, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useContext, createContext, useMemo } from "react";
+import { Follower, User } from "@prisma/client";
+
+import { getStatusFollowers } from "@/actions/user";
 
 interface Props {
   children: React.ReactNode;
@@ -15,6 +18,9 @@ type Context = {
   pathname?: string;
   accountData: User;
   isOwner: boolean;
+  isLoadingStatusFollowers: boolean;
+  refetchStatusFollowers: () => void;
+  statusFollowers: Follower[];
 };
 
 const tabs = [
@@ -29,6 +35,9 @@ const AccountContext = createContext<Context>({
   tabs,
   isOwner: false,
   accountData: {} as User,
+  isLoadingStatusFollowers: false,
+  refetchStatusFollowers: () => {},
+  statusFollowers: [],
 });
 
 export const AccountProvider = ({ children, accountData }: Props) => {
@@ -39,8 +48,31 @@ export const AccountProvider = ({ children, accountData }: Props) => {
     return userId === accountData.id;
   }, [accountData]);
 
+  // If is owner account page =>
+  // 1. take all User follow the CurrentUser
+  // 2. take all User that the CurrentUser following
+  const {
+    data: statusFollowers,
+    isLoading: isLoadingStatusFollowers,
+    refetch: refetchStatusFollowers,
+  } = useQuery({
+    enabled: isOwner && !!accountData.id,
+    queryKey: ["account", "status", "followers", accountData.id],
+    queryFn: () => getStatusFollowers(accountData.id),
+  });
+
   return (
-    <AccountContext.Provider value={{ tabs, pathname, accountData, isOwner }}>
+    <AccountContext.Provider
+      value={{
+        tabs,
+        pathname,
+        accountData,
+        isOwner,
+        isLoadingStatusFollowers,
+        statusFollowers: statusFollowers || [],
+        refetchStatusFollowers,
+      }}
+    >
       {children}
     </AccountContext.Provider>
   );

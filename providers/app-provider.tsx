@@ -73,6 +73,7 @@ export const AppProvider = ({ children }: Props) => {
     });
   }, []);
 
+  if (!user) return null;
   return (
     <AppContext.Provider value={{ currentUser, toastFeatureUpdating }}>
       <QueryClientProvider client={queryClient}>

@@ -1,4 +1,4 @@
-import { Friend, Group, Post, User } from "@prisma/client";
+import { Follower, Friend, Group, Post, User } from "@prisma/client";
 
 import defHttp from "@/lib/defHttp";
 
@@ -20,9 +20,37 @@ export const getPosts = async (
   defHttp.get(`${indexApi}/${userId}/posts`);
 
 export const getFriends = async (
-  userId: string
-): Promise<(Friend & { user: User; friend: User })[]> =>
-  defHttp.get(`${indexApi}/${userId}/friends`);
+  userId: string,
+  params?: any
+): Promise<{
+  friends: (Friend & { user: User; friend: User })[];
+  totalFriends: number;
+}> =>
+  defHttp.get(`${indexApi}/${userId}/friends`, {
+    params,
+  });
+
+export const getFollowing = async (
+  userId: string,
+  params?: any
+): Promise<(Follower & { user: User; follower: User })[]> =>
+  defHttp.get(`${indexApi}/${userId}/following`, {
+    params,
+  });
+
+export const getFollowers = async (
+  userId: string,
+  params?: any
+): Promise<(Follower & { user: User; follower: User })[]> =>
+  defHttp.get(`${indexApi}/${userId}/followers`, {
+    params,
+  });
+
+export const getStatusFollowers = async (
+  userId: string,
+  params?: any
+): Promise<Follower[]> =>
+  defHttp.get(`${indexApi}/${userId}/status-followers`, { params });
 
 export const isAddedFriend = async ({
   userId,

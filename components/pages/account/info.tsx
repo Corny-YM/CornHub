@@ -4,50 +4,50 @@ import Image from "next/image";
 import { useMemo } from "react";
 import { User } from "@prisma/client";
 import { Camera } from "lucide-react";
-import { useAuth } from "@clerk/nextjs";
 import { useQuery } from "@tanstack/react-query";
 
-import { formatAmounts } from "@/lib/utils";
 import { getFriends } from "@/actions/user";
 import { useAccountContext } from "@/providers/account-provider";
 import { Button } from "@/components/ui/button";
 import NoAvatar from "@/public/no-avatar.jpg";
 import AvatarImg from "@/components/avatar-img";
 import InfoActions from "./info-actions";
+import Link from "next/link";
 
 const Info = () => {
-  const { userId } = useAuth();
   const { accountData, isOwner } = useAccountContext();
 
   // useQuery
   const { data: dataFriends, isLoading: isLoadingFriends } = useQuery({
     enabled: !!accountData.id,
     queryKey: ["account", "friends", accountData.id],
-    queryFn: () => getFriends(accountData.id),
+    queryFn: () => getFriends(accountData.id, { limit: 5 }),
   });
 
-  const totalFriends = useMemo(() => {
-    if (!dataFriends) return 0;
-    return formatAmounts(dataFriends.length);
-  }, [dataFriends]);
-
   const accountFriends = useMemo(() => {
-    if (!dataFriends) return [];
+    if (!dataFriends || !dataFriends.friends) return [];
     const arrFriends: User[] = [];
-    dataFriends.forEach((item) => {
-      if (item.friend_id !== userId) arrFriends.push(item.friend);
+    dataFriends.friends.forEach((item) => {
+      if (item.friend_id !== accountData.id) arrFriends.push(item.friend);
       else arrFriends.push(item.user);
     });
     return arrFriends;
-  }, [dataFriends, userId]);
+  }, [dataFriends, accountData]);
 
   const accountFriendsContent = useMemo(() => {
     if (isLoadingFriends) return null;
-    if (!dataFriends || !dataFriends.length) return <div className="h-8" />;
+    if (!dataFriends || !dataFriends.friends || !dataFriends.friends?.length)
+      return <div className="h-8" />;
     return accountFriends.map(({ id, full_name, avatar }, index) => (
-      <div key={id} className="friends-icon" style={{ zIndex: length - index }}>
+      <Link
+        key={id}
+        className="friends-icon"
+        target="_blank"
+        href={`/account/${id}`}
+        style={{ zIndex: length - index }}
+      >
         <AvatarImg src={avatar} alt={full_name} />
-      </div>
+      </Link>
     ));
   }, [dataFriends, isLoadingFriends, accountFriends]);
 
@@ -75,11 +75,14 @@ const Info = () => {
       {/* Friends */}
       <div className="flex-1 h-full flex flex-col justify-center pt-6 pb-4">
         <div className="text-2xl font-semibold">{accountData.full_name}</div>
-        {!!totalFriends && (
+        {!!dataFriends?.totalFriends && (
           <div>
-            <a className="hover:underline w-fit" href="#">
-              {totalFriends} bạn bè
-            </a>
+            <Link
+              className="hover:underline w-fit"
+              href={`/account/${accountData.id}/friends`}
+            >
+              {dataFriends?.totalFriends} bạn bè
+            </Link>
           </div>
         )}
         <div className="w-full flex items-center">{accountFriendsContent}</div>
