@@ -145,34 +145,34 @@ const InfoActions = () => {
   const handleSendFriendRequest = useCallback(() => {
     if (!userId || !accountData) return;
     mutateSendFriendRequest({ userId, friendId: accountData.id });
-  }, [userId, accountData]);
+  }, [userId, accountData, mutateSendFriendRequest]);
 
   const handleAcceptFriendRequest = useCallback(() => {
     if (!userId || !accountData) return;
     mutateAcceptFriendRequest({ userId, friendId: accountData.id });
-  }, [userId, accountData]);
+  }, [userId, accountData, mutateAcceptFriendRequest]);
 
   const handleDeniedFriendRequest = useCallback(() => {
     if (!userId || !accountData) return;
     mutateDeniedFriendRequest({ userId, friendId: accountData.id });
-  }, [userId, accountData]);
+  }, [userId, accountData, mutateDeniedFriendRequest]);
 
   const handleRemoveFriendRequest = useCallback(() => {}, []);
 
   const handleUnfriend = useCallback(() => {
     if (!dataFriendStatus?.friend || !userId || !accountData) return;
     mutateUnfriend({ userId, friendId: accountData.id });
-  }, [userId, accountData, dataFriendStatus]);
+  }, [userId, accountData, dataFriendStatus, mutateUnfriend]);
 
   const handleFollowing = useCallback(() => {
     if (!userId || !accountData) return;
     mutateFollowing({ userId, followerId: accountData.id });
-  }, [userId, accountData]);
+  }, [userId, accountData, mutateFollowing]);
 
   const handleUnfollow = useCallback(() => {
     if (!userId || !accountData) return;
     mutateUnFollow({ userId, followerId: accountData.id });
-  }, [userId, accountData]);
+  }, [userId, accountData, mutateUnFollow]);
 
   // useMemo
   const btnActions = useMemo(() => {
@@ -302,6 +302,7 @@ const InfoActions = () => {
         }
         return (
           <DropdownActions
+            key={res.id}
             icon={
               <>
                 <Icon className="mr-2" size={20} />

@@ -24,12 +24,15 @@ const UserButton = ({ className }: Props) => {
 
   const { user } = useUser();
 
-  const handleClick = useCallback((e: React.MouseEvent) => {
-    const target = e.currentTarget as HTMLDivElement;
-    const url = target.dataset.url;
-    if (!url) return;
-    router.push(url);
-  }, []);
+  const handleClick = useCallback(
+    (e: React.MouseEvent) => {
+      const target = e.currentTarget as HTMLDivElement;
+      const url = target.dataset.url;
+      if (!url) return;
+      router.push(url);
+    },
+    [router]
+  );
 
   if (!user) return;
   return (

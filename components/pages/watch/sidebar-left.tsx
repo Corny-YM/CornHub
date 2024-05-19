@@ -25,7 +25,7 @@ const SidebarLeft = () => {
       if (isUndefined(url)) return;
       router.push(`/watch/${url}`);
     },
-    [router, pathname]
+    [router]
   );
   const hasSelected = useCallback(
     (url: string) => {

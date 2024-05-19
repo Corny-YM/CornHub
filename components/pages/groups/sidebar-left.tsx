@@ -24,7 +24,7 @@ const SidebarLeft = () => {
       if (!url) return;
       router.push(`/groups/${url}`);
     },
-    [router, pathname]
+    [router]
   );
 
   return (

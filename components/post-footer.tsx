@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 import { useCallback, useMemo } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -9,6 +10,7 @@ import {
   countReactions,
   getCurrentUserReaction,
 } from "@/actions/post";
+import { destroy, store } from "@/actions/reactions";
 import { cn, formatAmounts, getRandomItems } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -20,8 +22,6 @@ import Smile from "@/components/icons/smile";
 import Wow from "@/components/icons/wow";
 import Sad from "@/components/icons/sad";
 import Angry from "@/components/icons/angry";
-import { destroy, store } from "@/actions/reactions";
-import toast from "react-hot-toast";
 
 interface Props {
   data: Post & { user: User; group: Group | null };
@@ -100,7 +100,7 @@ const PostFooter = ({ data }: Props) => {
         user_id: userId,
       });
     },
-    [id, userId]
+    [id, userId, mutateStoreReaction]
   );
 
   const handleClickReaction = useCallback(() => {
@@ -111,7 +111,7 @@ const PostFooter = ({ data }: Props) => {
       post_id: id,
       user_id: userId,
     });
-  }, [id, dataCurrentUserReaction]);
+  }, [id, userId, dataCurrentUserReaction, mutateStoreReaction]);
 
   const button = useMemo(() => {
     const typeBtn = dataCurrentUserReaction?.type;
@@ -135,6 +135,7 @@ const PostFooter = ({ data }: Props) => {
     isPendingStoreReaction,
     isPendingDeleteReaction,
     dataCurrentUserReaction,
+    handleClickReaction,
   ]);
 
   return (

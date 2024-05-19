@@ -1,11 +1,15 @@
 "use client";
 
+import toast from "react-hot-toast";
+import { useMutation } from "@tanstack/react-query";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { Earth, Film, ImagePlus, Lock, UsersRound } from "lucide-react";
+import { Earth, ImagePlus, Lock, UsersRound } from "lucide-react";
 
-import SelectActions, { ISelectAction } from "@/components/select-actions";
+import { store } from "@/actions/post";
 import { useAppContext } from "@/providers/app-provider";
 import { Button } from "@/components/ui/button";
+import CustomEditor from "@/components/custom-editor";
+import SelectActions, { ISelectAction } from "@/components/select-actions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Dialog,
@@ -14,10 +18,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import CustomEditor from "@/components/custom-editor";
-import { useMutation } from "@tanstack/react-query";
-import { store } from "@/actions/post";
-import toast from "react-hot-toast";
 
 interface Props {
   open: boolean;
@@ -98,12 +98,12 @@ const PostingModal = ({ open, toggleOpen }: Props) => {
       if (isDirty) return;
       toggleOpen(open);
     },
-    [isDirty]
+    [isDirty, toggleOpen]
   );
   const handleStorePost = useCallback(() => {
     if (!currentUser) return;
     mutate({ content, status, file, userId: currentUser.id });
-  }, [content, status, file, currentUser]);
+  }, [content, status, file, currentUser, mutate]);
 
   const userName = useMemo(() => {
     if (!currentUser) return;
@@ -132,7 +132,7 @@ const PostingModal = ({ open, toggleOpen }: Props) => {
         </div>
       </div>
     );
-  }, [currentUser, userName]);
+  }, [currentUser, userName, handleChangeSelect]);
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>

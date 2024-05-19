@@ -9,21 +9,9 @@ import { cn } from "@/lib/utils";
 interface Props {}
 
 const items = [
-  {
-    id: "home",
-    url: "/",
-    icon: Warehouse,
-  },
-  {
-    id: "watch",
-    url: "/watch",
-    icon: MonitorPlay,
-  },
-  {
-    id: "groups",
-    url: "/groups",
-    icon: UsersRound,
-  },
+  { id: "home", url: "/", icon: Warehouse },
+  { id: "watch", url: "/watch", icon: MonitorPlay },
+  { id: "groups", url: "/groups", icon: UsersRound },
 ];
 
 const MenuItems = ({}: Props) => {
@@ -40,7 +28,7 @@ const MenuItems = ({}: Props) => {
       (item) => item.url !== "/" && pathname.includes(item.url)
     );
     return result ? result.id : pathname === "/" ? "home" : "";
-  }, [items, mounted]);
+  }, [mounted]);
 
   const handleClick = useCallback(
     (e: React.MouseEvent) => {

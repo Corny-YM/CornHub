@@ -17,11 +17,14 @@ const Posting = () => {
 
   const handleClickLiveStream = useCallback(() => {
     toastFeatureUpdating();
-  }, []);
-  const handleClickUpload = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    toggleModalEditor(true);
-  }, []);
+  }, [toastFeatureUpdating]);
+  const handleClickUpload = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      toggleModalEditor(true);
+    },
+    [toggleModalEditor]
+  );
 
   return (
     <div className="w-full flex justify-center items-center">

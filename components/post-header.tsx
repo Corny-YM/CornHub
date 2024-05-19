@@ -1,20 +1,20 @@
-import { useMemo } from "react";
 import {
+  X,
+  UserX,
+  Pencil,
+  Trash2,
   BellOff,
   Ellipsis,
-  MessageSquareWarning,
-  Pencil,
   ShieldAlert,
-  Trash2,
-  UserX,
-  X,
+  MessageSquareWarning,
 } from "lucide-react";
+import { useMemo } from "react";
+import { useAuth } from "@clerk/nextjs";
 import { Group, Post, User } from "@prisma/client";
 
 import { cn, getRelativeTime } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import AvatarImg from "@/components/avatar-img";
-import { useAuth } from "@clerk/nextjs";
 import DropdownActions from "./dropdown-actions";
 
 interface Props {
@@ -25,17 +25,17 @@ const PostHeader = ({ data }: Props) => {
   const { userId } = useAuth();
   const { id, user, group, group_id, created_at } = data;
 
-  const isOwner = useMemo(() => userId === user.id, [data, userId]);
+  const isOwner = useMemo(() => userId === user.id, [user, userId]);
 
   const avatar = useMemo(() => {
     if (group_id && group) return group.cover;
     return user.avatar;
-  }, [data]);
+  }, [group_id, group, user]);
 
   const name = useMemo(() => {
     if (!group_id || !group) return user.full_name;
     return group.group_name;
-  }, [data]);
+  }, [group_id, group, user]);
 
   const actions = useMemo(() => {
     const groupActions = [];
@@ -79,7 +79,7 @@ const PostHeader = ({ data }: Props) => {
     }
 
     return [...groupActions, ...userActions];
-  }, [data, isOwner]);
+  }, [group_id, group, user, isOwner]);
 
   return (
     <div className="flex w-full items-center px-4 pt-3 mb-3">

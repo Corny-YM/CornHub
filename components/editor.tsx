@@ -12,10 +12,13 @@ const Editor = ({ data, placeholder, onChange }: Props) => {
   const handleReady = useCallback((e: any) => {
     // console.log(e);
   }, []);
-  const handleChange = useCallback((e: any, editor: EditorBuild) => {
-    const data = editor.getData();
-    onChange?.(data);
-  }, []);
+  const handleChange = useCallback(
+    (event: any, editor: any) => {
+      const data = editor.getData();
+      onChange?.(data);
+    },
+    [onChange]
+  );
 
   return (
     <div className="flex items-center flex-shrink flex-grow">

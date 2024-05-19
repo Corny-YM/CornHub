@@ -71,24 +71,24 @@ const CardInfo = ({ data, accountId, queryKey }: Props) => {
   const handleFollowing = useCallback(() => {
     if (!userId) return;
     mutateFollowing({ userId, followerId: id });
-  }, [userId]);
+  }, [id, userId, mutateFollowing]);
 
   const handleUnfollow = useCallback(() => {
     if (!userId) return;
     mutateUnFollow({ userId, followerId: id });
-  }, [id, userId]);
+  }, [id, userId, mutateUnFollow]);
 
   const handleUnfriend = useCallback(() => {
     if (!userId) return;
     mutateUnfriend({ userId, friendId: id });
-  }, [id, userId]);
+  }, [id, userId, mutateUnfriend]);
 
   const followStatus = useMemo(() => {
     const status = statusFollowers.find(
       ({ follower_id, user_id }) => follower_id === accountId && user_id === id
     );
     return status;
-  }, [data, accountId, statusFollowers]);
+  }, [id, accountId, statusFollowers]);
 
   const actions = useMemo(() => {
     if (!isOwner) return [];

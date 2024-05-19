@@ -1,39 +1,30 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useMemo } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import { useCallback, useMemo } from "react";
 import { Contact, MonitorPlay, UsersRound } from "lucide-react";
 
 const actions = [
-  {
-    url: "/friends",
-    label: "Bạn bè",
-    icon: Contact,
-  },
-  {
-    url: "/groups",
-    label: "Nhóm",
-    icon: UsersRound,
-  },
-  {
-    url: "/watch",
-    label: "Video",
-    icon: MonitorPlay,
-  },
+  { url: "/friends", label: "Bạn bè", icon: Contact },
+  { url: "/groups", label: "Nhóm", icon: UsersRound },
+  { url: "/watch", label: "Video", icon: MonitorPlay },
 ];
 
 const UserActions = () => {
   const router = useRouter();
   const { user } = useUser();
 
-  const handleClick = useCallback((e: React.MouseEvent) => {
-    const target = e.currentTarget as HTMLDivElement;
-    const url = target.dataset.url;
-    if (!url) return;
-    router.push(url);
-  }, []);
+  const handleClick = useCallback(
+    (e: React.MouseEvent) => {
+      const target = e.currentTarget as HTMLDivElement;
+      const url = target.dataset.url;
+      if (!url) return;
+      router.push(url);
+    },
+    [router]
+  );
 
   const userInfo = useMemo(() => {
     if (!user) return null;
@@ -57,7 +48,7 @@ const UserActions = () => {
         </div>
       </div>
     );
-  }, [user]);
+  }, [user, handleClick]);
 
   const content = useMemo(
     () =>
@@ -75,7 +66,7 @@ const UserActions = () => {
           </div>
         </div>
       )),
-    [actions]
+    [handleClick]
   );
 
   return (

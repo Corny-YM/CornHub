@@ -8,11 +8,11 @@ const GroupFeed = () => {
 
         {/* List Posts */}
         <div className="w-full flex flex-col mt-4">
+          {/* <PostItem />
           <PostItem />
           <PostItem />
           <PostItem />
-          <PostItem />
-          <PostItem />
+          <PostItem /> */}
         </div>
       </div>
     </div>
