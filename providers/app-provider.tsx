@@ -73,7 +73,7 @@ export const AppProvider = ({ children }: Props) => {
     });
   }, []);
 
-  if (!user) return null;
+  // if (!user) return null; // this bull-shit make me tired
   return (
     <AppContext.Provider value={{ currentUser, toastFeatureUpdating }}>
       <QueryClientProvider client={queryClient}>

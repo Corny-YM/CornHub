@@ -22,7 +22,7 @@
     "@radix-ui/react-tooltip": "^1.0.7",
     "@tanstack/react-query": "^5.35.5",
     "axios": "^1.6.8",
-    "ckeditor5-custom-build": "file:ckeditor5",
+    "ckeditor5-custom-build": "file:./ckeditor5",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.376.0",
