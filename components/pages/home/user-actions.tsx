@@ -5,6 +5,7 @@ import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
 import { Contact, MonitorPlay, UsersRound } from "lucide-react";
+import Link from "next/link";
 
 const actions = [
   { url: "/friends", label: "Bạn bè", icon: Contact },
@@ -30,10 +31,9 @@ const UserActions = () => {
     if (!user) return null;
     return (
       <div className="px-2 flex justify-center items-center">
-        <div
-          className="w-full flex items-center px-2 rounded-md transition select-none cursor-pointer dark:hover:bg-primary/20 hover:bg-primary/70"
-          data-url={`/account/${user.id}`}
-          onClick={handleClick}
+        <Link
+          href={`/account/${user.id}`}
+          className="w-full flex items-center px-2 rounded-md transition select-none cursor-pointer dark:hover:bg-primary/20 hover:bg-primary/70 text-inherit hover:no-underline"
         >
           <div className="relative flex justify-center items-center w-9 h-9 my-2 mr-3 overflow-hidden rounded-full">
             <Image
@@ -45,7 +45,7 @@ const UserActions = () => {
             />
           </div>
           <div className="font-semibold">{user.fullName || "---"}</div>
-        </div>
+        </Link>
       </div>
     );
   }, [user, handleClick]);

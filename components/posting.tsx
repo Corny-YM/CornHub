@@ -9,8 +9,13 @@ import { useAppContext } from "@/providers/app-provider";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import PostingModal from "@/components/posting-modal";
+import { cn } from "@/lib/utils";
 
-const Posting = () => {
+interface Props {
+  className?: string;
+}
+
+const Posting = ({ className }: Props) => {
   const { currentUser, toastFeatureUpdating } = useAppContext();
 
   const [modalEditor, toggleModalEditor] = useToggle(false);
@@ -27,7 +32,7 @@ const Posting = () => {
   );
 
   return (
-    <div className="w-full flex justify-center items-center">
+    <div className={cn("w-full flex justify-center items-center", className)}>
       <div className="w-full flex flex-col justify-center items-center px-4 py-3 overflow-hidden rounded-lg dark:bg-neutral-800 bg-[#f0f2f5]">
         <div className="w-full flex items-center">
           {/* User Info */}

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Search } from "lucide-react";
+import { Bell, Search, Send } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -29,7 +29,7 @@ const Header = () => {
 
         {/* Search bar */}
         <Button
-          className="rounded-full cursor-pointer"
+          className="rounded-full cursor-pointer hover:bg-primary/50"
           variant="outline"
           size="icon"
         >
@@ -42,19 +42,21 @@ const Header = () => {
 
       {/* More */}
       <div className="flex items-center gap-2 h-full">
-        <ToggleMode />
+        <ToggleMode className="hover:bg-primary/50" />
         <Button
-          className="flex justify-center items-center w-10 h-10 p-2 rounded-full outline-none"
+          className="z-50 flex justify-center items-center w-10 h-10 p-2 rounded-full outline-none hover:bg-primary/50"
           variant="outline"
           size="icon"
         >
+          {/* <Send /> */}
           <Message />
         </Button>
         <Button
-          className="flex justify-center items-center w-10 h-10 p-2 rounded-full outline-none"
+          className="z-50 flex justify-center items-center w-10 h-10 p-2 rounded-full outline-none hover:bg-primary/50"
           variant="outline"
           size="icon"
         >
+          {/* <Bell /> */}
           <Notification />
         </Button>
         <UserButton />

@@ -1,9 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import Image from "next/image";
-import { Friend, User } from "@prisma/client";
 import { useAuth } from "@clerk/nextjs";
-import { useMemo } from "react";
+import { Friend, User } from "@prisma/client";
 
 interface Props {
   friends: (Friend & { user: User; friend: User })[];
@@ -27,7 +27,10 @@ const ListFriends = ({ friends }: Props) => {
             key={id}
             className="px-2 flex justify-center items-center min-h-11"
           >
-            <div className="w-full flex items-center px-2 rounded-md transition select-none cursor-pointer dark:hover:bg-primary/20 hover:bg-primary/70">
+            <Link
+              className="w-full flex items-center px-2 rounded-md transition select-none cursor-pointer dark:hover:bg-primary/20 hover:bg-primary/70"
+              href={`/account/${person.id}`}
+            >
               <div className="relative flex justify-center items-center w-9 h-9 my-2 mr-3 overflow-hidden rounded-full">
                 <Image
                   className="absolute w-full h-full aspect-square"
@@ -40,7 +43,7 @@ const ListFriends = ({ friends }: Props) => {
               <div className="font-semibold line-clamp-2 py-3 text-sm">
                 {person.full_name || "---"}
               </div>
-            </div>
+            </Link>
           </div>
         );
       })}

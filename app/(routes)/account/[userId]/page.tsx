@@ -44,10 +44,10 @@ const UserPage = ({ params }: Props) => {
 
       {/* Posts */}
       <div className="flex-1 flex flex-col ml-4">
-        {isOwner && <Posting />}
+        {isOwner && <Posting className="mb-4" />}
 
         {/* List Posts */}
-        <div className="w-full flex flex-col mb-4">{content}</div>
+        <div className="w-full flex flex-col">{content}</div>
       </div>
     </div>
   );

@@ -16,6 +16,7 @@ import { cn, getRelativeTime } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import AvatarImg from "@/components/avatar-img";
 import DropdownActions from "./dropdown-actions";
+import Link from "next/link";
 
 interface Props {
   data: Post & { user: User; group: Group | null };
@@ -26,6 +27,11 @@ const PostHeader = ({ data }: Props) => {
   const { id, user, group, group_id, created_at } = data;
 
   const isOwner = useMemo(() => userId === user.id, [user, userId]);
+
+  const href = useMemo(() => {
+    if (!group_id || !group) return `/account/${user.id}`;
+    return `/group/${group.id}`;
+  }, [user, group, group_id]);
 
   const avatar = useMemo(() => {
     if (group_id && group) return group.cover;
@@ -85,23 +91,29 @@ const PostHeader = ({ data }: Props) => {
     <div className="flex w-full items-center px-4 pt-3 mb-3">
       {/* Image */}
       <div className="relative flex justify-center items-center">
-        <div className="relative flex justify-center items-center w-9 h-9 rounded-lg overflow-hidden">
+        <Link
+          className="relative flex justify-center items-center w-9 h-9 rounded-lg overflow-hidden"
+          href={href}
+        >
           <AvatarImg
             className="absolute w-full h-full"
             src={avatar}
             alt={`post-avatar-${id}`}
           />
-        </div>
+        </Link>
         {group_id && (
           <div className="absolute -bottom-1 -right-2 flex justify-center items-center">
-            <div className="relative w-7 h-7 flex justify-center items-center rounded-full overflow-hidden border-slate-800 border border-solid shadow-lg">
+            <Link
+              className="relative w-7 h-7 flex justify-center items-center rounded-full overflow-hidden border-slate-800 border border-solid shadow-lg"
+              href={`/account/${user.id}`}
+            >
               <AvatarImg
                 className="absolute w-full h-full"
                 src={user.avatar}
                 alt={user.full_name}
                 fallback={user.first_name?.[0]}
               />
-            </div>
+            </Link>
           </div>
         )}
       </div>
@@ -113,13 +125,17 @@ const PostHeader = ({ data }: Props) => {
           group_id ? "mx-5" : "ml-2 mr-5"
         )}
       >
-        <div className="flex-1 text-sm">
-          <div className="font-semibold">{name}</div>
+        <div className="flex-1 text-sm line-clamp-1">
+          <Link className="font-semibold w-fit" href={href}>
+            {name}
+          </Link>
         </div>
         <div className="flex items-center flex-1 text-xs">
           {group && (
             <>
-              <div className="">{user.full_name}</div>
+              <Link className="" href={`/account/${user.id}`}>
+                {user.full_name}
+              </Link>
               <div className="mx-2">•</div>
             </>
           )}
@@ -134,7 +150,7 @@ const PostHeader = ({ data }: Props) => {
           actions={actions}
           icon={<Ellipsis size={20} />}
         />
-        {!isOwner && (
+        {isOwner && (
           <Button
             className="rounded-full hover:bg-primary/50"
             variant="outline"
