@@ -38,8 +38,11 @@ yarn-error.log*
 next-env.d.ts
 
 # dependencies
-package-lock.json
 yarn.lock
+pnpm-lock.yaml
+package-lock.json
 
-/ckeditor5/package-lock.json
 /ckeditor5/yarn.lock
+/ckeditor5/pnpm-lock.yaml
+/ckeditor5/package-lock.json
+
