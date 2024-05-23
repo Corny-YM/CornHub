@@ -103,7 +103,7 @@ export const following = async ({
 }: {
   userId: string;
   followerId: string;
-}): Promise<Friend> =>
+}): Promise<Follower> =>
   defHttp.post(`${indexApi}/${userId}/following`, { followerId });
 
 export const unfollow = async ({
@@ -112,5 +112,5 @@ export const unfollow = async ({
 }: {
   userId: string;
   followerId: string;
-}): Promise<Friend> =>
+}): Promise<Follower> =>
   defHttp.post(`${indexApi}/${userId}/unfollow`, { followerId });

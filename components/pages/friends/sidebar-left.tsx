@@ -1,11 +1,12 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { useFriendContext } from "@/providers/friends-provider";
-import { Contact, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { useCallback } from "react";
+import { Contact, UserPlus } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+import { useFriendContext } from "@/providers/friends-provider";
+import { Button } from "@/components/ui/button";
 
 const actions = [
   { label: "Danh sách bạn bè", url: "", icon: Contact },

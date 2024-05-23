@@ -16,9 +16,13 @@ export async function POST(
       return new NextResponse("Authenticated", { status: 401 });
     }
 
-    const follower = await prisma.follower.updateMany({
+    await prisma.follower.updateMany({
       where: { follower_id: userId, user_id: followerId },
       data: { status: false },
+    });
+
+    const follower = await prisma.follower.findFirst({
+      where: { follower_id: userId, user_id: followerId },
     });
 
     return NextResponse.json(follower);
