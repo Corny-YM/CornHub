@@ -1,9 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import Image from "next/image";
-import { useCallback } from "react";
 import { DoorOpen } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { SignOutButton, useUser } from "@clerk/nextjs";
 
 import { cn } from "@/lib/utils";
@@ -20,19 +19,7 @@ interface Props {
 }
 
 const UserButton = ({ className }: Props) => {
-  const router = useRouter();
-
   const { user } = useUser();
-
-  const handleClick = useCallback(
-    (e: React.MouseEvent) => {
-      const target = e.currentTarget as HTMLDivElement;
-      const url = target.dataset.url;
-      if (!url) return;
-      router.push(url);
-    },
-    [router]
-  );
 
   if (!user) return;
   return (
@@ -61,10 +48,9 @@ const UserButton = ({ className }: Props) => {
         align="end"
       >
         <DropdownMenuItem className={cn("cursor-pointer p-0", className)}>
-          <div
+          <Link
             className="w-full flex items-center px-2 rounded-md transition select-none cursor-pointer"
-            data-url={`/account/${user.id}`}
-            onClick={handleClick}
+            href={`/account/${user.id}`}
           >
             <div className="relative flex justify-center items-center w-9 h-9 my-2 mr-3 overflow-hidden rounded-full">
               <Image
@@ -76,7 +62,7 @@ const UserButton = ({ className }: Props) => {
               />
             </div>
             <div className="font-semibold">{user.fullName || "---"}</div>
-          </div>
+          </Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem className={cn("cursor-pointer p-0", className)}>
