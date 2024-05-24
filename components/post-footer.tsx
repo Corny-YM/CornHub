@@ -3,7 +3,7 @@ import { useCallback, useMemo } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Group, Post, User } from "@prisma/client";
-import { Forward, MessageCircle, ThumbsUp } from "lucide-react";
+import { Forward, Info, MessageCircle, ThumbsUp } from "lucide-react";
 
 import {
   countComments,
@@ -204,6 +204,12 @@ const PostFooter = ({ data }: Props) => {
         <Button
           className="hover:bg-primary/50 transition flex-1"
           variant="outline"
+          onClick={() =>
+            toast(
+              <div className="w-fit">Đang trong quá trình phát triển 💕</div>,
+              { icon: <Info className="text-blue-400" /> }
+            )
+          }
         >
           <Forward className="mr-1" size={20} />
           Chia sẻ

@@ -32,18 +32,19 @@ const SidebarLeft = () => {
 
         <div className="w-full flex flex-col gap-y-2">
           {actions.map(({ label, url, icon: Icon }) => (
-            <Link key={url} href={`/friends/${url}`}>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full flex items-center justify-start",
-                  hasSelected(url) && "bg-primary/50 hover:bg-primary/60"
-                )}
-              >
+            <Button
+              className={cn(
+                "w-full flex items-center justify-start",
+                hasSelected(url) && "bg-primary/50 hover:bg-primary/60"
+              )}
+              variant="outline"
+              asChild
+            >
+              <Link key={url} href={`/friends/${url}`}>
                 <Icon className="mr-2" size={20} />
                 {label}
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           ))}
         </div>
       </div>

@@ -1,34 +1,17 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback } from "react";
-import { usePathname, useRouter } from "next/navigation";
 
-import { cn, isUndefined } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useGroupContext } from "@/providers/group-provider";
 
-interface Props {
-  groupId: string;
-}
+interface Props {}
 
-const tabs = [
-  { url: "/", label: "Thảo luận" },
-  { url: "/members", label: "Thành viên" },
-  { url: "/media", label: "File phương tiện" },
-];
+const Tabs = ({}: Props) => {
+  const { tabs, pathname, groupData } = useGroupContext();
 
-const Tabs = ({ groupId }: Props) => {
-  const router = useRouter();
-  const pathname = usePathname();
-
-  const handleClickTab = useCallback(
-    (e: React.MouseEvent) => {
-      const target = e.currentTarget as HTMLButtonElement;
-      const url = target.dataset.url;
-      if (isUndefined(url) || !groupId) return;
-      router.push(`/groups/${groupId}${url}`);
-    },
-    [router, groupId]
-  );
   const hasSelected = useCallback(
     (url: string) => {
       const isRoot = pathname?.split("/")?.length === 3;
@@ -43,16 +26,15 @@ const Tabs = ({ groupId }: Props) => {
       {tabs.map(({ url, label }) => (
         <Button
           key={url}
-          data-url={url}
           className={cn(
             "transition ",
             hasSelected(url) &&
               "bg-primary/50 dark:hover:bg-primary/20 hover:bg-primary/70"
           )}
           variant="outline"
-          onClick={handleClickTab}
+          asChild
         >
-          {label}
+          <Link href={`/groups/${groupData.id}${url}`}>{label}</Link>
         </Button>
       ))}
     </div>

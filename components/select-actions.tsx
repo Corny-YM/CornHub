@@ -10,10 +10,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { ILucideIcon } from "@/types";
 
 export interface ISelectAction {
   value: string;
   label: React.ReactNode;
+  icon?: ILucideIcon;
 }
 
 interface Props {
@@ -40,9 +42,11 @@ const SelectActions = ({
       </SelectTrigger>
       <SelectContent className="">
         <SelectGroup>
-          {actions.map(({ value, label }) => (
+          {actions.map(({ value, label, icon: Icon }) => (
             <SelectItem key={value} value={value}>
-              {label}
+              <div className="flex items-center">
+                {Icon && <Icon className="mr-2" size={20} />} {label}
+              </div>
             </SelectItem>
           ))}
         </SelectGroup>

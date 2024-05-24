@@ -56,12 +56,12 @@ model User {
 model Group {
   id              Int      @id @default(autoincrement())
   group_name      String
-  cover           String
+  cover           String?
   status          Boolean  @default(true) // public or private
   quantity        Int      @default(0)
   approve_members Boolean  @default(false) // active feat confirm members
   approve_posts   Boolean  @default(false) // active feat confirm posts
-  description     String   @db.Text
+  description     String?   @db.Text
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
 

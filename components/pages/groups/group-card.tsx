@@ -1,10 +1,18 @@
+"use client";
+
 import Image from "next/image";
+import { Group } from "@prisma/client";
 import { DoorOpen, Ellipsis, EyeOff } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import DropdownActions, {
   IDropdownAction,
 } from "@/components/dropdown-actions";
+import NoCover from "@/public/no-background.jpg";
+
+interface Props {
+  data: Group;
+}
 
 const actions: IDropdownAction[] = [
   { label: "Bỏ theo dõi", icon: <EyeOff className="mr-2" size={20} /> },
@@ -15,22 +23,21 @@ const actions: IDropdownAction[] = [
   },
 ];
 
-const GroupCard = () => {
+const GroupCard = ({ data }: Props) => {
+  const { group_name, cover } = data;
   return (
     <div className="p-4 w-full flex flex-col items-center justify-center overflow-hidden rounded-lg shadow dark:bg-neutral-800 bg-[#f0f2f5]">
       <div className="w-full flex items-center justify-start">
         <div className="relative flex justify-center items-center w-20 h-20 aspect-square rounded-lg overflow-hidden">
           <Image
             className="absolute w-full h-full"
-            src="https://i.pravatar.cc/150?img=3"
+            src={cover || NoCover}
             alt="avatar_group"
             fill
           />
         </div>
         <div className="pl-3 flex flex-col justify-center">
-          <div className="font-semibold w-full line-clamp-2">
-            I am Programmer, I have no life
-          </div>
+          <div className="font-semibold w-full line-clamp-2">{group_name}</div>
         </div>
       </div>
       <div className="mt-4 flex items-center w-full gap-x-2">

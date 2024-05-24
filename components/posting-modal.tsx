@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dialog";
 
 interface Props {
+  groupId?: number;
   open: boolean;
   toggleOpen: (val?: boolean) => void;
 }
@@ -54,7 +55,7 @@ const actions: ISelectAction[] = [
   },
 ];
 
-const PostingModal = ({ open, toggleOpen }: Props) => {
+const PostingModal = ({ groupId, open, toggleOpen }: Props) => {
   const { currentUser } = useAppContext();
 
   const [content, setContent] = useState("");
@@ -102,7 +103,7 @@ const PostingModal = ({ open, toggleOpen }: Props) => {
   );
   const handleStorePost = useCallback(() => {
     if (!currentUser) return;
-    mutate({ content, status, file, userId: currentUser.id });
+    mutate({ groupId, content, status, file, userId: currentUser.id });
   }, [content, status, file, currentUser, mutate]);
 
   const userName = useMemo(() => {

@@ -77,7 +77,7 @@ export const AppProvider = ({ children }: Props) => {
   return (
     <AppContext.Provider value={{ currentUser, toastFeatureUpdating }}>
       <QueryClientProvider client={queryClient}>
-        <Toaster />
+        <Toaster containerStyle={{ zIndex: 99999 }} />
         {children}
       </QueryClientProvider>
     </AppContext.Provider>

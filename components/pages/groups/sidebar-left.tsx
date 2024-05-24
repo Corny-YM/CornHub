@@ -1,12 +1,12 @@
 "use client";
 
-import { useCallback } from "react";
-import { useRouter } from "next/navigation";
-import { Boxes, Newspaper } from "lucide-react";
+import Link from "next/link";
+import { Boxes, Newspaper, Plus } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { useGroupsContext } from "@/providers/groups-provider";
 import { Button } from "@/components/ui/button";
-import { useGroupContext } from "@/providers/groups-provider";
+import ModalCreate from "./modal-create";
 
 const actions = [
   { label: "Nhóm của bạn", url: "joins", icon: Boxes },
@@ -14,19 +14,7 @@ const actions = [
 ];
 
 const SidebarLeft = () => {
-  const router = useRouter();
-  const { pathname } = useGroupContext();
-
-  const handleClick = useCallback(
-    (e: React.MouseEvent) => {
-      const target = e.currentTarget as HTMLButtonElement;
-      const url = target.dataset.url;
-      if (!url) return;
-      router.push(`/groups/${url}`);
-    },
-    [router]
-  );
-
+  const { pathname } = useGroupsContext();
   return (
     <div className="side-bar">
       <div className="w-full flex flex-col px-2 pb-4">
@@ -35,19 +23,26 @@ const SidebarLeft = () => {
         <div className="w-full flex flex-col gap-y-2">
           {actions.map(({ label, url, icon: Icon }) => (
             <Button
-              key={label}
-              data-url={url}
+              key={url}
               className={cn(
                 "w-full flex items-center justify-start",
                 pathname?.includes(url) && "bg-primary/50 hover:bg-primary/60"
               )}
               variant="outline"
-              onClick={handleClick}
+              asChild
             >
-              <Icon className="mr-2" size={20} />
-              {label}
+              <Link key={url} href={url}>
+                <Icon className="mr-2" size={20} />
+                {label}
+              </Link>
             </Button>
           ))}
+
+          <ModalCreate>
+            <Button className="w-full bg-primary/50" size="sm">
+              <Plus className="mr-2" size={20} /> Tạo nhóm mới
+            </Button>
+          </ModalCreate>
         </div>
       </div>
     </div>

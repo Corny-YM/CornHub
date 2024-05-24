@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext } from "react";
 
 interface Props {
   children: React.ReactNode;
@@ -11,18 +11,18 @@ type Context = {
   pathname?: string | null;
 };
 
-const GroupContext = createContext<Context>({});
+const GroupsContext = createContext<Context>({});
 
-export const GroupProvider = ({ children }: Props) => {
+export const GroupsProvider = ({ children }: Props) => {
   const pathname = usePathname();
 
   return (
-    <GroupContext.Provider value={{ pathname: pathname }}>
+    <GroupsContext.Provider value={{ pathname: pathname }}>
       {children}
-    </GroupContext.Provider>
+    </GroupsContext.Provider>
   );
 };
 
-export const useGroupContext = () => {
-  return useContext(GroupContext);
+export const useGroupsContext = () => {
+  return useContext(GroupsContext);
 };
