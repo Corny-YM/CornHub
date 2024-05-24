@@ -2,17 +2,21 @@
 
 import Image from "next/image";
 import { useMemo } from "react";
-import { Pencil } from "lucide-react";
+import { Pencil, Plus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 import { getMembers } from "@/actions/group";
+import { useToggle } from "@/hooks/useToggle";
 import { useGroupContext } from "@/providers/group-provider";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import ModalInvite from "@/components/pages/groups/[groupId]/modal-invite";
 import NoAvatar from "@/public/no-avatar.jpg";
 
 const Info = () => {
-  const { groupData, isOwner } = useGroupContext();
+  const { groupData, isGroupOwner } = useGroupContext();
+
+  const [open, toggleOpen] = useToggle(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["group", "members", groupData.id],
@@ -51,14 +55,20 @@ const Info = () => {
       </div>
 
       {/* Actions */}
-      {isOwner && (
-        <div className="flex items-center">
+      <div className="flex items-center gap-2">
+        <ModalInvite open={open} onOpenChange={toggleOpen}>
+          <Button onClick={() => toggleOpen(true)}>
+            <Plus className="mr-2" size={20} />
+            Mời
+          </Button>
+        </ModalInvite>
+        {isGroupOwner && (
           <Button variant="outline">
             <Pencil className="mr-2" size={20} />
             Chỉnh sửa nhóm
           </Button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

@@ -49,6 +49,8 @@ model User {
   followers             Follower[]      @relation("UserToFollower")
   groupMembers          GroupMember[]   @relation("MemberToGroupMember")
   groupFollowers        GroupFollower[]
+  senderGroupRequest    GroupRequest[]  @relation("SenderToGroupRequest")
+  receiverGroupRequest  GroupRequest[]  @relation("ReceiverToGroupRequest")
 
   @@map("users")
 }
@@ -61,7 +63,7 @@ model Group {
   quantity        Int      @default(0)
   approve_members Boolean  @default(false) // active feat confirm members
   approve_posts   Boolean  @default(false) // active feat confirm posts
-  description     String?   @db.Text
+  description     String?  @db.Text
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
 
@@ -74,7 +76,9 @@ model Group {
   reports       Report[]        @relation("GroupToReport")
   groupMembers  GroupMember[]   @relation("GroupToGroupMember")
   groupFollower GroupFollower[]
+  groupRequests GroupRequest[]  @relation("GroupToGroupRequest")
 
+  @@index([owner_id])
   @@map("groups")
 }
 
@@ -101,6 +105,8 @@ model Post {
   notifications Notification[] @relation("PostToNotification")
   reports       Report[]       @relation("PostToReport")
 
+  @@index([user_id])
+  @@index([group_id])
   @@map("posts")
 }
 
@@ -126,6 +132,9 @@ model Comment {
   notifications Notification[] @relation("CommentToNotification")
   reports       Report[]       @relation("CommentToReport")
 
+  @@index([post_id])
+  @@index([user_id])
+  @@index([comment_id])
   @@map("comments")
 }
 
@@ -147,6 +156,9 @@ model Reaction {
 
   @@unique([user_id, post_id])
   @@unique([user_id, post_id, comment_id])
+  @@index([comment_id])
+  @@index([post_id])
+  @@index([user_id])
   @@map("reactions")
 }
 
@@ -175,6 +187,11 @@ model Notification {
   group_id Int?
   group    Group? @relation("GroupToNotification", fields: [group_id], references: [id])
 
+  @@index([sender_id])
+  @@index([receiver_id])
+  @@index([post_id])
+  @@index([comment_id])
+  @@index([group_id])
   @@map("notifications")
 }
 
@@ -201,6 +218,11 @@ model Report {
   group_id Int?
   group    Group? @relation("GroupToReport", fields: [group_id], references: [id])
 
+  @@index([user_id])
+  @@index([post_id])
+  @@index([sender_id])
+  @@index([comment_id])
+  @@index([group_id])
   @@map("reports")
 }
 
@@ -218,6 +240,8 @@ model Friend {
   friend    User   @relation("UserToFriend", fields: [friend_id], references: [id])
 
   @@unique([user_id, friend_id])
+  @@index([user_id])
+  @@index([friend_id])
   @@map("friends")
 }
 
@@ -235,6 +259,8 @@ model FriendRequest {
   receiver    User   @relation("ReceiverToFriendRequest", fields: [receiver_id], references: [id])
 
   @@unique([sender_id, receiver_id])
+  @@index([sender_id])
+  @@index([receiver_id])
   @@map("friend_request")
 }
 
@@ -252,6 +278,8 @@ model Follower {
   follower    User   @relation("UserToFollower", fields: [follower_id], references: [id])
 
   @@unique([user_id, follower_id])
+  @@index([user_id])
+  @@index([follower_id])
   @@map("followers")
 }
 
@@ -268,6 +296,8 @@ model GroupMember {
   group    Group @relation("GroupToGroupMember", fields: [group_id], references: [id])
 
   @@unique([member_id, group_id])
+  @@index([member_id])
+  @@index([group_id])
   @@map("group_members")
 }
 
@@ -283,5 +313,29 @@ model GroupFollower {
   group    Group @relation(fields: [group_id], references: [id])
 
   @@unique([follower_id, group_id])
+  @@index([follower_id])
+  @@index([group_id])
   @@map("group_followers")
+}
+
+model GroupRequest {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // relation
+  group_id Int
+  group    Group @relation("GroupToGroupRequest", fields: [group_id], references: [id])
+
+  sender_id String
+  sender    User   @relation("SenderToGroupRequest", fields: [sender_id], references: [id])
+
+  receiver_id String
+  receiver    User   @relation("ReceiverToGroupRequest", fields: [receiver_id], references: [id])
+
+  @@unique([sender_id, receiver_id])
+  @@index([sender_id])
+  @@index([receiver_id])
+  @@index([group_id])
+  @@map("group_requests")
 }

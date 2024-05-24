@@ -18,7 +18,7 @@ interface Props {
 
 type Context = {
   tabs: { url: string; label: string }[];
-  isOwner: boolean;
+  isGroupOwner: boolean;
   pathname?: string | null;
   groupData: IGroupWithCountMember;
   setGroupData: IDispatchState;
@@ -32,7 +32,7 @@ const tabs = [
 
 const GroupContext = createContext<Context>({
   tabs,
-  isOwner: false,
+  isGroupOwner: false,
   groupData: {} as IGroupWithCountMember,
   setGroupData: () => {},
 });
@@ -42,14 +42,14 @@ export const GroupProvider = ({ children, data }: Props) => {
   const { userId } = useAuth();
   const [groupData, setGroupData] = useState<IGroupWithCountMember>(data);
 
-  const isOwner = useMemo(
+  const isGroupOwner = useMemo(
     () => userId === groupData.owner_id,
     [userId, groupData]
   );
 
   return (
     <GroupContext.Provider
-      value={{ tabs, isOwner, pathname, groupData, setGroupData }}
+      value={{ tabs, isGroupOwner, pathname, groupData, setGroupData }}
     >
       {children}
     </GroupContext.Provider>

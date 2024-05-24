@@ -8,14 +8,25 @@ import PostHeader from "@/components/post-header";
 
 interface Props {
   className?: string;
+  isGroupOwner?: boolean;
+  isGroupOwnerPost?: boolean;
   data: Post & { user: User; group: Group | null };
 }
 
-const PostItem = ({ className, data }: Props) => {
+const PostItem = ({
+  data,
+  className,
+  isGroupOwner,
+  isGroupOwnerPost,
+}: Props) => {
   return (
     <div className={cn("post-item", className)}>
       {/* Header */}
-      <PostHeader data={data} />
+      <PostHeader
+        isGroupOwner={isGroupOwner}
+        isGroupOwnerPost={isGroupOwnerPost}
+        data={data}
+      />
 
       {/* Content */}
       <div className="flex flex-col w-full text-sm">

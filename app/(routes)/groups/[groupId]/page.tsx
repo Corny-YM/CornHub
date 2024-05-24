@@ -16,12 +16,14 @@ interface Props {
 }
 
 const GroupIdPage = ({ params }: Props) => {
-  const { groupData, isOwner } = useGroupContext();
+  const { groupData, isGroupOwner } = useGroupContext();
 
   const { data, isLoading } = useQuery({
     queryKey: ["group", "posts", groupData.id],
     queryFn: () => getPosts(groupData.id),
   });
+
+  const groupOwnerId = useMemo(() => groupData.owner_id, [groupData]);
 
   const content = useMemo(() => {
     if (isLoading)
@@ -31,8 +33,18 @@ const GroupIdPage = ({ params }: Props) => {
         </div>
       );
     if (!data || !data.length) return <EmptyData />;
-    return data.map((post) => <PostItem key={post.id} data={post} />);
-  }, [data, isLoading]);
+    return data.map((post) => {
+      const isGroupOwnerPost = post.user_id === groupOwnerId;
+      return (
+        <PostItem
+          key={post.id}
+          data={post}
+          isGroupOwner={isGroupOwner}
+          isGroupOwnerPost={isGroupOwnerPost}
+        />
+      );
+    });
+  }, [data, isLoading, groupOwnerId]);
 
   return (
     <div className="mt-4 flex w-full pb-4 relative">

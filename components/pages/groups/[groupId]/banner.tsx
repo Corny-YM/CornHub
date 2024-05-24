@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import NoBackground from "@/public/no-background.jpg";
 
 const Banner = () => {
-  const { groupData, isOwner } = useGroupContext();
+  const { groupData, isGroupOwner } = useGroupContext();
 
   return (
     <div className="relative w-full flex items-center justify-center shadow-2xl rounded-b-lg overflow-hidden dark:border dark:border-solid dark:border-neutral-600/50">
@@ -20,7 +20,7 @@ const Banner = () => {
           fill
         />
       </div>
-      {isOwner && (
+      {isGroupOwner && (
         <div className="absolute right-4 bottom-4">
           <Button variant="outline">
             <Camera size={20} className="mr-2" /> Chỉnh sửa ảnh bìa
