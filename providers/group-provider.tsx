@@ -13,15 +13,24 @@ export type IGroupWithCountMember = Group & {
 
 interface Props {
   children: React.ReactNode;
-  data: IGroupWithCountMember;
+  data: {
+    isMember: boolean;
+    isFollowing: boolean;
+    group: IGroupWithCountMember;
+  };
 }
 
 type Context = {
-  tabs: { url: string; label: string }[];
+  isMember: boolean;
+  isFollowing: boolean;
   isGroupOwner: boolean;
   pathname?: string | null;
   groupData: IGroupWithCountMember;
+  tabs: { url: string; label: string }[];
+  // Actions
   setGroupData: IDispatchState;
+  setIsMember: IDispatchState;
+  setIsFollowing: IDispatchState;
 };
 
 const tabs = [
@@ -32,15 +41,23 @@ const tabs = [
 
 const GroupContext = createContext<Context>({
   tabs,
+  isMember: false,
+  isFollowing: false,
   isGroupOwner: false,
   groupData: {} as IGroupWithCountMember,
   setGroupData: () => {},
+  setIsMember: () => {},
+  setIsFollowing: () => {},
 });
 
 export const GroupProvider = ({ children, data }: Props) => {
   const pathname = usePathname();
+
   const { userId } = useAuth();
-  const [groupData, setGroupData] = useState<IGroupWithCountMember>(data);
+
+  const [isMember, setIsMember] = useState(data.isMember);
+  const [isFollowing, setIsFollowing] = useState(data.isFollowing);
+  const [groupData, setGroupData] = useState<IGroupWithCountMember>(data.group);
 
   const isGroupOwner = useMemo(
     () => userId === groupData.owner_id,
@@ -49,7 +66,17 @@ export const GroupProvider = ({ children, data }: Props) => {
 
   return (
     <GroupContext.Provider
-      value={{ tabs, isGroupOwner, pathname, groupData, setGroupData }}
+      value={{
+        tabs,
+        isFollowing,
+        isGroupOwner,
+        isMember,
+        pathname,
+        groupData,
+        setGroupData,
+        setIsMember,
+        setIsFollowing,
+      }}
     >
       {children}
     </GroupContext.Provider>

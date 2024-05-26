@@ -14,25 +14,31 @@ import {
 } from "@/components/ui/alert-dialog";
 
 interface Props {
+  open?: boolean;
   disabled?: boolean;
   destructive?: boolean;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   onClick: (e?: React.MouseEvent) => void;
+  onOpenChange?: (val?: boolean) => void;
 }
 
-const AlertModal = ({ disabled, destructive, children, onClick }: Props) => {
+const AlertModal = ({
+  open,
+  disabled,
+  destructive,
+  children,
+  onClick,
+  onOpenChange,
+}: Props) => {
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        {/* <Button variant="outline">Show Dialog</Button> */}
-        {children}
-      </AlertDialogTrigger>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogTitle>Bạn có hoàn toàn chắc chắn không?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently your data from
-            our servers.
+            Hành động này không thể được hoàn tác. Điều này sẽ xóa bỏ vĩnh viễn
+            dữ liệu của bạn từ máy chủ của chúng tôi.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

@@ -6,6 +6,7 @@ import Banner from "@/components/pages/groups/[groupId]/banner";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { GroupProvider } from "@/providers/group-provider";
+import { auth } from "@clerk/nextjs/server";
 
 interface Props {
   children: React.ReactNode;
@@ -13,6 +14,8 @@ interface Props {
 }
 
 const GroupIdLayout = async ({ children, params }: Props) => {
+  const { userId } = auth();
+
   const group = await prisma.group.findFirst({
     include: { _count: { select: { groupMembers: true } } },
     where: { id: +params.groupId },
@@ -20,12 +23,23 @@ const GroupIdLayout = async ({ children, params }: Props) => {
 
   if (!group) redirect("/groups");
 
+  const member = await prisma.groupMember.findFirst({
+    where: { member_id: userId!, group_id: group.id },
+  });
+
+  const follower = await prisma.groupFollower.findFirst({
+    where: { follower_id: userId!, group_id: group.id },
+  });
+
+  const isMember = !!member || userId === group?.owner_id;
+  const isFollowing = !!follower;
+
   return (
     <div className="relative w-full flex items-center">
       <Header />
 
       <div className="w-full h-full flex items-center justify-center relative pt-14 overflow-hidden overflow-y-auto">
-        <GroupProvider data={group}>
+        <GroupProvider data={{ group, isMember, isFollowing }}>
           <div className="w-full h-full max-w-[1250px] flex flex-col items-center">
             <Banner />
 

@@ -17,23 +17,31 @@ export async function GET(
     const type = url.searchParams.get("type");
     const limit = url.searchParams.get("limit");
     const searchKey = url.searchParams.get("searchKey");
+    const exceptId = url.searchParams.get("exceptId");
 
-    const condition: Record<string, any> = {};
-
-    const args: any = {
-      include: { user: true, friend: true },
-      where: condition,
-    };
-
-    if (limit) args.take = +limit;
-    if (searchKey) condition.full_name = { contains: searchKey };
-
-    // TODO: searching for friend's name
     const friends = await prisma.friend.findMany({
       include: { user: true, friend: true },
       where: {
-        OR: [{ user_id: params.userId }, { friend_id: params.userId }],
+        OR: [
+          {
+            AND: [
+              { user_id: params.userId },
+              searchKey
+                ? { friend: { full_name: { contains: searchKey } } }
+                : {},
+            ],
+            NOT: exceptId ? [{ friend_id: exceptId! }] : [],
+          },
+          {
+            AND: [
+              { friend_id: params.userId },
+              searchKey ? { user: { full_name: { contains: searchKey } } } : {},
+            ],
+            NOT: exceptId ? [{ user_id: exceptId! }] : [],
+          },
+        ],
       },
+      ...(limit && !isNaN(+limit) ? { take: +limit } : {}),
     });
 
     const totalFriends = await prisma.friend.count({

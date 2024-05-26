@@ -24,6 +24,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import EmptyData from "@/components/empty-data";
 import AvatarImg from "@/components/avatar-img";
 import Loading from "@/components/icons/loading";
+import { useGroupContext } from "@/providers/group-provider";
 
 interface Props {
   open: boolean;
@@ -32,6 +33,7 @@ interface Props {
 }
 
 const ModalInvite = ({ children, open, onOpenChange }: Props) => {
+  const { groupData } = useGroupContext();
   const { userId } = useAuth();
 
   const [inputValue, setInputValue] = useState("");
@@ -41,12 +43,25 @@ const ModalInvite = ({ children, open, onOpenChange }: Props) => {
   const { data, isLoading } = useQuery({
     enabled: open && !!userId,
     queryKey: ["user", "friends", userId, searchKey],
-    queryFn: () => getFriends(userId!, { limit: 10, searchKey }),
+    queryFn: () =>
+      getFriends(userId!, {
+        limit: 10,
+        searchKey,
+        exceptId: groupData.owner_id,
+      }),
   });
 
   useDebounce(() => setSearchKey(inputValue), 250, [inputValue]);
 
-  const handleSendInvite = useCallback(() => {}, []);
+  const isDisabled = useMemo(
+    () => !Object.keys(selectedIds).length,
+    [selectedIds]
+  );
+
+  const handleSendInvite = useCallback(() => {
+    const ids = Object.keys(selectedIds);
+    if (!ids.length) return;
+  }, [selectedIds]);
 
   const handleSearch = useCallback((e: React.ChangeEvent) => {
     const target = e.target as HTMLInputElement;
@@ -143,21 +158,25 @@ const ModalInvite = ({ children, open, onOpenChange }: Props) => {
               onChange={handleSearch}
             />
             <div className="w-full flex flex-col">
-              <ScrollArea className="h-96">{contentFriends}</ScrollArea>
+              <ScrollArea className="h-96 pr-3">{contentFriends}</ScrollArea>
             </div>
           </div>
-          <div className="w-2/5 px-3 py-2 bg-primary-foreground/50 rounded-lg">
-            <div className="text-sm mb-4">
+          <div className="w-2/5  py-2 bg-primary-foreground/50 rounded-lg">
+            <div className="text-sm mb-4 px-3">
               Đã chọn {Object.keys(selectedIds).length || 0} người bạn
             </div>
             <div className="flex flex-col">
-              <ScrollArea className="h-96">{contentSelectedFriends}</ScrollArea>
+              <ScrollArea className="h-96 px-3">
+                <div className="flex flex-col gap-2">
+                  {contentSelectedFriends}
+                </div>
+              </ScrollArea>
             </div>
           </div>
         </div>
 
         <DialogFooter>
-          <Button disabled={false} size="sm" onClick={handleSendInvite}>
+          <Button disabled={isDisabled} size="sm" onClick={handleSendInvite}>
             Gửi lời mời
           </Button>
         </DialogFooter>

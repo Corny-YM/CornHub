@@ -16,7 +16,7 @@ interface Props {
 }
 
 const GroupIdPage = ({ params }: Props) => {
-  const { groupData, isGroupOwner } = useGroupContext();
+  const { groupData, isGroupOwner, isMember } = useGroupContext();
 
   const { data, isLoading } = useQuery({
     queryKey: ["group", "posts", groupData.id],
@@ -49,10 +49,10 @@ const GroupIdPage = ({ params }: Props) => {
   return (
     <div className="mt-4 flex w-full pb-4 relative">
       <div className="w-full xl:w-2/3 flex flex-col">
-        <Posting groupId={+params.groupId} />
+        {isMember && <Posting className="mb-4" groupId={+params.groupId} />}
 
         {/* List Posts */}
-        <div className="w-full flex flex-col mt-4">{content}</div>
+        <div className="w-full flex flex-col">{content}</div>
       </div>
 
       <div className="hidden xl:flex w-1/3 flex-col ml-4">

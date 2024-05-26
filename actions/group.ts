@@ -18,3 +18,27 @@ export const getPosts = async (
   params?: any
 ): Promise<(Post & { user: User; group: Group })[]> =>
   await defHttp.get(`${indexApi}/${groupId}/posts`, { params });
+
+export const userJoinGroup = async ({
+  groupId,
+  userId,
+}: {
+  groupId: number;
+  userId: string;
+}) => await defHttp.get(`${indexApi}/${groupId}/users/${userId}/join`);
+
+export const userUnfollowGroup = async ({
+  groupId,
+  userId,
+}: {
+  groupId: number;
+  userId: string;
+}) => await defHttp.get(`${indexApi}/${groupId}/users/${userId}/unfollow`);
+
+export const userLeaveGroup = async ({
+  groupId,
+  userId,
+}: {
+  groupId: number;
+  userId: string;
+}) => await defHttp.get(`${indexApi}/${groupId}/users/${userId}/leave`);
