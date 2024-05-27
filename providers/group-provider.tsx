@@ -16,6 +16,7 @@ interface Props {
   data: {
     isMember: boolean;
     isFollowing: boolean;
+    isRequested: boolean;
     group: IGroupWithCountMember;
   };
 }
@@ -24,6 +25,7 @@ type Context = {
   isMember: boolean;
   isFollowing: boolean;
   isGroupOwner: boolean;
+  isRequested: boolean;
   pathname?: string | null;
   groupData: IGroupWithCountMember;
   tabs: { url: string; label: string }[];
@@ -31,6 +33,7 @@ type Context = {
   setGroupData: IDispatchState;
   setIsMember: IDispatchState;
   setIsFollowing: IDispatchState;
+  setIsRequested: IDispatchState;
 };
 
 const tabs = [
@@ -44,10 +47,12 @@ const GroupContext = createContext<Context>({
   isMember: false,
   isFollowing: false,
   isGroupOwner: false,
+  isRequested: false,
   groupData: {} as IGroupWithCountMember,
   setGroupData: () => {},
   setIsMember: () => {},
   setIsFollowing: () => {},
+  setIsRequested: () => {},
 });
 
 export const GroupProvider = ({ children, data }: Props) => {
@@ -57,6 +62,7 @@ export const GroupProvider = ({ children, data }: Props) => {
 
   const [isMember, setIsMember] = useState(data.isMember);
   const [isFollowing, setIsFollowing] = useState(data.isFollowing);
+  const [isRequested, setIsRequested] = useState(data.isRequested);
   const [groupData, setGroupData] = useState<IGroupWithCountMember>(data.group);
 
   const isGroupOwner = useMemo(
@@ -70,12 +76,14 @@ export const GroupProvider = ({ children, data }: Props) => {
         tabs,
         isFollowing,
         isGroupOwner,
+        isRequested,
         isMember,
         pathname,
         groupData,
         setGroupData,
         setIsMember,
         setIsFollowing,
+        setIsRequested,
       }}
     >
       {children}

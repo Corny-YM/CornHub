@@ -31,15 +31,21 @@ const GroupIdLayout = async ({ children, params }: Props) => {
     where: { follower_id: userId!, group_id: group.id },
   });
 
+  // Many users invite you to this group => only get 1 to confirm that requested or not
+  const groupRequest = await prisma.groupRequest.findFirst({
+    where: { receiver_id: userId!, group_id: group.id },
+  });
+
   const isMember = !!member || userId === group?.owner_id;
   const isFollowing = !!follower;
+  const isRequested = !!groupRequest;
 
   return (
     <div className="relative w-full flex items-center">
       <Header />
 
       <div className="w-full h-full flex items-center justify-center relative pt-14 overflow-hidden overflow-y-auto">
-        <GroupProvider data={{ group, isMember, isFollowing }}>
+        <GroupProvider data={{ group, isMember, isFollowing, isRequested }}>
           <div className="w-full h-full max-w-[1250px] flex flex-col items-center">
             <Banner />
 

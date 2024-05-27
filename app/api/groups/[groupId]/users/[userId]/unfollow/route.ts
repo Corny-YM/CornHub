@@ -23,27 +23,13 @@ export async function GET(
     if (!group)
       return new NextResponse("Group does not exist", { status: 404 });
 
-    if (group.approve_members)
-      return new NextResponse(
-        "Invalid action. Group is on approve member mode",
-        { status: 409 }
-      );
-
-    await prisma.groupMember.create({
-      data: { group_id: group.id, member_id: params.userId },
-    });
-
-    await prisma.groupFollower.create({
-      data: { group_id: group.id, follower_id: params.userId },
-    });
-
-    await prisma.groupRequest.deleteMany({
-      where: { group_id: group.id, receiver_id: params.userId },
+    await prisma.groupFollower.deleteMany({
+      where: { group_id: group.id, follower_id: params.userId },
     });
 
     return NextResponse.json({});
   } catch (err) {
-    console.log("[GROUP_USER_JOIN_GET]", err);
+    console.log("[GROUP_USER_UNFOLLOW_GET]", err);
     return new NextResponse("Internal error", { status: 500 });
   }
 }

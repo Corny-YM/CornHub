@@ -3,16 +3,18 @@
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import NoAvatar from "@/public/no-avatar.jpg";
+import NoBackground from "@/public/no-background.jpg";
 import Image from "next/image";
 
 interface Props {
   className?: string;
+  isGroup?: boolean;
   src?: string | null;
   alt?: string | null;
   fallback?: React.ReactNode;
 }
 
-const AvatarImg = ({ className, src, alt, fallback }: Props) => {
+const AvatarImg = ({ className, isGroup, src, alt, fallback }: Props) => {
   return (
     <Avatar className={cn("select-none", className)}>
       <AvatarImage src={src!} alt={alt!} />
@@ -22,7 +24,7 @@ const AvatarImg = ({ className, src, alt, fallback }: Props) => {
             <Image
               className="absolute w-full h-full"
               alt="no-avatar-friend"
-              src={NoAvatar}
+              src={!isGroup ? NoAvatar : NoBackground}
               fill
             />
           )}

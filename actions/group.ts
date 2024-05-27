@@ -7,6 +7,11 @@ const indexApi = "groups";
 export const store = async (data: any): Promise<Group> =>
   await defHttp.post(indexApi, data);
 
+export const sendGroupRequest = async (data: {
+  ids: string[];
+  groupId: number;
+}): Promise<any> => await defHttp.post(`${indexApi}/send-group-request`, data);
+
 export const getMembers = async (
   groupId: number,
   params?: any
@@ -26,6 +31,14 @@ export const userJoinGroup = async ({
   groupId: number;
   userId: string;
 }) => await defHttp.get(`${indexApi}/${groupId}/users/${userId}/join`);
+
+export const userFollowingGroup = async ({
+  groupId,
+  userId,
+}: {
+  groupId: number;
+  userId: string;
+}) => await defHttp.get(`${indexApi}/${groupId}/users/${userId}/following`);
 
 export const userUnfollowGroup = async ({
   groupId,

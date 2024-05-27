@@ -26,6 +26,7 @@ export async function GET(
     const posts = await prisma.post.findMany({
       include: { user: true, group: true },
       where: { group_id: +params.groupId, ...clause },
+      orderBy: { created_at: "desc" },
     });
 
     return NextResponse.json(posts);

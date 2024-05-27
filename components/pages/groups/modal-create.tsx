@@ -68,8 +68,6 @@ const ModalCreate = ({ children }: Props) => {
     mutate({ name, status });
   }, [name, status]);
 
-  // TODO: make action create group
-
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>

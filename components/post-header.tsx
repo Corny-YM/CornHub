@@ -25,7 +25,6 @@ interface Props {
   data: Post & { user: User; group: Group | null };
 }
 
-// TODO: isPostOwner & isGroupOwnerPost
 const PostHeader = ({ data, isGroupOwner, isGroupOwnerPost }: Props) => {
   const { userId } = useAuth();
   const { id, user, group, group_id, created_at } = data;
@@ -86,6 +85,7 @@ const PostHeader = ({ data, isGroupOwner, isGroupOwnerPost }: Props) => {
         {
           label: `Chặn trang cá nhân của ${user.full_name}}`,
           icon: <UserX className="mr-2" size={20} />,
+          destructive: true,
         }
       );
     }
@@ -103,6 +103,7 @@ const PostHeader = ({ data, isGroupOwner, isGroupOwnerPost }: Props) => {
         >
           <AvatarImg
             className="absolute w-full h-full"
+            isGroup
             src={avatar}
             alt={`post-avatar-${id}`}
           />

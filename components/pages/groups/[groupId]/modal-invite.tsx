@@ -1,13 +1,16 @@
 "use client";
 
+import toast from "react-hot-toast";
 import { X } from "lucide-react";
 import { User } from "@prisma/client";
 import { useAuth } from "@clerk/nextjs";
-import { useQuery } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { getFriends } from "@/actions/user";
+import { sendGroupRequest } from "@/actions/group";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useGroupContext } from "@/providers/group-provider";
 import {
   Dialog,
   DialogContent,
@@ -24,7 +27,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import EmptyData from "@/components/empty-data";
 import AvatarImg from "@/components/avatar-img";
 import Loading from "@/components/icons/loading";
-import { useGroupContext } from "@/providers/group-provider";
 
 interface Props {
   open: boolean;
@@ -33,8 +35,8 @@ interface Props {
 }
 
 const ModalInvite = ({ children, open, onOpenChange }: Props) => {
-  const { groupData } = useGroupContext();
   const { userId } = useAuth();
+  const { groupData } = useGroupContext();
 
   const [inputValue, setInputValue] = useState("");
   const [searchKey, setSearchKey] = useState("");
@@ -51,23 +53,37 @@ const ModalInvite = ({ children, open, onOpenChange }: Props) => {
       }),
   });
 
+  const { mutate, isPending } = useMutation({
+    mutationKey: ["group", "user", "invite", "friends"],
+    mutationFn: sendGroupRequest,
+    onSuccess() {
+      setSelectedIds({});
+      onOpenChange(false);
+      toast.success("Gửi yêu cầu thành công");
+    },
+    onError() {
+      toast.error("Gửi yêu cầu thất bại. Vui lòng thử lại sau");
+    },
+  });
+
   useDebounce(() => setSearchKey(inputValue), 250, [inputValue]);
 
-  const isDisabled = useMemo(
-    () => !Object.keys(selectedIds).length,
-    [selectedIds]
-  );
-
-  const handleSendInvite = useCallback(() => {
+  const handleSendGroupRequest = useCallback(() => {
     const ids = Object.keys(selectedIds);
-    if (!ids.length) return;
-  }, [selectedIds]);
+    if (!ids.length || !groupData) return;
+    mutate({ ids, groupId: groupData.id });
+  }, [selectedIds, groupData]);
 
   const handleSearch = useCallback((e: React.ChangeEvent) => {
     const target = e.target as HTMLInputElement;
     const value = target.value;
     setInputValue(value);
   }, []);
+
+  const isDisabled = useMemo(
+    () => !Object.keys(selectedIds).length || isPending,
+    [selectedIds, isPending]
+  );
 
   const contentFriends = useMemo(() => {
     if (isLoading)
@@ -176,7 +192,11 @@ const ModalInvite = ({ children, open, onOpenChange }: Props) => {
         </div>
 
         <DialogFooter>
-          <Button disabled={isDisabled} size="sm" onClick={handleSendInvite}>
+          <Button
+            disabled={isDisabled}
+            size="sm"
+            onClick={handleSendGroupRequest}
+          >
             Gửi lời mời
           </Button>
         </DialogFooter>
