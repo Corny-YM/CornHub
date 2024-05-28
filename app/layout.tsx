@@ -3,12 +3,17 @@ import "@/assets/scss/index.scss";
 import "@/assets/scss/editor.scss";
 
 import type { Metadata } from "next";
+import { dark } from "@clerk/themes";
 import { ClerkLoaded, ClerkProvider } from "@clerk/nextjs";
 import { Inter, Kodchasan, Baloo_Bhaijaan_2 } from "next/font/google";
 
 import { cn } from "@/lib/utils";
 import { AppProvider } from "@/providers/app-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
+
+type Props = Readonly<{
+  children: React.ReactNode;
+}>;
 
 // const font = Inter({
 //   subsets: ["vietnamese"],
@@ -27,13 +32,9 @@ export const metadata: Metadata = {
   description: "Mini Social Media",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Props) {
   return (
-    <ClerkProvider>
+    <ClerkProvider appearance={{ baseTheme: dark }}>
       <html lang="en">
         <body
           className={cn(

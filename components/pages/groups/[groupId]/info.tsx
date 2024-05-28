@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import toast from "react-hot-toast";
 import {
   Bell,
   BellOff,
@@ -15,16 +14,11 @@ import {
 } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
 import { useCallback, useMemo } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
-import {
-  getMembers,
-  userFollowingGroup,
-  userJoinGroup,
-  userLeaveGroup,
-  userUnfollowGroup,
-} from "@/actions/group";
+import { getMembers } from "@/actions/group";
 import { useToggle } from "@/hooks/useToggle";
+import { useMutates } from "@/hooks/mutations/group/useMutates";
 import { useGroupContext } from "@/providers/group-provider";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -46,6 +40,19 @@ const Info = () => {
     setIsFollowing,
   } = useGroupContext();
 
+  const {
+    isPendingJoin,
+    isPendingLeave,
+    isPendingUnfollow,
+    isPendingFollowing,
+    isPendingDeniedRequest,
+    onJoin,
+    onLeave,
+    onUnfollow,
+    onFollowing,
+    onDeniedRequest,
+  } = useMutates({ groupId: groupData.id, userId });
+
   const [openModalInvite, toggleOpenModalInvite] = useToggle(false);
   const [openModalLeaveGroup, toggleOpenModalLeaveGroup] = useToggle(false);
 
@@ -53,59 +60,6 @@ const Info = () => {
     queryKey: ["group", "members", groupData.id],
     queryFn: () => getMembers(groupData.id, { limit: 10 }),
   });
-
-  // useMutation
-  const { mutate: mutateJoinGroup, isPending: isPendingJoinGroup } =
-    useMutation({
-      mutationKey: ["group", "join", groupData.id, userId],
-      mutationFn: userJoinGroup,
-      onSuccess() {
-        setIsMember(true);
-        toast.success("Tham gia nhóm thành công");
-      },
-      onError() {
-        toast.error("Tham gia nhóm thất bại. Vui lòng thử lại sau");
-      },
-    });
-
-  const { mutate: mutateFollowingGroup, isPending: isPendingFollowingGroup } =
-    useMutation({
-      mutationKey: ["group", "following", groupData.id, userId],
-      mutationFn: userFollowingGroup,
-      onSuccess() {
-        setIsFollowing(true);
-        toast.success("Theo dõi nhóm thành công");
-      },
-      onError() {
-        toast.error("Theo dõi nhóm thất bại. Vui lòng thử lại sau");
-      },
-    });
-
-  const { mutate: mutateUnfollowGroup, isPending: isPendingUnfollowGroup } =
-    useMutation({
-      mutationKey: ["group", "unfollow", groupData.id, userId],
-      mutationFn: userUnfollowGroup,
-      onSuccess() {
-        setIsFollowing(false);
-        toast.success("Bỏ theo dõi nhóm thành công");
-      },
-      onError() {
-        toast.error("Bỏ theo dõi nhóm thất bại. Vui lòng thử lại sau");
-      },
-    });
-
-  const { mutate: mutateLeaveGroup, isPending: isPendingLeaveGroup } =
-    useMutation({
-      mutationKey: ["group", "leave", groupData.id, userId],
-      mutationFn: userLeaveGroup,
-      onSuccess() {
-        setIsMember(false);
-        toast.success("Rời nhóm thành công");
-      },
-      onError() {
-        toast.error("Rời nhóm thất bại. Vui lòng thử lại sau");
-      },
-    });
 
   const content = useMemo(() => {
     if (isLoading) return <Skeleton className="friends-icon" />;
@@ -126,25 +80,28 @@ const Info = () => {
     ));
   }, [data, isLoading]);
 
-  const handleJoinGroup = useCallback(() => {
-    if (!userId || !groupData || isMember) return;
-    mutateJoinGroup({ userId, groupId: groupData.id });
-  }, [userId, groupData, isMember]);
+  const handleJoinGroup = useCallback(async () => {
+    await onJoin(() => {
+      setIsMember(true);
+      setIsRequested(false);
+    });
+  }, [onJoin]);
 
-  const handleFollowingGroup = useCallback(() => {
-    if (!userId || !groupData || !isMember) return;
-    mutateFollowingGroup({ userId, groupId: groupData.id });
-  }, [userId, groupData, isMember]);
+  const handleFollowingGroup = useCallback(async () => {
+    await onFollowing(() => setIsFollowing(true));
+  }, [onFollowing]);
 
-  const handleUnfollowGroup = useCallback(() => {
-    if (!userId || !groupData || !isMember) return;
-    mutateUnfollowGroup({ userId, groupId: groupData.id });
-  }, [userId, groupData, isMember]);
+  const handleUnfollowGroup = useCallback(async () => {
+    await onUnfollow(() => setIsFollowing(false));
+  }, [onUnfollow]);
 
-  const handleLeaveGroup = useCallback(() => {
-    if (!userId || !groupData || !isMember) return;
-    mutateLeaveGroup({ userId, groupId: groupData.id });
-  }, [userId, groupData, isMember]);
+  const handleLeaveGroup = useCallback(async () => {
+    await onLeave(() => setIsMember(false));
+  }, [onLeave]);
+
+  const handleDeniedGroupRequest = useCallback(async () => {
+    await onDeniedRequest(() => setIsRequested(false));
+  }, [onDeniedRequest]);
 
   return (
     <div className="w-full relative flex items-center px-4">
@@ -183,13 +140,13 @@ const Info = () => {
               isFollowing
                 ? {
                     label: "Bỏ theo dõi nhóm",
-                    disabled: isPendingUnfollowGroup,
+                    disabled: isPendingUnfollow,
                     icon: <BellOff className="mr-2" size={20} />,
                     onClick: handleUnfollowGroup,
                   }
                 : {
                     label: "Theo dõi nhóm",
-                    disabled: isPendingFollowingGroup,
+                    disabled: isPendingFollowing,
                     icon: <Bell className="mr-2" size={20} />,
                     onClick: handleFollowingGroup,
                   },
@@ -203,23 +160,22 @@ const Info = () => {
           />
         )}
         {!isMember && !isRequested && (
-          <Button disabled={isPendingJoinGroup} onClick={handleJoinGroup}>
+          <Button disabled={isPendingJoin} onClick={handleJoinGroup}>
             <UsersRound className="mr-2" size={20} />
             Tham gia
           </Button>
         )}
-        {/* TODO: api for Denied & Accept group request */}
         {!isMember && isRequested && (
           <>
             <Button
               variant="destructive"
-              disabled={isPendingJoinGroup}
-              onClick={() => {}}
+              disabled={isPendingDeniedRequest}
+              onClick={handleDeniedGroupRequest}
             >
               <X className="mr-2" size={20} />
               Hủy bỏ
             </Button>
-            <Button disabled={isPendingJoinGroup} onClick={() => {}}>
+            <Button disabled={isPendingJoin} onClick={handleJoinGroup}>
               <CheckCircle className="mr-2" size={20} />
               Chấp nhận
             </Button>
@@ -236,7 +192,7 @@ const Info = () => {
       {/* Modals */}
       <AlertModal
         destructive
-        disabled={isPendingLeaveGroup}
+        disabled={isPendingLeave}
         open={openModalLeaveGroup}
         onOpenChange={toggleOpenModalLeaveGroup}
         onClick={handleLeaveGroup}

@@ -51,6 +51,7 @@ model User {
   groupFollowers        GroupFollower[]
   senderGroupRequest    GroupRequest[]  @relation("SenderToGroupRequest")
   receiverGroupRequest  GroupRequest[]  @relation("ReceiverToGroupRequest")
+  files                 File[]          @relation("UserToFile")
 
   @@map("users")
 }
@@ -86,8 +87,6 @@ model Post {
   id         Int      @id @default(autoincrement())
   type       Int      @default(0) @db.TinyInt // 0: personal - 1: group
   content    String?  @db.Text
-  file       String?
-  file_type  Int?     @db.TinyInt
   background String?
   status     String   @default("friends") @db.VarChar(10) // friends, public, hide
   approve    Boolean?
@@ -99,13 +98,16 @@ model Post {
   user     User   @relation("UserToPost", fields: [user_id], references: [id])
   group_id Int?
   group    Group? @relation("GroupToPost", fields: [group_id], references: [id])
+  file_id  Int?
+  file     File?  @relation("FileToPost", fields: [file_id], references: [id])
 
+  reports       Report[]       @relation("PostToReport")
   comments      Comment[]      @relation("PostToComment")
   reactions     Reaction[]     @relation("PostToReaction")
   notifications Notification[] @relation("PostToNotification")
-  reports       Report[]       @relation("PostToReport")
 
   @@index([user_id])
+  @@index([file_id])
   @@index([group_id])
   @@map("posts")
 }
@@ -303,6 +305,7 @@ model GroupMember {
 
 model GroupFollower {
   id         Int      @id @default(autoincrement())
+  status     Boolean  @default(true) // true: follow - false: unfollow
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
@@ -338,4 +341,24 @@ model GroupRequest {
   @@index([receiver_id])
   @@index([group_id])
   @@map("group_requests")
+}
+
+model File {
+  id          Int      @id @default(autoincrement())
+  size        Int
+  name        String
+  actual_name String
+  path        String
+  ext         String
+  type        String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  // Relation
+  user_id String
+  user    User   @relation("UserToFile", fields: [user_id], references: [id])
+  post_id Post[] @relation("FileToPost")
+
+  @@index([user_id])
+  @@map("files")
 }

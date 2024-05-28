@@ -1,5 +1,4 @@
 import {
-  X,
   UserX,
   Pencil,
   Trash2,
@@ -9,15 +8,16 @@ import {
   MessageSquareWarning,
 } from "lucide-react";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { Group, Post, User } from "@prisma/client";
 
 import { cn, getRelativeTime } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import AvatarImg from "@/components/avatar-img";
 import DropdownActions from "@/components/dropdown-actions";
+import { useToggle } from "@/hooks/useToggle";
+import AlertModal from "./alert-modal";
 
 interface Props {
   isGroupOwner?: boolean;
@@ -28,12 +28,13 @@ interface Props {
 const PostHeader = ({ data, isGroupOwner, isGroupOwnerPost }: Props) => {
   const { userId } = useAuth();
   const { id, user, group, group_id, created_at } = data;
+  const [confirmDelete, toggleConfirmDelete] = useToggle(false);
 
   const isPostOwner = useMemo(() => userId === user.id, [user, userId]);
 
   const href = useMemo(() => {
     if (!group_id || !group) return `/account/${user.id}`;
-    return `/group/${group.id}`;
+    return `/groups/${group.id}`;
   }, [user, group, group_id]);
 
   const avatar = useMemo(() => {
@@ -74,6 +75,7 @@ const PostHeader = ({ data, isGroupOwner, isGroupOwnerPost }: Props) => {
           label: "Xóa bài viết",
           icon: <Trash2 className="mr-2" size={20} />,
           destructive: true,
+          onClick: () => toggleConfirmDelete(true),
         }
       );
     } else {
@@ -92,6 +94,8 @@ const PostHeader = ({ data, isGroupOwner, isGroupOwnerPost }: Props) => {
 
     return [...groupActions, ...userActions];
   }, [group_id, group, user, isPostOwner, isGroupOwner]);
+
+  const handleDeletePost = useCallback(() => {}, []);
 
   return (
     <div className="flex w-full items-center px-4 pt-3 mb-3">
@@ -159,16 +163,14 @@ const PostHeader = ({ data, isGroupOwner, isGroupOwnerPost }: Props) => {
           actions={actions}
           icon={<Ellipsis size={20} />}
         />
-        {(isGroupOwnerPost || isPostOwner) && (
-          <Button
-            className="rounded-full hover:bg-primary/50"
-            variant="outline"
-            size="icon"
-          >
-            <X size={20} />
-          </Button>
-        )}
       </div>
+
+      <AlertModal
+        destructive
+        open={confirmDelete}
+        onOpenChange={toggleConfirmDelete}
+        onClick={handleDeletePost}
+      />
     </div>
   );
 };

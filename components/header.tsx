@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, Search, Send } from "lucide-react";
+import { Search } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import Logo from "@/components/icons/logo";
 import MenuItems from "@/components/menu-items";
 import Message from "@/components/icons/message";
 import UserButton from "@/components/user-button";
+import * as ClerkNextJs from "@clerk/nextjs";
 import Notification from "@/components/icons/notification";
 
 const Header = () => {
@@ -60,6 +61,7 @@ const Header = () => {
           <Notification />
         </Button>
         <UserButton />
+        <ClerkNextJs.UserButton />
       </div>
     </div>
   );

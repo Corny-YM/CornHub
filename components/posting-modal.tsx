@@ -18,6 +18,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import PostingPreviewFile from "./posting-preview-file";
+import { useRouter } from "next/navigation";
 
 interface Props {
   groupId?: number;
@@ -56,10 +58,10 @@ const actions: ISelectAction[] = [
 ];
 
 const PostingModal = ({ groupId, open, toggleOpen }: Props) => {
+  const router = useRouter();
   const { currentUser } = useAppContext();
 
   const [content, setContent] = useState("");
-  const [isDirty, setIsDirty] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState(actions[0].value);
 
@@ -70,11 +72,14 @@ const PostingModal = ({ groupId, open, toggleOpen }: Props) => {
     mutationFn: store,
     onSuccess() {
       toast.success("Tạo bài viết thành công");
-      setIsDirty(false);
+      setContent("");
+      setFile(null);
+      setStatus(actions[0].value);
       toggleOpen(false);
+      router.refresh();
     },
     onError() {
-      toast.success("Tạo bài viết thất bại. Vui lòng thử lại sau");
+      toast.error("Tạo bài viết thất bại. Vui lòng thử lại sau");
     },
   });
 
@@ -91,16 +96,8 @@ const PostingModal = ({ groupId, open, toggleOpen }: Props) => {
     setStatus(val);
   }, []);
   const handleEditorChange = useCallback((val: string) => {
-    setIsDirty(true);
     setContent(val);
   }, []);
-  const handleOpenChange = useCallback(
-    (open: boolean) => {
-      if (isDirty) return;
-      toggleOpen(open);
-    },
-    [isDirty, toggleOpen]
-  );
   const handleStorePost = useCallback(() => {
     if (!currentUser) return;
     mutate({ groupId, content, status, file, userId: currentUser.id });
@@ -136,7 +133,7 @@ const PostingModal = ({ groupId, open, toggleOpen }: Props) => {
   }, [currentUser, userName, handleChangeSelect]);
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={toggleOpen}>
       <DialogContent className="sm:w-[600px] sm:max-w-none flex flex-col">
         <DialogHeader>
           <DialogTitle>Tạo bài viết</DialogTitle>
@@ -146,25 +143,30 @@ const PostingModal = ({ groupId, open, toggleOpen }: Props) => {
         <div className="flex-1 flex justify-center items-center">
           <div className="w-full max-w-full flex flex-col justify-center">
             {userContent}
-            <div className="max-h-96 overflow-hidden overflow-y-auto mt-4">
+            <div className="max-h-96 overflow-hidden overflow-y-auto mt-4 -mx-6 px-6">
               <CustomEditor
                 data={content}
                 placeholder={placeholder}
                 onChange={handleEditorChange}
               />
 
-              <div className="flex items-center justify-between gap-2 p-2 mt-4 border border-solid rounded-lg">
-                <div>Thêm vào bài viết của bạn</div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={handleShowAddFile}
-                  >
-                    <ImagePlus size={20} />
-                  </Button>
+              {/* PreviewFile: Image or Video */}
+              {file && <PostingPreviewFile file={file} setFile={setFile} />}
+
+              {!file && (
+                <div className="flex items-center justify-between gap-2 p-2 mt-4 border border-solid rounded-lg">
+                  <div>Thêm vào bài viết của bạn</div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={handleShowAddFile}
+                    >
+                      <ImagePlus size={20} />
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
 

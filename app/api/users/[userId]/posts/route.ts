@@ -15,7 +15,7 @@ export async function GET(
     }
 
     const posts = await prisma.post.findMany({
-      include: { user: true, group: true },
+      include: { user: true, group: true, file: true },
       where: { user_id: params.userId, group_id: null },
     });
 

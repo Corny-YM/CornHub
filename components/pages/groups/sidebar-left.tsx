@@ -1,7 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Boxes, Newspaper, Plus } from "lucide-react";
+import {
+  Boxes,
+  GitPullRequestCreateArrow,
+  Newspaper,
+  Plus,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { useGroupsContext } from "@/providers/groups-provider";
@@ -11,6 +16,11 @@ import ModalCreate from "./modal-create";
 const actions = [
   { label: "Nhóm của bạn", url: "joins", icon: Boxes },
   { label: "Bảng feed của bạn", url: "feed", icon: Newspaper },
+  {
+    label: "Lời mời vào nhóm",
+    url: "requests",
+    icon: GitPullRequestCreateArrow,
+  },
 ];
 
 const SidebarLeft = () => {

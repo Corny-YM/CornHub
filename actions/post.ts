@@ -2,10 +2,25 @@ import { Post, Reaction } from "@prisma/client";
 
 import defHttp from "@/lib/defHttp";
 
+interface IPostData extends Record<string, any> {
+  status: string;
+  userId: string;
+  content: string;
+  file?: File | null;
+  groupId?: number | null;
+}
+
 const indexApi = "posts";
 
-export const store = async (data: any): Promise<Post> =>
-  defHttp.post(indexApi, data);
+export const store = async (data: IPostData): Promise<Post> => {
+  const formData = new FormData();
+  Object.keys(data).forEach((key) => {
+    const value = data?.[key];
+    if (!value) return;
+    formData.append(key, value);
+  });
+  return defHttp.put(indexApi, formData);
+};
 
 // =============================Comments=============================
 export const countComments = async (id: number): Promise<number> =>

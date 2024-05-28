@@ -1,17 +1,20 @@
+import { redirect } from "next/navigation";
+import { auth } from "@clerk/nextjs/server";
+
+import prisma from "@/lib/prisma";
+import { GroupProvider } from "@/providers/group-provider";
 import { Separator } from "@/components/ui/separator";
 import Header from "@/components/header";
 import Info from "@/components/pages/groups/[groupId]/info";
 import Tabs from "@/components/pages/groups/[groupId]/tabs";
 import Banner from "@/components/pages/groups/[groupId]/banner";
-import prisma from "@/lib/prisma";
-import { redirect } from "next/navigation";
-import { GroupProvider } from "@/providers/group-provider";
-import { auth } from "@clerk/nextjs/server";
 
 interface Props {
   children: React.ReactNode;
   params: { groupId: string };
 }
+
+export const revalidate = 0;
 
 const GroupIdLayout = async ({ children, params }: Props) => {
   const { userId } = auth();
@@ -28,7 +31,7 @@ const GroupIdLayout = async ({ children, params }: Props) => {
   });
 
   const follower = await prisma.groupFollower.findFirst({
-    where: { follower_id: userId!, group_id: group.id },
+    where: { follower_id: userId!, group_id: group.id, status: true },
   });
 
   // Many users invite you to this group => only get 1 to confirm that requested or not

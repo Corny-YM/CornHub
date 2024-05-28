@@ -23,8 +23,9 @@ export async function GET(
     if (!group)
       return new NextResponse("Group does not exist", { status: 404 });
 
-    await prisma.groupFollower.deleteMany({
+    await prisma.groupFollower.updateMany({
       where: { group_id: group.id, follower_id: params.userId },
+      data: { status: false },
     });
 
     return NextResponse.json({});

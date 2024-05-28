@@ -1,9 +1,10 @@
+import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
+import { GroupMember } from "@prisma/client";
 
 import { cn } from "@/lib/utils";
 import prisma from "@/lib/prisma";
 import GroupCard from "@/components/pages/groups/group-card";
-import { redirect } from "next/navigation";
 import EmptyData from "@/components/empty-data";
 
 const GroupJoinPage = async () => {
@@ -14,7 +15,17 @@ const GroupJoinPage = async () => {
   const groupMembers = await prisma.groupMember.findMany({
     include: { group: true },
     where: { member_id: userId },
+    orderBy: { created_at: "desc" },
   });
+
+  const groupUserFollowings = await prisma.groupFollower.findMany({
+    where: { follower_id: userId, status: true },
+  });
+
+  const followingGroups: Record<number, GroupMember> =
+    groupUserFollowings.reduce((obj, item) => {
+      return { ...obj, [item.group_id]: item };
+    }, {});
 
   return (
     <div className="flex-1 h-full px-8 pt-4">
@@ -33,7 +44,12 @@ const GroupJoinPage = async () => {
           )}
         >
           {groupMembers.map((item) => (
-            <GroupCard key={item.id} data={item.group} />
+            <GroupCard
+              key={item.id}
+              data={item.group}
+              following={!!followingGroups?.[item.group_id]}
+              member
+            />
           ))}
         </div>
       )}

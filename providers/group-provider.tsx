@@ -21,7 +21,7 @@ interface Props {
   };
 }
 
-type Context = {
+export type GroupContext = {
   isMember: boolean;
   isFollowing: boolean;
   isGroupOwner: boolean;
@@ -42,7 +42,7 @@ const tabs = [
   { url: "/media", label: "File phương tiện" },
 ];
 
-const GroupContext = createContext<Context>({
+const GroupContext = createContext<GroupContext>({
   tabs,
   isMember: false,
   isFollowing: false,

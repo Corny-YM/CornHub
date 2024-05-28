@@ -24,7 +24,7 @@ export async function GET(
     const clause = group.approve_posts ? { approve: true } : {};
 
     const posts = await prisma.post.findMany({
-      include: { user: true, group: true },
+      include: { user: true, group: true, file: true },
       where: { group_id: +params.groupId, ...clause },
       orderBy: { created_at: "desc" },
     });

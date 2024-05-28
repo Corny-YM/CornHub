@@ -30,6 +30,10 @@ export async function GET(
       where: { group_id: group.id, follower_id: params.userId },
     });
 
+    await prisma.groupRequest.deleteMany({
+      where: { group_id: group.id, receiver_id: userId },
+    });
+
     return NextResponse.json({});
   } catch (err) {
     console.log("[GROUP_USER_LEAVE_GET]", err);

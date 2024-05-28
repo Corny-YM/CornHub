@@ -6,11 +6,9 @@ interface Props {
   userId: string;
 }
 
-export const revalidate = 0;
-
 const NewFeeds = async ({ userId }: Props) => {
   const userPosts = await prisma.post.findMany({
-    include: { user: true, group: true },
+    include: { user: true, group: true, file: true },
     where: { user_id: userId },
   });
   const userFriends = await prisma.friend.findMany({
@@ -26,7 +24,7 @@ const NewFeeds = async ({ userId }: Props) => {
 
   // Retrieve posts of user's friends
   const friendsPosts = await prisma.post.findMany({
-    include: { user: true, group: true },
+    include: { user: true, group: true, file: true },
     where: { user_id: { in: friendIds } },
   });
 
