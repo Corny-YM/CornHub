@@ -22,6 +22,9 @@ export const store = async (data: IPostData): Promise<Post> => {
   return defHttp.put(indexApi, formData);
 };
 
+export const destroy = async (id: number): Promise<number> =>
+  defHttp.delete(`${indexApi}/${id}`);
+
 // =============================Comments=============================
 export const countComments = async (id: number): Promise<number> =>
   defHttp.get(`${indexApi}/${id}/comments/count`);

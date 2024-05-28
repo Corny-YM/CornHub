@@ -8,16 +8,20 @@ import {
   MessageSquareWarning,
 } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useMemo } from "react";
+import toast from "react-hot-toast";
 import { useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import { useCallback, useMemo } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { Group, Post, User } from "@prisma/client";
 
+import { destroy } from "@/actions/post";
+import { useToggle } from "@/hooks/useToggle";
 import { cn, getRelativeTime } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import AvatarImg from "@/components/avatar-img";
+import AlertModal from "@/components/alert-modal";
 import DropdownActions from "@/components/dropdown-actions";
-import { useToggle } from "@/hooks/useToggle";
-import AlertModal from "./alert-modal";
 
 interface Props {
   isGroupOwner?: boolean;
@@ -26,9 +30,23 @@ interface Props {
 }
 
 const PostHeader = ({ data, isGroupOwner, isGroupOwnerPost }: Props) => {
+  const router = useRouter();
   const { userId } = useAuth();
   const { id, user, group, group_id, created_at } = data;
+
   const [confirmDelete, toggleConfirmDelete] = useToggle(false);
+
+  const { mutate, isPending } = useMutation({
+    mutationKey: ["post", "destroy", data.id],
+    mutationFn: destroy,
+    onSuccess() {
+      toast.success("Xóa post thành công");
+      router.refresh();
+    },
+    onError() {
+      toast.error("Xóa post thất bại. Vui lòng thử lại sau");
+    },
+  });
 
   const isPostOwner = useMemo(() => userId === user.id, [user, userId]);
 
@@ -75,6 +93,7 @@ const PostHeader = ({ data, isGroupOwner, isGroupOwnerPost }: Props) => {
           label: "Xóa bài viết",
           icon: <Trash2 className="mr-2" size={20} />,
           destructive: true,
+          disabled: isPending,
           onClick: () => toggleConfirmDelete(true),
         }
       );
@@ -93,9 +112,12 @@ const PostHeader = ({ data, isGroupOwner, isGroupOwnerPost }: Props) => {
     }
 
     return [...groupActions, ...userActions];
-  }, [group_id, group, user, isPostOwner, isGroupOwner]);
+  }, [group_id, group, user, isPostOwner, isGroupOwner, isPending]);
 
-  const handleDeletePost = useCallback(() => {}, []);
+  const handleDeletePost = useCallback(() => {
+    if (!data) return;
+    mutate(data.id);
+  }, [data]);
 
   return (
     <div className="flex w-full items-center px-4 pt-3 mb-3">
