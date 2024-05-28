@@ -46,3 +46,6 @@ package-lock.json
 /ckeditor5/pnpm-lock.yaml
 /ckeditor5/package-lock.json
 
+# folders
+/public/uploads
+
