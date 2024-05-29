@@ -1,19 +1,22 @@
 "use client";
 
+import * as ClerkNextJs from "@clerk/nextjs";
 import Link from "next/link";
 import { Search } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { useToggle } from "@/hooks/useToggle";
 import { Button } from "@/components/ui/button";
 import { ToggleMode } from "@/components/toggle-mode";
 import Logo from "@/components/icons/logo";
 import MenuItems from "@/components/menu-items";
 import Message from "@/components/icons/message";
 import UserButton from "@/components/user-button";
-import * as ClerkNextJs from "@clerk/nextjs";
+import SearchModal from "@/components/search-modal";
 import Notification from "@/components/icons/notification";
 
 const Header = () => {
+  const [modalSearch, toggleModalSearch] = useToggle(false);
   return (
     <div
       className={cn(
@@ -33,6 +36,7 @@ const Header = () => {
           className="rounded-full cursor-pointer hover:bg-primary/50"
           variant="outline"
           size="icon"
+          onClick={() => toggleModalSearch(true)}
         >
           <Search size={20} />
         </Button>
@@ -49,7 +53,6 @@ const Header = () => {
           variant="outline"
           size="icon"
         >
-          {/* <Send /> */}
           <Message />
         </Button>
         <Button
@@ -57,12 +60,13 @@ const Header = () => {
           variant="outline"
           size="icon"
         >
-          {/* <Bell /> */}
           <Notification />
         </Button>
         <UserButton />
         <ClerkNextJs.UserButton />
       </div>
+
+      <SearchModal open={modalSearch} onOpenChange={toggleModalSearch} />
     </div>
   );
 };
