@@ -47,5 +47,6 @@ package-lock.json
 /ckeditor5/package-lock.json
 
 # folders
+cornhub.sql
 /public/uploads
 
