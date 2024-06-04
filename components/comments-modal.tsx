@@ -1,10 +1,14 @@
 "use client";
 
+import toast from "react-hot-toast";
 import { SendHorizontal } from "lucide-react";
-import { ChangeEvent, useCallback, useMemo, useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Group, Post, User, File as IFile } from "@prisma/client";
+import { ChangeEvent, useCallback, useMemo, useState } from "react";
 
 import { cn } from "@/lib/utils";
+import { store } from "@/actions/comments";
+import { getComments } from "@/actions/post";
 import { useAppContext } from "@/providers/app-provider";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -22,12 +26,8 @@ import {
 import PostItem from "@/components/post";
 import AvatarImg from "@/components/avatar-img";
 import EmptyData from "@/components/empty-data";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { getComments } from "@/actions/post";
-import Loading from "./icons/loading";
-import CommentItem from "./comments";
-import { store } from "@/actions/comments";
-import toast from "react-hot-toast";
+import CommentItem from "@/components/comments";
+import Loading from "@/components/icons/loading";
 
 interface Props {
   data: Post & { user: User; group: Group | null; file: IFile | null };
@@ -64,7 +64,10 @@ const CommentsModal = ({ data, open, children, onOpenChange }: Props) => {
     },
   });
 
-  const isDisabled = useMemo(() => !inputValue.trim(), [inputValue]);
+  const isDisabled = useMemo(
+    () => !inputValue.trim() || isPending,
+    [inputValue, isPending]
+  );
 
   const handleChange = useCallback((e: ChangeEvent) => {
     const target = e.target as HTMLInputElement;
