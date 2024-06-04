@@ -22,9 +22,12 @@ import {
 import PostItem from "@/components/post";
 import AvatarImg from "@/components/avatar-img";
 import EmptyData from "@/components/empty-data";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { getComments } from "@/actions/post";
 import Loading from "./icons/loading";
+import CommentItem from "./comments";
+import { store } from "@/actions/comments";
+import toast from "react-hot-toast";
 
 interface Props {
   data: Post & { user: User; group: Group | null; file: IFile | null };
@@ -38,17 +41,48 @@ const CommentsModal = ({ data, open, children, onOpenChange }: Props) => {
 
   const [inputValue, setInputValue] = useState("");
 
-  const { data: commentData, isLoading } = useQuery({
+  const {
+    data: commentData,
+    isLoading,
+    refetch,
+  } = useQuery({
     enabled: !!open && !!data.id,
     queryKey: ["post", "comment", data.id],
     queryFn: () => getComments(data.id),
   });
+
+  const { mutate, isPending } = useMutation({
+    mutationKey: ["post", "comments", "store", data.id],
+    mutationFn: store,
+    onSuccess() {
+      refetch();
+      setInputValue("");
+      toast.success("Bình luận bài viết thành công");
+    },
+    onError() {
+      toast.error("Bình luận bài viết thất bại. Vui lòng thử lại sau");
+    },
+  });
+
+  const isDisabled = useMemo(() => !inputValue.trim(), [inputValue]);
 
   const handleChange = useCallback((e: ChangeEvent) => {
     const target = e.target as HTMLInputElement;
     const val = target.value;
     setInputValue(val);
   }, []);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key.toLowerCase() !== "enter" || isDisabled || !currentUser) return;
+      console.log(inputValue);
+      mutate({
+        postId: data.id,
+        content: inputValue,
+      });
+    },
+    [inputValue, isDisabled, currentUser, data]
+  );
 
   const content = useMemo(() => {
     if (isLoading)
@@ -58,7 +92,9 @@ const CommentsModal = ({ data, open, children, onOpenChange }: Props) => {
         </div>
       );
     if (!commentData || !commentData.length) return <EmptyData />;
-    return null;
+    return commentData.map((item) => {
+      return <CommentItem key={item.id} data={item} />;
+    });
   }, [commentData, isLoading]);
 
   return (
@@ -81,7 +117,7 @@ const CommentsModal = ({ data, open, children, onOpenChange }: Props) => {
             <PostItem data={data} isModal />
 
             {/* Comments */}
-            {content}
+            <div className="w-full">{content}</div>
           </ScrollArea>
         </div>
 
@@ -94,11 +130,12 @@ const CommentsModal = ({ data, open, children, onOpenChange }: Props) => {
                 placeholder="Viết bình luận"
                 value={inputValue}
                 onChange={handleChange}
+                onKeyDown={handleKeyDown}
               />
               <Button
                 className={cn(
                   "w-10 h-10 p-0 hover:bg-primary/50 rounded-full",
-                  !!inputValue.trim() && "bg-primary/50 hover:bg-primary/40"
+                  !isDisabled && "bg-primary/50 hover:bg-primary/40"
                 )}
                 variant="outline"
                 size="icon"

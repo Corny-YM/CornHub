@@ -13,7 +13,7 @@ export async function POST(
     const { followerId }: { followerId: string } = body;
 
     if (!userId || userId !== params.userId) {
-      return new NextResponse("Authenticated", { status: 401 });
+      return new NextResponse("Unauthenticated", { status: 401 });
     }
 
     await prisma.follower.updateMany({

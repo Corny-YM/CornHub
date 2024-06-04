@@ -1,4 +1,4 @@
-import { Post, Reaction } from "@prisma/client";
+import { Post, Reaction, User, File as IFile } from "@prisma/client";
 
 import defHttp from "@/lib/defHttp";
 
@@ -29,8 +29,10 @@ export const destroy = async (id: number): Promise<number> =>
 export const countComments = async (id: number): Promise<number> =>
   defHttp.get(`${indexApi}/${id}/comments/count`);
 
-export const getComments = async (id: number): Promise<Comment[]> =>
-  defHttp.get(`${indexApi}/${id}/comments`);
+export const getComments = async (
+  id: number
+): Promise<(Comment & { user: User; file?: IFile })[]> =>
+  await defHttp.get(`${indexApi}/${id}/comments`);
 
 // =============================Reactions=============================
 export const countReactions = async (id: number): Promise<number> =>

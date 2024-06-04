@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     const { userId: userSeverId } = auth();
     const { userId, friendId }: { userId: string; friendId: string } = body;
 
-    if (!userSeverId) return new NextResponse("Authenticated", { status: 401 });
+    if (!userSeverId) return new NextResponse("Unauthenticated", { status: 401 });
 
     const friendRequest = await prisma.friendRequest.findFirst({
       where: {

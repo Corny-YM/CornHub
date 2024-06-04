@@ -11,7 +11,7 @@ export async function GET(
     const { userId: currentUserId } = auth();
 
     if (!currentUserId) {
-      return new NextResponse("Authenticated", { status: 401 });
+      return new NextResponse("Unauthenticated", { status: 401 });
     }
 
     let userId = "";

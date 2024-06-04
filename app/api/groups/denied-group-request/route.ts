@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     const { groupId }: { groupId: number } = body;
 
     const { userId } = auth();
-    if (!userId) return new NextResponse("Authenticated", { status: 401 });
+    if (!userId) return new NextResponse("Unauthenticated", { status: 401 });
 
     if (!groupId)
       return new NextResponse("Group ID is required", { status: 404 });

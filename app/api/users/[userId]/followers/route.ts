@@ -9,7 +9,7 @@ export async function GET(
 ) {
   try {
     const { userId } = auth();
-    if (!userId) return new NextResponse("Authenticated", { status: 401 });
+    if (!userId) return new NextResponse("Unauthenticated", { status: 401 });
 
     const followings = await prisma.follower.findMany({
       include: { follower: true, user: true },

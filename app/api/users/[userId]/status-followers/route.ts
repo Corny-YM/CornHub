@@ -11,7 +11,7 @@ export async function GET(
     const { userId } = auth();
 
     if (!userId || userId !== params.userId)
-      return new NextResponse("Authenticated", { status: 401 });
+      return new NextResponse("Unauthenticated", { status: 401 });
 
     const followers = await prisma.follower.findMany({
       where: {

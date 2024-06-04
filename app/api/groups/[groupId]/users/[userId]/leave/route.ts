@@ -8,7 +8,7 @@ export async function GET(
 ) {
   try {
     const { userId } = auth();
-    if (!userId) return new NextResponse("Authenticated", { status: 401 });
+    if (!userId) return new NextResponse("Unauthenticated", { status: 401 });
 
     if (!params.userId)
       return new NextResponse("User ID is required", { status: 404 });

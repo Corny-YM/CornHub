@@ -13,7 +13,7 @@ export async function GET(
 
     const { userId } = auth();
     if (!userId) {
-      return new NextResponse("Authenticated", { status: 400 });
+      return new NextResponse("Unauthenticated", { status: 400 });
     }
 
     const groupMembers = await prisma.groupMember.findMany({

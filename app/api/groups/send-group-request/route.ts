@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     } = body;
 
     const { userId } = auth();
-    if (!userId) return new NextResponse("Authenticated", { status: 401 });
+    if (!userId) return new NextResponse("Unauthenticated", { status: 401 });
 
     const data = ids.map((id) => ({
       sender_id: userId,

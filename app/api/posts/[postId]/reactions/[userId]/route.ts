@@ -11,7 +11,7 @@ export async function GET(
     const { userId } = auth();
 
     if (!userId || userId !== params.userId) {
-      return new NextResponse("Authenticated", { status: 400 });
+      return new NextResponse("Unauthenticated", { status: 400 });
     }
 
     const post = await prisma.post.findUnique({

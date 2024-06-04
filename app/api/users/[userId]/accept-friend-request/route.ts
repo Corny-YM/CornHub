@@ -13,7 +13,7 @@ export async function POST(
     const { friendId }: { friendId: string } = body;
 
     if (!userId || userId !== params.userId) {
-      return new NextResponse("Authenticated", { status: 401 });
+      return new NextResponse("Unauthenticated", { status: 401 });
     }
 
     // if a person accept the friendRequest => that person is friend_id

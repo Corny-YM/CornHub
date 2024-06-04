@@ -7,7 +7,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { name, status }: { name: string; status: string } = body;
     const { userId } = auth();
-    if (!userId) return new NextResponse("Authenticated", { status: 401 });
+    if (!userId) return new NextResponse("Unauthenticated", { status: 401 });
 
     const group = await prisma.group.create({
       data: {

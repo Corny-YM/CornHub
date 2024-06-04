@@ -10,7 +10,7 @@ export async function GET(
   try {
     const { userId } = auth();
 
-    if (!userId) return new NextResponse("Authenticated", { status: 400 });
+    if (!userId) return new NextResponse("Unauthenticated", { status: 400 });
 
     const post = await prisma.post.findUnique({
       where: { id: +params.postId },
@@ -19,13 +19,16 @@ export async function GET(
     if (!post) return new NextResponse("Post doesn't exist", { status: 400 });
 
     const comments = await prisma.comment.findMany({
-      include: { user: true },
+      include: {
+        user: true,
+        file: true,
+      },
       where: { post_id: +params.postId },
     });
 
     return NextResponse.json(comments);
   } catch (err) {
-    console.log("[POST__COMMENTS_GET]", err);
+    console.log("[POST_COMMENTS_GET]", err);
     return new NextResponse("Internal error", { status: 500 });
   }
 }
