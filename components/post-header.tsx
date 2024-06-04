@@ -24,12 +24,18 @@ import AlertModal from "@/components/alert-modal";
 import DropdownActions from "@/components/dropdown-actions";
 
 interface Props {
+  isModal?: boolean;
   isGroupOwner?: boolean;
   isGroupOwnerPost?: boolean;
   data: Post & { user: User; group: Group | null };
 }
 
-const PostHeader = ({ data, isGroupOwner, isGroupOwnerPost }: Props) => {
+const PostHeader = ({
+  data,
+  isModal,
+  isGroupOwner,
+  isGroupOwnerPost,
+}: Props) => {
   const router = useRouter();
   const { userId } = useAuth();
   const { id, user, group, group_id, created_at } = data;
@@ -104,7 +110,7 @@ const PostHeader = ({ data, isGroupOwner, isGroupOwnerPost }: Props) => {
           icon: <MessageSquareWarning className="mr-2" size={20} />,
         },
         {
-          label: `Chặn trang cá nhân của ${user.full_name}}`,
+          label: `Chặn trang cá nhân của ${user.full_name}`,
           icon: <UserX className="mr-2" size={20} />,
           destructive: true,
         }
@@ -120,7 +126,12 @@ const PostHeader = ({ data, isGroupOwner, isGroupOwnerPost }: Props) => {
   }, [data]);
 
   return (
-    <div className="flex w-full items-center px-4 pt-3 mb-3">
+    <div
+      className={cn(
+        "flex w-full items-center px-4 pt-3 mb-3",
+        isModal && "px-0"
+      )}
+    >
       {/* Image */}
       <div className="relative flex justify-center items-center">
         <Link

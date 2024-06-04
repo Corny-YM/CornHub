@@ -16,6 +16,10 @@ a {
   @apply rounded-lg overflow-hidden;
   @apply dark:bg-neutral-800 bg-[#f0f2f5];
 
+  &.popup {
+    @apply rounded-none bg-inherit;
+  }
+
   & + & {
     @apply mt-4;
   }

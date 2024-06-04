@@ -114,3 +114,11 @@ export const unfollow = async ({
   followerId: string;
 }): Promise<Follower> =>
   defHttp.post(`${indexApi}/${userId}/unfollow`, { followerId });
+
+export const searching = async (params: {
+  searchKey: string;
+  limit?: number;
+}): Promise<{
+  users: User[];
+  groups: Group[];
+}> => defHttp.get(`${indexApi}/searching`, { params });

@@ -24,7 +24,10 @@ import Sad from "@/components/icons/sad";
 import Angry from "@/components/icons/angry";
 
 interface Props {
+  isModal?: boolean;
   data: Post & { user: User; group: Group | null };
+  onClickReaction: () => void;
+  onClickComment: () => void;
 }
 
 const emotions = [
@@ -37,7 +40,12 @@ const emotions = [
   { label: "Phẫn nộ", type: "angry", color: "#e9710f", icon: Angry },
 ];
 
-const PostFooter = ({ data }: Props) => {
+const PostFooter = ({
+  data,
+  isModal,
+  onClickReaction,
+  onClickComment,
+}: Props) => {
   const { userId } = useAuth();
   const { id } = data;
 
@@ -139,7 +147,12 @@ const PostFooter = ({ data }: Props) => {
   ]);
 
   return (
-    <div className="w-full flex flex-col justify-center text-sm px-4">
+    <div
+      className={cn(
+        "w-full flex flex-col justify-center text-sm px-4",
+        isModal && "px-0"
+      )}
+    >
       <div
         className={cn(
           "w-full flex items-center",
@@ -160,7 +173,10 @@ const PostFooter = ({ data }: Props) => {
                 </div>
               ))}
             </div>
-            <div className="pl-1 cursor-pointer hover:underline">
+            <div
+              className="pl-1 cursor-pointer hover:underline"
+              onClick={onClickReaction}
+            >
               {dataCountReactions}
             </div>
           </div>
@@ -168,7 +184,7 @@ const PostFooter = ({ data }: Props) => {
 
         {/* Comments */}
         {!!dataCountComments && (
-          <div className="flex ml-3 items-center">
+          <div className="flex ml-3 items-center" onClick={onClickComment}>
             <span className="cursor-pointer hover:underline">
               {formatAmounts(dataCountComments)} bình luận
             </span>
@@ -197,6 +213,7 @@ const PostFooter = ({ data }: Props) => {
         <Button
           className="hover:bg-primary/50 transition flex-1"
           variant="outline"
+          onClick={onClickComment}
         >
           <MessageCircle className="mr-1" size={20} />
           Bình luận

@@ -115,8 +115,6 @@ model Post {
 model Comment {
   id         Int      @id @default(autoincrement())
   content    String
-  file       String?
-  file_type  Int?     @db.TinyInt
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
@@ -129,6 +127,9 @@ model Comment {
   user_id String
   user    User   @relation("UserToComment", fields: [user_id], references: [id])
 
+  file_id Int?
+  file    File? @relation("FileToComment", fields: [file_id], references: [id])
+
   // 
   reacts        Reaction[]     @relation("CommentToReaction")
   notifications Notification[] @relation("CommentToNotification")
@@ -136,6 +137,7 @@ model Comment {
 
   @@index([post_id])
   @@index([user_id])
+  @@index([file_id])
   @@index([comment_id])
   @@map("comments")
 }
@@ -355,9 +357,10 @@ model File {
   updated_at  DateTime @updatedAt
 
   // Relation
-  user_id String
-  user    User   @relation("UserToFile", fields: [user_id], references: [id])
-  post_id Post[] @relation("FileToPost")
+  user_id  String
+  user     User      @relation("UserToFile", fields: [user_id], references: [id])
+  post_id  Post[]    @relation("FileToPost")
+  comments Comment[] @relation("FileToComment")
 
   @@index([user_id])
   @@map("files")
