@@ -12,6 +12,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { AlertDialogOverlay } from "@radix-ui/react-alert-dialog";
 
 interface Props {
   open?: boolean;
@@ -33,7 +34,8 @@ const AlertModal = ({
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogOverlay className="!z-[99999999] bg-neutral-600/10" />
+      <AlertDialogContent className="z-[99999999]">
         <AlertDialogHeader>
           <AlertDialogTitle>Bạn có hoàn toàn chắc chắn không?</AlertDialogTitle>
           <AlertDialogDescription>

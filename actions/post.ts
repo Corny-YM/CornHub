@@ -31,8 +31,13 @@ export const countComments = async (id: number): Promise<number> =>
 
 export const getComments = async (
   id: number
-): Promise<(Comment & { user: User; file?: IFile })[]> =>
-  await defHttp.get(`${indexApi}/${id}/comments`);
+): Promise<
+  (Comment & {
+    user: User;
+    file?: IFile;
+    _count: { reacts: number; commentReplies: number };
+  })[]
+> => await defHttp.get(`${indexApi}/${id}/comments`);
 
 // =============================Reactions=============================
 export const countReactions = async (id: number): Promise<number> =>

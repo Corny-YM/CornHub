@@ -9,7 +9,7 @@ export function isUndefined(value: any): boolean {
   return typeof value === "undefined";
 }
 
-export const getRelativeTime = (date: Date) => {
+export const getRelativeTime = (date: Date, suffix = true) => {
   const now = new Date().getTime();
   const past = new Date(date).getTime();
   const diffInSeconds = Math.floor((now - past) / 1000);
@@ -26,6 +26,7 @@ export const getRelativeTime = (date: Date) => {
   for (let unit of units) {
     const quotient = Math.floor(diffInSeconds / unit.value);
     if (quotient > 0) {
+      if (!suffix) return `${quotient} ${unit.name}`;
       return `${quotient} ${unit.name} trước`;
     }
   }

@@ -1,69 +1,58 @@
 "use client";
 
-import Link from "next/link";
-import { useMemo } from "react";
-import { Comment, User, File as IFile } from "@prisma/client";
+import { Comment, User, Post, Group, File as IFile } from "@prisma/client";
 
-import { cn } from "@/lib/utils";
-import Video from "@/components/video";
+import { cn, getRelativeTime } from "@/lib/utils";
 import AvatarImg from "@/components/avatar-img";
-import Image from "next/image";
-
-type CommentWithInfo = Comment & { user: User; file?: IFile | null };
+import Actions from "./actions";
+import Content from "./content";
 
 interface Props {
   className?: string;
-  data: CommentWithInfo;
+  data: Comment & {
+    user: User;
+    file?: IFile | null;
+    _count: { reacts: number; commentReplies: number };
+  };
+  dataPost: Post & {
+    user: User;
+    group: Group | null;
+    file: IFile | null;
+  };
 }
 
-const CommentItem = ({ data, className }: Props) => {
-  const { user, file, content, comment_id } = data;
-
-  const type = useMemo(() => {
-    if (!file) return;
-    return `${file.type}/${file.ext}`;
-  }, [file]);
-  const path = useMemo(() => {
-    if (!file) return;
-    return file.path;
-  }, [file]);
-
-  const isVideo = useMemo(() => {
-    const checked = file?.type === "video";
-    return checked;
-  }, [file]);
-
-  const contentFile = useMemo(() => {
-    if (!path || !file) return null;
-    if (isVideo && type) return <Video src={path} type={type} />;
-    return (
-      <Image
-        className="absolute w-full h-full"
-        alt={file.name}
-        src={path}
-        fill
-      />
-    );
-  }, [isVideo, type, file, path]);
+const CommentItem = ({ data, dataPost, className }: Props) => {
+  const { user, created_at, _count } = data;
 
   return (
     <div className={cn("w-full flex flex-col px-2 pt-1", className)}>
-      <div className="w-full flex items-start">
+      <div className="w-full h-fit flex items-start group">
         <AvatarImg src={user.avatar!} className="mr-2" />
-        {/* Content comment */}
-        <div className="w-full h-fit px-3 py-2 rounded-lg bg-primary-foreground/50 leading-normal">
-          <Link
-            className="font-bold hover:underline"
-            href={`/account/${user.id}`}
-          >
-            {user.full_name}
-          </Link>
-          <div className="w-full break-words">{content}</div>
-          <div className="w-full">
-            <div className="w-full relative flex justify-center items-center">
-              {contentFile}
+
+        <div className="w-full flex flex-col">
+          <div className="w-fit flex items-center gap-1">
+            {/* Content */}
+            <Content data={data} />
+
+            {/* Actions */}
+            <div className="group-hover:opacity-100 opacity-0 h-full flex-grow flex-shrink flex justify-center items-center transition">
+              <Actions data={data} dataPost={dataPost} />
             </div>
           </div>
+
+          {/* Interactions */}
+          <div className="w-full flex items-center gap-x-4 text-xs px-2">
+            <div>{getRelativeTime(created_at, false)}</div>
+            <div className="cursor-pointer hover:underline">Thích</div>
+            <div className="cursor-pointer hover:underline">Phản hồi</div>
+            {_count.reacts >= 3 && <div>tuowng tac comment</div>}
+          </div>
+
+          {!_count.commentReplies && (
+            <div className="cursor-pointer hover:underline px-1">
+              15 phản hồi
+            </div>
+          )}
         </div>
       </div>
     </div>

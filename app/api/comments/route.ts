@@ -11,7 +11,6 @@ export async function PUT(req: Request) {
     const file = formData.get("file") as File | null;
     const postId = formData.get("postId") as string;
     const content = formData.get("content") as string;
-    const commentId = formData.get("commentId") as string;
 
     const { userId } = auth();
     if (!userId) return new NextResponse("Unauthenticated", { status: 401 });
@@ -27,7 +26,6 @@ export async function PUT(req: Request) {
     const comment = await prisma.comment.create({
       data: {
         content: content || "",
-        comment_id: commentId ? +commentId : undefined,
         post_id: +postId,
         user_id: userId,
         file_id: fileDB?.id,

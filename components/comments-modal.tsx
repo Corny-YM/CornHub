@@ -96,7 +96,7 @@ const CommentsModal = ({ data, open, children, onOpenChange }: Props) => {
       );
     if (!commentData || !commentData.length) return <EmptyData />;
     return commentData.map((item) => {
-      return <CommentItem key={item.id} data={item} />;
+      return <CommentItem key={item.id} data={item} dataPost={data} />;
     });
   }, [commentData, isLoading]);
 
