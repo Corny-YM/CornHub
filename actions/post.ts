@@ -1,4 +1,4 @@
-import { Post, Reaction, User, File as IFile } from "@prisma/client";
+import { Post, Reaction, Comment, User, File as IFile } from "@prisma/client";
 
 import defHttp from "@/lib/defHttp";
 

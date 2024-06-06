@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { Button } from "./ui/button";
 import { X } from "lucide-react";
 import { IDispatchState } from "@/types";
+import Video from "./video";
 
 interface Props {
   file: File;
@@ -34,11 +35,7 @@ const PostingPreviewFile = ({ file, setFile }: Props) => {
           />
         </div>
       )}
-      {!isImg && (
-        <video className="w-full h-full" controls preload="auto">
-          <source src={fileUrl} type={file.type} />
-        </video>
-      )}
+      {!isImg && <Video src={fileUrl} type={file.type} />}
 
       <Button
         className="absolute top-1 right-1 rounded-full w-7 h-7"

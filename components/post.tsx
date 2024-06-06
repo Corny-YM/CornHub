@@ -1,13 +1,14 @@
 "use client";
 
+import Image from "next/image";
+import { useMemo } from "react";
 import { Group, Post, User, File as IFile } from "@prisma/client";
 
 import { cn } from "@/lib/utils";
+import { useToggle } from "@/hooks/useToggle";
+import Video from "@/components/video";
 import PostFooter from "@/components/post-footer";
 import PostHeader from "@/components/post-header";
-import Image from "next/image";
-import { useMemo } from "react";
-import { useToggle } from "@/hooks/useToggle";
 import CommentsModal from "./comments-modal";
 import ReactionsModal from "./reactions-modal";
 
@@ -67,13 +68,11 @@ const PostItem = ({
                 />
               )}
               {type === "video" && (
-                <video
-                  className="absolute w-full h-full object-cover"
-                  preload="auto"
-                  controls
-                >
-                  <source src={path} type={`${file.type}/${file.ext}`} />
-                </video>
+                <Video
+                  className="absolute object-cover"
+                  src={path}
+                  type={`${file.type}/${file.ext}`}
+                />
               )}
             </div>
           </div>

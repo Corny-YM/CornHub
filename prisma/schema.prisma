@@ -52,6 +52,7 @@ model User {
   senderGroupRequest    GroupRequest[]  @relation("SenderToGroupRequest")
   receiverGroupRequest  GroupRequest[]  @relation("ReceiverToGroupRequest")
   files                 File[]          @relation("UserToFile")
+  commentReplies        CommentReply[]  @relation("UserToCommentReply")
 
   @@map("users")
 }
@@ -101,10 +102,11 @@ model Post {
   file_id  Int?
   file     File?  @relation("FileToPost", fields: [file_id], references: [id])
 
-  reports       Report[]       @relation("PostToReport")
-  comments      Comment[]      @relation("PostToComment")
-  reactions     Reaction[]     @relation("PostToReaction")
-  notifications Notification[] @relation("PostToNotification")
+  reports        Report[]       @relation("PostToReport")
+  comments       Comment[]      @relation("PostToComment")
+  reactions      Reaction[]     @relation("PostToReaction")
+  notifications  Notification[] @relation("PostToNotification")
+  commentReplies CommentReply[] @relation("PostToCommentReply")
 
   @@index([user_id])
   @@index([file_id])
@@ -119,8 +121,6 @@ model Comment {
   updated_at DateTime @updatedAt
 
   // relation
-  comment_id Int?
-
   post_id Int
   post    Post @relation("PostToComment", fields: [post_id], references: [id])
 
@@ -131,15 +131,41 @@ model Comment {
   file    File? @relation("FileToComment", fields: [file_id], references: [id])
 
   // 
-  reacts        Reaction[]     @relation("CommentToReaction")
-  notifications Notification[] @relation("CommentToNotification")
-  reports       Report[]       @relation("CommentToReport")
+  reacts         Reaction[]     @relation("CommentToReaction")
+  notifications  Notification[] @relation("CommentToNotification")
+  reports        Report[]       @relation("CommentToReport")
+  commentReplies CommentReply[] @relation("CommentToCommentReply")
+
+  @@index([post_id])
+  @@index([user_id])
+  @@index([file_id])
+  @@map("comments")
+}
+
+model CommentReply {
+  id         Int      @id @default(autoincrement())
+  content    String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // relation
+  comment_id Int
+  comment    Comment @relation("CommentToCommentReply", fields: [comment_id], references: [id])
+
+  post_id Int
+  post    Post @relation("PostToCommentReply", fields: [post_id], references: [id])
+
+  user_id String
+  user    User   @relation("UserToCommentReply", fields: [user_id], references: [id])
+
+  file_id Int?
+  file    File? @relation("FileToCommentReply", fields: [file_id], references: [id])
 
   @@index([post_id])
   @@index([user_id])
   @@index([file_id])
   @@index([comment_id])
-  @@map("comments")
+  @@map("comment_replies")
 }
 
 model Reaction {
@@ -357,10 +383,11 @@ model File {
   updated_at  DateTime @updatedAt
 
   // Relation
-  user_id  String
-  user     User      @relation("UserToFile", fields: [user_id], references: [id])
-  post_id  Post[]    @relation("FileToPost")
-  comments Comment[] @relation("FileToComment")
+  user_id        String
+  user           User           @relation("UserToFile", fields: [user_id], references: [id])
+  post_id        Post[]         @relation("FileToPost")
+  comments       Comment[]      @relation("FileToComment")
+  commentReplies CommentReply[] @relation("FileToCommentReply")
 
   @@index([user_id])
   @@map("files")

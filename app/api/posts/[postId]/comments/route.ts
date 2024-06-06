@@ -19,10 +19,7 @@ export async function GET(
     if (!post) return new NextResponse("Post doesn't exist", { status: 400 });
 
     const comments = await prisma.comment.findMany({
-      include: {
-        user: true,
-        file: true,
-      },
+      include: { user: true, file: true },
       where: { post_id: +params.postId },
     });
 
