@@ -25,6 +25,8 @@ import { Skeleton } from "./ui/skeleton";
 
 interface Props {
   data: Post & { user: User; group: Group | null; file: IFile | null };
+  commentId?: number;
+  replyId?: number;
   open?: boolean;
   children?: React.ReactNode;
   onOpenChange?: (val?: boolean) => void;
@@ -32,23 +34,33 @@ interface Props {
 
 const defaultType = "all";
 
-const ReactionsModal = ({ data, open, children, onOpenChange }: Props) => {
+const ReactionsModal = ({
+  data,
+  commentId,
+  replyId,
+  open,
+  children,
+  onOpenChange,
+}: Props) => {
   const [currentType, setCurrentType] = useState(defaultType);
+  const dynamicKeys = [data.id, commentId, replyId];
 
   // Get all type of reactions that post had
   const { data: dataReactionTypes, isLoading: isLoadingReactionTypes } =
     useQuery({
       enabled: !!data.id && open,
-      queryKey: ["post", "types", "reactions", data.id, currentType],
-      queryFn: () => getAllReactionTypes({ postId: data.id }),
+      queryKey: ["post", "types", "reactions", ...dynamicKeys],
+      queryFn: () =>
+        getAllReactionTypes({ postId: data.id, commentId, replyId }),
     });
 
   // Get all reactions of currentType
   const { data: dataReactions, isLoading: isLoadingReactions } = useQuery({
     enabled:
       !!data.id && !!dataReactionTypes && !!dataReactionTypes.length && open,
-    queryKey: ["post", "getReactions", data.id, currentType],
-    queryFn: () => index({ postId: data.id, type: currentType }),
+    queryKey: ["post", "getReactions", currentType, ...dynamicKeys],
+    queryFn: () =>
+      index({ postId: data.id, commentId, replyId, type: currentType }),
   });
 
   const handleOpenChange = useCallback(

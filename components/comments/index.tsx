@@ -1,11 +1,17 @@
 "use client";
 
+import { useCallback } from "react";
+import { useAuth } from "@clerk/nextjs";
 import { Comment, User, Post, Group, File as IFile } from "@prisma/client";
 
+import { emotions } from "@/lib/const";
 import { cn, getRelativeTime } from "@/lib/utils";
+import { useMutates } from "@/hooks/mutations/reaction/useMutates";
 import AvatarImg from "@/components/avatar-img";
-import Actions from "./actions";
+import TooltipButton from "@/components/tooltip-button";
 import Content from "./content";
+import Actions from "./actions";
+import { Button } from "../ui/button";
 
 interface Props {
   className?: string;
@@ -22,7 +28,37 @@ interface Props {
 }
 
 const CommentItem = ({ data, dataPost, className }: Props) => {
+  const { userId } = useAuth();
   const { user, created_at, _count } = data;
+
+  const { isPendingDeleteReaction, isPendingStoreReaction, onDelete, onStore } =
+    useMutates();
+
+  const handleClickEmotion = useCallback(
+    async (e: React.MouseEvent) => {
+      if (!userId || !dataPost.id) return;
+      const target = e.currentTarget as HTMLDivElement;
+      const type = target.dataset.type;
+      if (!type) return;
+      await onStore({ type, postId: dataPost.id, userId: userId }, () => {});
+    },
+    [dataPost, userId]
+  );
+
+  const handleClickReaction = useCallback(async () => {
+    if (!userId || !dataPost.id) return;
+    // TODO: remove reaction
+    // if (dataCurrentUserReaction)
+    //   return mutateDeleteReaction(dataCurrentUserReaction.id);
+    await onStore(
+      {
+        type: emotions[0].type,
+        postId: dataPost.id,
+        userId: userId,
+      },
+      () => {}
+    );
+  }, [dataPost, userId, onDelete, onStore]);
 
   return (
     <div className={cn("w-full flex flex-col px-2 pt-1", className)}>
@@ -43,8 +79,40 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
           {/* Interactions */}
           <div className="w-full flex items-center gap-x-4 text-xs px-2">
             <div>{getRelativeTime(created_at, false)}</div>
-            <div className="cursor-pointer hover:underline">Thích</div>
-            <div className="cursor-pointer hover:underline">Phản hồi</div>
+            <TooltipButton
+              className="rounded-full"
+              button={
+                <Button
+                  className="px-1 text-xs cursor-pointer select-none leading-normal hover:underline"
+                  variant="link"
+                  size="sm"
+                  disabled={isPendingStoreReaction || isPendingDeleteReaction}
+                  onClick={handleClickReaction}
+                >
+                  Thích
+                </Button>
+              }
+            >
+              <div className="flex items-center justify-center gap-1">
+                {emotions.map(({ label, type, icon: Icon }) => (
+                  <div
+                    key={label}
+                    data-type={type}
+                    className="w-10 h-10 flex justify-center items-center rounded-full overflow-hidden border border-solid cursor-pointer transition-all hover:scale-110"
+                    onClick={handleClickEmotion}
+                  >
+                    <Icon />
+                  </div>
+                ))}
+              </div>
+            </TooltipButton>
+            <Button
+              className="px-1 text-xs cursor-pointer select-none leading-normal hover:underline"
+              variant="link"
+              size="sm"
+            >
+              Phản hồi
+            </Button>
             {_count.reacts >= 3 && <div>tuowng tac comment</div>}
           </div>
 

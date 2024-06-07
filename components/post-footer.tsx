@@ -16,6 +16,7 @@ import { cn, formatAmounts, getRandomItems } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import TooltipButton from "@/components/tooltip-button";
+import { useMutates } from "@/hooks/mutations/reaction/useMutates";
 
 interface Props {
   isModal?: boolean;
@@ -54,56 +55,38 @@ const PostFooter = ({
     });
 
   // useMutation
-  const { mutate: mutateStoreReaction, isPending: isPendingStoreReaction } =
-    useMutation({
-      mutationKey: ["post", "react", "store", userId, id],
-      mutationFn: store,
-      onSuccess() {
-        refetchUserReaction();
-        refetchCountReactions();
-      },
-      onError() {
-        toast.error(
-          "Thả tương tác bài viết không thành công. Vui lòng thử lại sau"
-        );
-      },
-    });
-  const { mutate: mutateDeleteReaction, isPending: isPendingDeleteReaction } =
-    useMutation({
-      mutationKey: ["post", "react", "delete", userId, id],
-      mutationFn: destroy,
-      onSuccess() {
-        refetchUserReaction();
-        refetchCountReactions();
-      },
-      onError() {
-        toast.error("Thao tác không thất bại. Vui lòng thử lại sau");
-      },
-    });
+  const { isPendingDeleteReaction, isPendingStoreReaction, onDelete, onStore } =
+    useMutates();
 
   const handleClickEmotion = useCallback(
-    (e: React.MouseEvent) => {
+    async (e: React.MouseEvent) => {
       const target = e.currentTarget as HTMLDivElement;
       const type = target.dataset.type;
       if (!type) return;
-      mutateStoreReaction({
-        type,
-        post_id: id,
-        user_id: userId,
+      await onStore({ type, postId: id, userId: userId }, () => {
+        refetchCountReactions();
+        refetchUserReaction();
       });
     },
-    [id, userId, mutateStoreReaction]
+    [id, userId, onStore]
   );
 
-  const handleClickReaction = useCallback(() => {
-    if (dataCurrentUserReaction)
-      return mutateDeleteReaction(dataCurrentUserReaction.id);
-    mutateStoreReaction({
-      type: emotions[0].type,
-      post_id: id,
-      user_id: userId,
-    });
-  }, [id, userId, dataCurrentUserReaction, mutateStoreReaction]);
+  const handleClickReaction = useCallback(async () => {
+    if (dataCurrentUserReaction) {
+      await onDelete(dataCurrentUserReaction.id, () => {
+        refetchCountReactions();
+        refetchUserReaction();
+      });
+      return;
+    }
+    await onStore(
+      { type: emotions[0].type, postId: id, userId: userId },
+      () => {
+        refetchCountReactions();
+        refetchUserReaction();
+      }
+    );
+  }, [id, userId, dataCurrentUserReaction, onStore, onDelete]);
 
   const button = useMemo(() => {
     const typeBtn = dataCurrentUserReaction?.type;
