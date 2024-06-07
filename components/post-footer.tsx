@@ -11,17 +11,11 @@ import {
   getCurrentUserReaction,
 } from "@/actions/post";
 import { destroy, store } from "@/actions/reactions";
+import { emotions } from "@/lib/const";
 import { cn, formatAmounts, getRandomItems } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import TooltipButton from "@/components/tooltip-button";
-import Like from "@/components/icons/like";
-import Heart from "@/components/icons/heart";
-import Love from "@/components/icons/love";
-import Smile from "@/components/icons/smile";
-import Wow from "@/components/icons/wow";
-import Sad from "@/components/icons/sad";
-import Angry from "@/components/icons/angry";
 
 interface Props {
   isModal?: boolean;
@@ -29,16 +23,6 @@ interface Props {
   onClickReaction: () => void;
   onClickComment: () => void;
 }
-
-const emotions = [
-  { label: "Thích", type: "like", color: "#0866ff", icon: Like },
-  { label: "Yêu thích", type: "heart", color: "#f33e58", icon: Heart },
-  { label: "Thương thương", type: "love", color: "#f7b125", icon: Love },
-  { label: "Haha", type: "smile", color: "#f7b125", icon: Smile },
-  { label: "Wow", type: "wow", color: "#f7b125", icon: Wow },
-  { label: "Buồn", type: "sad", color: "#f7b125", icon: Sad },
-  { label: "Phẫn nộ", type: "angry", color: "#e9710f", icon: Angry },
-];
 
 const PostFooter = ({
   data,
@@ -123,7 +107,7 @@ const PostFooter = ({
 
   const button = useMemo(() => {
     const typeBtn = dataCurrentUserReaction?.type;
-    const emo = emotions.find((item) => item.label === typeBtn) || emotions[0];
+    const emo = emotions.find((item) => item.type === typeBtn) || emotions[0];
     const { color, label, icon: Icon } = emo;
     return (
       <Button
@@ -197,10 +181,10 @@ const PostFooter = ({
       <div className="w-full flex items-center pt-2 pb-3 gap-x-2">
         <TooltipButton className="rounded-full" button={button}>
           <div className="flex items-center justify-center gap-1">
-            {emotions.map(({ label, icon: Icon }) => (
+            {emotions.map(({ label, type, icon: Icon }) => (
               <div
                 key={label}
-                data-type={label}
+                data-type={type}
                 className="w-10 h-10 flex justify-center items-center rounded-full overflow-hidden border border-solid cursor-pointer transition-all hover:scale-110"
                 onClick={handleClickEmotion}
               >
