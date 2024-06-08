@@ -13,6 +13,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { emotions } from "@/lib/const";
 import { cn, formatAmounts, getRelativeTime } from "@/lib/utils";
+import { useToggle } from "@/hooks/useToggle";
 import { useMutates } from "@/hooks/mutations/reaction/useMutates";
 import { Button } from "@/components/ui/button";
 import AvatarImg from "@/components/avatar-img";
@@ -21,7 +22,7 @@ import ReactionsModal from "@/components/reactions-modal";
 import ReactionsButton from "@/components/reactions-button";
 import Content from "./content";
 import Actions from "./actions";
-import { useToggle } from "@/hooks/useToggle";
+import UserInputSending from "../user-input-sending";
 
 interface Props {
   className?: string;
@@ -45,6 +46,8 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
   const { isPendingDeleteReaction, isPendingStoreReaction, onDelete, onStore } =
     useMutates();
 
+  const [inputValue, setInputValue] = useState("");
+  const [isReply, toggleIsReply] = useToggle(false);
   const [totalReactions, setTotalReactions] = useState(_count.reactions);
   const [totalCommentReplies, setTotalCommentReplies] = useState(
     _count.commentReplies
@@ -95,6 +98,10 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
     );
   }, [data, dataPost, userId, onDelete, onStore]);
 
+  const handleClickReply = useCallback((e: React.MouseEvent) => {
+    toggleIsReply();
+  }, []);
+
   const button = useMemo(() => {
     const typeBtn = currentUserReaction?.type;
     const emo = emotions.find((item) => item.type === typeBtn) || emotions[0];
@@ -111,7 +118,12 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
         {label}
       </Button>
     );
-  }, [currentUserReaction, data]);
+  }, [
+    data,
+    currentUserReaction,
+    isPendingStoreReaction,
+    isPendingDeleteReaction,
+  ]);
 
   return (
     <div className={cn("w-full flex flex-col px-2 pt-1", className)}>
@@ -150,6 +162,7 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
               className="px-1 text-xs text-inherit cursor-pointer select-none leading-normal hover:underline"
               variant="link"
               size="sm"
+              onClick={handleClickReply}
             >
               Phản hồi
             </Button>
@@ -166,6 +179,10 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
               {formatAmounts(_count.commentReplies)} phản hồi
             </div>
           )}
+
+          {/* Reply input */}
+          {/* TODO: full functioning input reply */}
+          {isReply && <UserInputSending value={inputValue} />}
         </div>
       </div>
 

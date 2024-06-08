@@ -1,6 +1,7 @@
 "use client";
 
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 import { SendHorizontal } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Group, Post, User, File as IFile, Reaction } from "@prisma/client";
@@ -28,7 +29,7 @@ import AvatarImg from "@/components/avatar-img";
 import EmptyData from "@/components/empty-data";
 import CommentItem from "@/components/comments";
 import Loading from "@/components/icons/loading";
-import { useRouter } from "next/navigation";
+import UserInputSending from "./user-input-sending";
 
 interface Props {
   data: Post & {
@@ -78,7 +79,7 @@ const CommentsModal = ({ data, open, children, onOpenChange }: Props) => {
     [inputValue, isPending]
   );
 
-  const handleChange = useCallback((e: ChangeEvent) => {
+  const handleChange = useCallback((e: React.ChangeEvent) => {
     const target = e.target as HTMLInputElement;
     const val = target.value;
     setInputValue(val);
@@ -95,6 +96,14 @@ const CommentsModal = ({ data, open, children, onOpenChange }: Props) => {
     },
     [inputValue, isDisabled, currentUser, data]
   );
+
+  const handleClickSend = useCallback(() => {
+    if (!currentUser) return;
+    mutate({
+      postId: data.id,
+      content: inputValue,
+    });
+  }, [inputValue, currentUser, data]);
 
   const content = useMemo(() => {
     if (isLoading)
@@ -135,26 +144,13 @@ const CommentsModal = ({ data, open, children, onOpenChange }: Props) => {
 
         {currentUser && (
           <DialogFooter>
-            <div className="flex w-full items-center gap-x-2">
-              <AvatarImg src={currentUser.avatar} />
-              <Input
-                className="flex-1 !ring-0 !ring-offset-0 rounded-full outline-none"
-                placeholder="Viết bình luận"
-                value={inputValue}
-                onChange={handleChange}
-                onKeyDown={handleKeyDown}
-              />
-              <Button
-                className={cn(
-                  "w-10 h-10 p-0 hover:bg-primary/50 rounded-full",
-                  !isDisabled && "bg-primary/50 hover:bg-primary/40"
-                )}
-                variant="outline"
-                size="icon"
-              >
-                <SendHorizontal size={20} />
-              </Button>
-            </div>
+            <UserInputSending
+              value={inputValue}
+              disabled={isDisabled}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+              onSend={handleClickSend}
+            />
           </DialogFooter>
         )}
       </DialogContent>
