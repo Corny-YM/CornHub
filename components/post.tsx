@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useMemo } from "react";
-import { Group, Post, User, File as IFile } from "@prisma/client";
+import { Group, Post, User, File as IFile, Reaction } from "@prisma/client";
 
 import { cn } from "@/lib/utils";
 import { useToggle } from "@/hooks/useToggle";
@@ -17,7 +17,13 @@ interface Props {
   isModal?: boolean;
   isGroupOwner?: boolean;
   isGroupOwnerPost?: boolean;
-  data: Post & { user: User; group: Group | null; file: IFile | null };
+  data: Post & {
+    user: User;
+    group: Group | null;
+    file: IFile | null;
+    reactions: Reaction[];
+    _count: { comments: number; reactions: number };
+  };
 }
 
 const PostItem = ({

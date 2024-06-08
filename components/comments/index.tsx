@@ -1,23 +1,32 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useAuth } from "@clerk/nextjs";
-import { Comment, User, Post, Group, File as IFile } from "@prisma/client";
+import {
+  User,
+  Post,
+  Group,
+  Comment,
+  Reaction,
+  File as IFile,
+} from "@prisma/client";
 
 import { emotions } from "@/lib/const";
-import { cn, getRelativeTime } from "@/lib/utils";
+import { cn, formatAmounts, getRelativeTime } from "@/lib/utils";
 import { useMutates } from "@/hooks/mutations/reaction/useMutates";
+import { Button } from "@/components/ui/button";
 import AvatarImg from "@/components/avatar-img";
 import TooltipButton from "@/components/tooltip-button";
+import ReactionsButton from "@/components/reactions-button";
 import Content from "./content";
 import Actions from "./actions";
-import { Button } from "../ui/button";
 
 interface Props {
   className?: string;
   data: Comment & {
     user: User;
     file?: IFile | null;
+    reacts: Reaction[];
     _count: { reacts: number; commentReplies: number };
   };
   dataPost: Post & {
@@ -29,20 +38,26 @@ interface Props {
 
 const CommentItem = ({ data, dataPost, className }: Props) => {
   const { userId } = useAuth();
-  const { user, created_at, _count } = data;
+  const { user, created_at, reacts, _count } = data;
 
   const { isPendingDeleteReaction, isPendingStoreReaction, onDelete, onStore } =
     useMutates();
 
+  const currentUserReaction = useMemo(() => {
+    return reacts?.[0];
+  }, [reacts]);
+
   const handleClickEmotion = useCallback(
     async (e: React.MouseEvent) => {
-      if (!userId || !dataPost.id) return;
       const target = e.currentTarget as HTMLDivElement;
       const type = target.dataset.type;
-      if (!type) return;
-      await onStore({ type, postId: dataPost.id, userId: userId }, () => {});
+      if (!type || !userId || !dataPost.id) return;
+      await onStore(
+        { type, user_id: userId, post_id: dataPost.id, comment_id: data.id },
+        () => {}
+      );
     },
-    [dataPost, userId]
+    [data, dataPost, userId]
   );
 
   const handleClickReaction = useCallback(async () => {
@@ -53,12 +68,32 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
     await onStore(
       {
         type: emotions[0].type,
-        postId: dataPost.id,
-        userId: userId,
+        user_id: userId,
+        post_id: dataPost.id,
+        comment_id: data.id,
       },
       () => {}
     );
-  }, [dataPost, userId, onDelete, onStore]);
+  }, [data, dataPost, userId, onDelete, onStore]);
+
+  const button = useMemo(() => {
+    const typeBtn = currentUserReaction?.type;
+    const emo = emotions.find((item) => item.type === typeBtn) || emotions[0];
+    if (!emo) return;
+    const { color, label } = emo;
+    return (
+      <Button
+        className="px-1 text-xs cursor-pointer select-none leading-normal hover:underline"
+        variant="link"
+        size="sm"
+        disabled={isPendingStoreReaction || isPendingDeleteReaction}
+        style={{ color: currentUserReaction ? color : "inherit" }}
+        onClick={handleClickReaction}
+      >
+        {label}
+      </Button>
+    );
+  }, [currentUserReaction, data]);
 
   return (
     <div className={cn("w-full flex flex-col px-2 pt-1", className)}>
@@ -79,20 +114,7 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
           {/* Interactions */}
           <div className="w-full flex items-center gap-x-4 text-xs px-2">
             <div>{getRelativeTime(created_at, false)}</div>
-            <TooltipButton
-              className="rounded-full"
-              button={
-                <Button
-                  className="px-1 text-xs cursor-pointer select-none leading-normal hover:underline"
-                  variant="link"
-                  size="sm"
-                  disabled={isPendingStoreReaction || isPendingDeleteReaction}
-                  onClick={handleClickReaction}
-                >
-                  Thích
-                </Button>
-              }
-            >
+            <TooltipButton className="rounded-full" button={button}>
               <div className="flex items-center justify-center gap-1">
                 {emotions.map(({ label, type, icon: Icon }) => (
                   <div
@@ -107,18 +129,20 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
               </div>
             </TooltipButton>
             <Button
-              className="px-1 text-xs cursor-pointer select-none leading-normal hover:underline"
+              className="px-1 text-xs text-inherit cursor-pointer select-none leading-normal hover:underline"
               variant="link"
               size="sm"
             >
               Phản hồi
             </Button>
-            {_count.reacts >= 3 && <div>tuowng tac comment</div>}
+            {_count.reacts > 0 && (
+              <ReactionsButton totalReactions={_count.reacts} />
+            )}
           </div>
 
-          {!_count.commentReplies && (
+          {!!_count.commentReplies && (
             <div className="cursor-pointer hover:underline px-1">
-              15 phản hồi
+              {formatAmounts(_count.commentReplies)} phản hồi
             </div>
           )}
         </div>

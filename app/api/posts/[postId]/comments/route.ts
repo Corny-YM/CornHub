@@ -22,7 +22,13 @@ export async function GET(
       include: {
         user: true,
         file: true,
-        _count: { select: { reacts: true, commentReplies: true } },
+        reacts: { where: { user_id: userId, reply_id: null }, take: 1 },
+        _count: {
+          select: {
+            reacts: { where: { reply_id: null } },
+            commentReplies: true,
+          },
+        },
       },
       where: { post_id: +params.postId },
       orderBy: { updated_at: "desc" },

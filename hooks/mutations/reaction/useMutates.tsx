@@ -3,7 +3,7 @@ import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 
-import { destroy, store } from "@/actions/reactions";
+import { IRequestData, destroy, store } from "@/actions/reactions";
 
 export const useMutates = () => {
   const router = useRouter();
@@ -38,20 +38,15 @@ export const useMutates = () => {
   });
 
   const onStore = useCallback(
-    async (
-      data: {
-        postId: number;
-        userId?: string | null;
-        type?: string | null;
-      },
-      callback?: Function | null
-    ) => {
-      const { postId, type, userId } = data;
-      if (!userId || !postId || !type) return;
+    async (data: IRequestData, callback?: Function | null) => {
+      const { post_id, type, user_id, comment_id, reply_id } = data;
+      if (!post_id || !user_id || !type) return;
       await mutateAsyncStoreReaction({
         type,
-        post_id: postId,
-        user_id: userId,
+        post_id,
+        user_id,
+        comment_id,
+        reply_id,
       }).then((e) => callback?.());
     },
     []

@@ -161,6 +161,8 @@ model CommentReply {
   file_id Int?
   file    File? @relation("FileToCommentReply", fields: [file_id], references: [id])
 
+  reactions Reaction[] @relation("CommentReplyToReaction")
+
   @@index([post_id])
   @@index([user_id])
   @@index([file_id])
@@ -175,6 +177,9 @@ model Reaction {
   updated_at DateTime @updatedAt
 
   // relation
+  reply_id Int?
+  reply    CommentReply? @relation("CommentReplyToReaction", fields: [reply_id], references: [id])
+
   comment_id Int?
   comment    Comment? @relation("CommentToReaction", fields: [comment_id], references: [id])
 
@@ -184,11 +189,11 @@ model Reaction {
   user_id String
   user    User   @relation("UserToReaction", fields: [user_id], references: [id])
 
-  @@unique([user_id, post_id])
-  @@unique([user_id, post_id, comment_id])
-  @@index([comment_id])
-  @@index([post_id])
+  @@unique([user_id, post_id, comment_id, reply_id])
   @@index([user_id])
+  @@index([post_id])
+  @@index([comment_id])
+  @@index([reply_id])
   @@map("reactions")
 }
 

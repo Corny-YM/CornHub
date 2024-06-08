@@ -3,7 +3,7 @@
 import toast from "react-hot-toast";
 import { SendHorizontal } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Group, Post, User, File as IFile } from "@prisma/client";
+import { Group, Post, User, File as IFile, Reaction } from "@prisma/client";
 import { ChangeEvent, useCallback, useMemo, useState } from "react";
 
 import { cn } from "@/lib/utils";
@@ -28,15 +28,23 @@ import AvatarImg from "@/components/avatar-img";
 import EmptyData from "@/components/empty-data";
 import CommentItem from "@/components/comments";
 import Loading from "@/components/icons/loading";
+import { useRouter } from "next/navigation";
 
 interface Props {
-  data: Post & { user: User; group: Group | null; file: IFile | null };
+  data: Post & {
+    user: User;
+    group: Group | null;
+    file: IFile | null;
+    reactions: Reaction[];
+    _count: { comments: number; reactions: number };
+  };
   open?: boolean;
   children?: React.ReactNode;
   onOpenChange?: (val: boolean) => void;
 }
 
 const CommentsModal = ({ data, open, children, onOpenChange }: Props) => {
+  const router = useRouter();
   const { currentUser } = useAppContext();
 
   const [inputValue, setInputValue] = useState("");
@@ -57,6 +65,7 @@ const CommentsModal = ({ data, open, children, onOpenChange }: Props) => {
     onSuccess() {
       refetch();
       setInputValue("");
+      router.refresh();
       toast.success("Bình luận bài viết thành công");
     },
     onError() {

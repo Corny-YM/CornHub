@@ -16,7 +16,10 @@ export const emotions = [
   { label: "Phẫn nộ", type: "angry", color: "#e9710f", icon: Angry },
 ];
 
-export const emotionIcons: Record<string, any> = {
+export const emotionIcons: Record<
+  string,
+  ({ className }: { className?: string }) => JSX.Element
+> = {
   like: Like,
   heart: Heart,
   love: Love,

@@ -1,26 +1,26 @@
 import toast from "react-hot-toast";
-import { useCallback, useMemo } from "react";
 import { useAuth } from "@clerk/nextjs";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { Group, Post, User } from "@prisma/client";
+import { useCallback, useMemo } from "react";
+import { Group, Post, Reaction, User, File as IFile } from "@prisma/client";
 import { Forward, Info, MessageCircle, ThumbsUp } from "lucide-react";
 
-import {
-  countComments,
-  countReactions,
-  getCurrentUserReaction,
-} from "@/actions/post";
-import { destroy, store } from "@/actions/reactions";
 import { emotions } from "@/lib/const";
 import { cn, formatAmounts, getRandomItems } from "@/lib/utils";
+import { useMutates } from "@/hooks/mutations/reaction/useMutates";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import TooltipButton from "@/components/tooltip-button";
-import { useMutates } from "@/hooks/mutations/reaction/useMutates";
+import ReactionsButton from "@/components/reactions-button";
 
 interface Props {
   isModal?: boolean;
-  data: Post & { user: User; group: Group | null };
+  data: Post & {
+    user: User;
+    group: Group | null;
+    file: IFile | null;
+    reactions: Reaction[];
+    _count: { comments: number; reactions: number };
+  };
   onClickReaction: () => void;
   onClickComment: () => void;
 }
@@ -32,76 +32,56 @@ const PostFooter = ({
   onClickComment,
 }: Props) => {
   const { userId } = useAuth();
-  const { id } = data;
-
-  // useQuery
-  const { data: dataCountReactions, refetch: refetchCountReactions } = useQuery(
-    {
-      enabled: !!id,
-      queryKey: ["post", "reactions", "count", id],
-      queryFn: () => countReactions(id),
-    }
-  );
-  const { data: dataCountComments } = useQuery({
-    enabled: !!id,
-    queryKey: ["post", "comments", "count", id],
-    queryFn: () => countComments(id),
-  });
-  const { data: dataCurrentUserReaction, refetch: refetchUserReaction } =
-    useQuery({
-      enabled: !!id && !!userId,
-      queryKey: ["post", "user", "reaction", id, userId],
-      queryFn: () => getCurrentUserReaction({ postId: id, userId: userId! }),
-    });
+  const { id, reactions, _count } = data;
 
   // useMutation
   const { isPendingDeleteReaction, isPendingStoreReaction, onDelete, onStore } =
     useMutates();
 
+  const currentUserReaction = useMemo(() => {
+    return reactions?.[0];
+  }, [reactions]);
+
+  const totalReactions = useMemo(() => _count.reactions || 0, [_count]);
+  const totalComments = useMemo(() => _count.comments || 0, [_count]);
+
   const handleClickEmotion = useCallback(
     async (e: React.MouseEvent) => {
       const target = e.currentTarget as HTMLDivElement;
       const type = target.dataset.type;
-      if (!type) return;
-      await onStore({ type, postId: id, userId: userId }, () => {
-        refetchCountReactions();
-        refetchUserReaction();
-      });
+      if (!type || !userId) return;
+      await onStore({ type, post_id: id, user_id: userId }, () => {});
     },
     [id, userId, onStore]
   );
 
   const handleClickReaction = useCallback(async () => {
-    if (dataCurrentUserReaction) {
-      await onDelete(dataCurrentUserReaction.id, () => {
-        refetchCountReactions();
-        refetchUserReaction();
-      });
+    if (!userId) return;
+    if (currentUserReaction) {
+      await onDelete(currentUserReaction.id, () => {});
       return;
     }
     await onStore(
-      { type: emotions[0].type, postId: id, userId: userId },
-      () => {
-        refetchCountReactions();
-        refetchUserReaction();
-      }
+      { type: emotions[0].type, post_id: id, user_id: userId },
+      () => {}
     );
-  }, [id, userId, dataCurrentUserReaction, onStore, onDelete]);
+  }, [id, userId, currentUserReaction, onStore, onDelete]);
 
   const button = useMemo(() => {
-    const typeBtn = dataCurrentUserReaction?.type;
+    const typeBtn = currentUserReaction?.type;
     const emo = emotions.find((item) => item.type === typeBtn) || emotions[0];
+    if (!emo) return;
     const { color, label, icon: Icon } = emo;
     return (
       <Button
         className="hover:bg-primary/50 transition flex-1"
         variant="outline"
         disabled={isPendingStoreReaction || isPendingDeleteReaction}
-        style={{ color: dataCurrentUserReaction ? color : "inherit" }}
+        style={{ color: currentUserReaction ? color : "inherit" }}
         onClick={handleClickReaction}
       >
         <div className="w-5 h-5 flex justify-center items-center mr-1">
-          {dataCurrentUserReaction ? <Icon /> : <ThumbsUp size={20} />}
+          {currentUserReaction ? <Icon /> : <ThumbsUp size={20} />}
         </div>
         <div className="font-medium">{label}</div>
       </Button>
@@ -109,7 +89,7 @@ const PostFooter = ({
   }, [
     isPendingStoreReaction,
     isPendingDeleteReaction,
-    dataCurrentUserReaction,
+    currentUserReaction,
     handleClickReaction,
   ]);
 
@@ -123,38 +103,27 @@ const PostFooter = ({
       <div
         className={cn(
           "w-full flex items-center",
-          (!!dataCountReactions || !!dataCountReactions) && "py-3"
+          (!!totalReactions || !!totalComments) && "py-3"
         )}
       >
         {/* Emotions */}
-        {!!dataCountReactions && (
-          <div className="flex-1 flex items-center">
-            <div className="flex items-center">
-              {getRandomItems(emotions).map(({ type, icon: Icon }, index) => (
-                <div
-                  key={type}
-                  className="emotions"
-                  style={{ zIndex: emotions.length - index }}
-                >
-                  <Icon />
-                </div>
-              ))}
-            </div>
-            <div
-              className="pl-1 cursor-pointer hover:underline"
+        {!!totalReactions && (
+          <div className="flex items-center mr-3">
+            <ReactionsButton
+              totalReactions={totalReactions}
               onClick={onClickReaction}
-            >
-              {dataCountReactions}
-            </div>
+            />
           </div>
         )}
 
         {/* Comments */}
-        {!!dataCountComments && (
-          <div className="flex ml-3 items-center" onClick={onClickComment}>
-            <span className="cursor-pointer hover:underline">
-              {formatAmounts(dataCountComments)} bình luận
-            </span>
+        {!!totalComments && (
+          <div className="flex-1 flex justify-end items-center">
+            <div className="w-fit flex items-center" onClick={onClickComment}>
+              <span className="cursor-pointer hover:underline">
+                {formatAmounts(totalComments)} bình luận
+              </span>
+            </div>
           </div>
         )}
       </div>
