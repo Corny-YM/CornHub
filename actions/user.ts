@@ -1,4 +1,12 @@
-import { Follower, Friend, Group, Post, User } from "@prisma/client";
+import {
+  Post,
+  User,
+  Group,
+  Friend,
+  Follower,
+  Reaction,
+  File as IFile,
+} from "@prisma/client";
 
 import defHttp from "@/lib/defHttp";
 
@@ -16,8 +24,15 @@ export const store = async (user: {
 
 export const getPosts = async (
   userId: string
-): Promise<(Post & { user: User; group: Group })[]> =>
-  defHttp.get(`${indexApi}/${userId}/posts`);
+): Promise<
+  (Post & {
+    user: User;
+    group: Group | null;
+    file: IFile | null;
+    reactions: Reaction[];
+    _count: { comments: number; reactions: number };
+  })[]
+> => defHttp.get(`${indexApi}/${userId}/posts`);
 
 export const getFriends = async (
   userId: string,

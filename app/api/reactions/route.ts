@@ -27,7 +27,11 @@ export async function GET(req: Request) {
     if (!postId)
       return new NextResponse("Post Id is required", { status: 400 });
 
-    const clause: Record<string, any> = {};
+    const clause: Record<string, any> = {
+      post_id: +postId,
+      comment_id: null,
+      reply_id: null,
+    };
 
     if (commentId) clause.comment_id = +commentId;
     if (replyId) clause.reply_id = +replyId;
@@ -35,7 +39,7 @@ export async function GET(req: Request) {
 
     const reactions = await prisma.reaction.findMany({
       include: { user: true },
-      where: { post_id: +postId, ...clause },
+      where: { ...clause },
     });
 
     return NextResponse.json(reactions);

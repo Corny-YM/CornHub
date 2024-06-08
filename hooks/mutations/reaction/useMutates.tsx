@@ -1,5 +1,6 @@
 import toast from "react-hot-toast";
 import { useCallback } from "react";
+import { Reaction } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 
@@ -38,7 +39,7 @@ export const useMutates = () => {
   });
 
   const onStore = useCallback(
-    async (data: IRequestData, callback?: Function | null) => {
+    async (data: IRequestData, callback?: (val: Reaction) => void | null) => {
       const { post_id, type, user_id, comment_id, reply_id } = data;
       if (!post_id || !user_id || !type) return;
       await mutateAsyncStoreReaction({
@@ -47,7 +48,7 @@ export const useMutates = () => {
         user_id,
         comment_id,
         reply_id,
-      }).then((e) => callback?.());
+      }).then((res) => callback?.(res));
     },
     []
   );

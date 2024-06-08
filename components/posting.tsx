@@ -14,9 +14,10 @@ import { cn } from "@/lib/utils";
 interface Props {
   className?: string;
   groupId?: number;
+  onPostingSuccess?: () => void;
 }
 
-const Posting = ({ className, groupId }: Props) => {
+const Posting = ({ className, groupId, onPostingSuccess }: Props) => {
   const { currentUser, toastFeatureUpdating } = useAppContext();
 
   const [modalEditor, toggleModalEditor] = useToggle(false);
@@ -103,6 +104,7 @@ const Posting = ({ className, groupId }: Props) => {
         groupId={groupId}
         open={modalEditor}
         toggleOpen={toggleModalEditor}
+        onSuccess={onPostingSuccess}
       />
     </div>
   );

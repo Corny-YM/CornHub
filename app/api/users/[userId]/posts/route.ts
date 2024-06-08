@@ -15,7 +15,21 @@ export async function GET(
     }
 
     const posts = await prisma.post.findMany({
-      include: { user: true, group: true, file: true },
+      include: {
+        user: true,
+        group: true,
+        file: true,
+        reactions: {
+          where: { user_id: currentUserId, comment_id: null, reply_id: null },
+          take: 1,
+        },
+        _count: {
+          select: {
+            comments: true,
+            reactions: { where: { comment_id: null, reply_id: null } },
+          },
+        },
+      },
       where: { user_id: params.userId, group_id: null },
       orderBy: { created_at: "desc" },
     });

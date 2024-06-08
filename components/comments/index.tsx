@@ -1,7 +1,5 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
-import { useAuth } from "@clerk/nextjs";
 import {
   User,
   Post,
@@ -10,6 +8,8 @@ import {
   Reaction,
   File as IFile,
 } from "@prisma/client";
+import { useAuth } from "@clerk/nextjs";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { emotions } from "@/lib/const";
 import { cn, formatAmounts, getRelativeTime } from "@/lib/utils";
@@ -17,9 +17,11 @@ import { useMutates } from "@/hooks/mutations/reaction/useMutates";
 import { Button } from "@/components/ui/button";
 import AvatarImg from "@/components/avatar-img";
 import TooltipButton from "@/components/tooltip-button";
+import ReactionsModal from "@/components/reactions-modal";
 import ReactionsButton from "@/components/reactions-button";
 import Content from "./content";
 import Actions from "./actions";
+import { useToggle } from "@/hooks/useToggle";
 
 interface Props {
   className?: string;
@@ -43,9 +45,15 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
   const { isPendingDeleteReaction, isPendingStoreReaction, onDelete, onStore } =
     useMutates();
 
-  const currentUserReaction = useMemo(() => {
-    return reacts?.[0];
-  }, [reacts]);
+  const [totalReactions, setTotalReactions] = useState(_count.reacts);
+  const [modalReaction, toggleModalReaction] = useToggle(false);
+  const [currentUserReaction, setCurrentUserReaction] =
+    useState<Reaction | null>(reacts?.[0]);
+
+  useEffect(() => {
+    setTotalReactions(_count.reacts);
+    setCurrentUserReaction(reacts?.[0]);
+  }, [data]);
 
   const handleClickEmotion = useCallback(
     async (e: React.MouseEvent) => {
@@ -54,7 +62,10 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
       if (!type || !userId || !dataPost.id) return;
       await onStore(
         { type, user_id: userId, post_id: dataPost.id, comment_id: data.id },
-        () => {}
+        (res) => {
+          setCurrentUserReaction(res);
+          setTotalReactions((prev) => prev + 1);
+        }
       );
     },
     [data, dataPost, userId]
@@ -62,9 +73,11 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
 
   const handleClickReaction = useCallback(async () => {
     if (!userId || !dataPost.id) return;
-    // TODO: remove reaction
-    // if (dataCurrentUserReaction)
-    //   return mutateDeleteReaction(dataCurrentUserReaction.id);
+    if (currentUserReaction)
+      return onDelete(currentUserReaction.id, () => {
+        setCurrentUserReaction(null);
+        setTotalReactions((prev) => prev - 1);
+      });
     await onStore(
       {
         type: emotions[0].type,
@@ -72,7 +85,10 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
         post_id: dataPost.id,
         comment_id: data.id,
       },
-      () => {}
+      (res) => {
+        setCurrentUserReaction(res);
+        setTotalReactions((prev) => prev + 1);
+      }
     );
   }, [data, dataPost, userId, onDelete, onStore]);
 
@@ -135,8 +151,11 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
             >
               Phản hồi
             </Button>
-            {_count.reacts > 0 && (
-              <ReactionsButton totalReactions={_count.reacts} />
+            {totalReactions > 0 && (
+              <ReactionsButton
+                totalReactions={totalReactions}
+                onClick={() => toggleModalReaction(true)}
+              />
             )}
           </div>
 
@@ -147,6 +166,13 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
           )}
         </div>
       </div>
+
+      <ReactionsModal
+        data={dataPost}
+        commentId={data.id}
+        open={modalReaction}
+        onOpenChange={toggleModalReaction}
+      />
     </div>
   );
 };

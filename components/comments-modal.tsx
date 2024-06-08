@@ -54,8 +54,8 @@ const CommentsModal = ({ data, open, children, onOpenChange }: Props) => {
     isLoading,
     refetch,
   } = useQuery({
-    enabled: !!open && !!data.id,
-    queryKey: ["post", "comment", data.id],
+    enabled: !!open && !!data.id && !!currentUser,
+    queryKey: ["post", "comment", data.id, currentUser?.id],
     queryFn: () => getComments(data.id),
   });
 

@@ -17,7 +17,12 @@ const NewFeeds = async ({ userId }: Props) => {
         where: { user_id: userId, comment_id: null, reply_id: null },
         take: 1,
       },
-      _count: { select: { comments: true, reactions: true } },
+      _count: {
+        select: {
+          comments: true,
+          reactions: { where: { comment_id: null, reply_id: null } },
+        },
+      },
     },
     where: {
       OR: [

@@ -20,7 +20,7 @@ const GroupIdPage = ({ params }: Props) => {
   const { userId } = useAuth();
   const { groupData, isGroupOwner, isMember } = useGroupContext();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ["group", "posts", groupData.id],
     queryFn: () => getPosts(groupData.id),
   });
@@ -52,7 +52,13 @@ const GroupIdPage = ({ params }: Props) => {
   return (
     <div className="mt-4 flex w-full pb-4 relative">
       <div className="w-full xl:w-2/3 flex flex-col">
-        {isMember && <Posting className="mb-4" groupId={+params.groupId} />}
+        {isMember && (
+          <Posting
+            className="mb-4"
+            groupId={+params.groupId}
+            onPostingSuccess={() => refetch()}
+          />
+        )}
 
         {/* List Posts */}
         <div className="w-full flex flex-col">{content}</div>

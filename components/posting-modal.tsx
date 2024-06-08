@@ -25,6 +25,7 @@ interface Props {
   groupId?: number;
   open: boolean;
   toggleOpen: (val?: boolean) => void;
+  onSuccess?: () => void;
 }
 
 const actions: ISelectAction[] = [
@@ -57,7 +58,7 @@ const actions: ISelectAction[] = [
   },
 ];
 
-const PostingModal = ({ groupId, open, toggleOpen }: Props) => {
+const PostingModal = ({ groupId, open, toggleOpen, onSuccess }: Props) => {
   const router = useRouter();
   const { currentUser } = useAppContext();
 
@@ -70,13 +71,14 @@ const PostingModal = ({ groupId, open, toggleOpen }: Props) => {
   const { mutate, isPending } = useMutation({
     mutationKey: ["store", "post", currentUser?.id],
     mutationFn: store,
-    onSuccess() {
+    onSuccess(res) {
       toast.success("Tạo bài viết thành công");
+      router.refresh();
       setContent("");
       setFile(null);
       setStatus(actions[0].value);
       toggleOpen(false);
-      router.refresh();
+      onSuccess?.();
     },
     onError() {
       toast.error("Tạo bài viết thất bại. Vui lòng thử lại sau");
