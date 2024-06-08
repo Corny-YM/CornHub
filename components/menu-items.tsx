@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { MonitorPlay, UsersRound, Warehouse } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 interface Props {}
 
@@ -30,16 +31,6 @@ const MenuItems = ({}: Props) => {
     return result ? result.id : pathname === "/" ? "home" : "";
   }, [mounted]);
 
-  const handleClick = useCallback(
-    (e: React.MouseEvent) => {
-      const target = e.currentTarget as HTMLDivElement;
-      const url = target.dataset.url;
-      if (!url) return;
-      router.push(url);
-    },
-    [router]
-  );
-
   if (!mounted) return null;
   return (
     <div className="absolute right-0 left-0 flex items-center justify-center h-full">
@@ -50,7 +41,7 @@ const MenuItems = ({}: Props) => {
             key={id}
             className="relative flex justify-center items-center w-28 h-full py-1 select-none"
           >
-            <div
+            <Link
               className={cn(
                 "flex justify-center items-center w-full h-full",
                 "cursor-pointer rounded-md transition",
@@ -58,11 +49,10 @@ const MenuItems = ({}: Props) => {
                   ? "text-primary"
                   : "dark:hover:bg-primary/20 hover:bg-primary/50"
               )}
-              data-url={url}
-              onClick={handleClick}
+              href={url}
             >
               <Icon />
-            </div>
+            </Link>
             <div
               className={cn(
                 "absolute bottom-0 left-0 right-0 h-[3px] invisible",

@@ -33,6 +33,7 @@ const SidebarLeft = () => {
         <div className="w-full flex flex-col gap-y-2">
           {actions.map(({ label, url, icon: Icon }) => (
             <Button
+              key={url}
               className={cn(
                 "w-full flex items-center justify-start",
                 hasSelected(url) && "bg-primary/50 hover:bg-primary/60"

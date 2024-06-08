@@ -18,8 +18,12 @@ interface Props {
 const UserPage = ({ params }: Props) => {
   const { accountData, isOwner } = useAccountContext();
 
-  const { data: dataPosts, isLoading } = useQuery({
-    queryKey: ["account", "posts", params.userId],
+  const {
+    data: dataPosts,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["account", "posts", params.userId, accountData.id],
     queryFn: () => getPosts(params.userId),
   });
 
@@ -31,7 +35,9 @@ const UserPage = ({ params }: Props) => {
         </div>
       );
     if (!dataPosts || !dataPosts.length) return <EmptyData />;
-    return dataPosts.map((post) => <PostItem key={post.id} data={post} />);
+    return dataPosts.map((post) => (
+      <PostItem key={post.id} data={post} onSuccessDelete={refetch} />
+    ));
   }, [isLoading, dataPosts]);
 
   return (
@@ -44,7 +50,9 @@ const UserPage = ({ params }: Props) => {
 
       {/* Posts */}
       <div className="flex-1 flex flex-col ml-4">
-        {isOwner && <Posting className="mb-4" />}
+        {isOwner && (
+          <Posting className="mb-4" onPostingSuccess={() => refetch()} />
+        )}
 
         {/* List Posts */}
         <div className="w-full flex flex-col">{content}</div>

@@ -17,7 +17,21 @@ const GroupFeedPage = async ({}: Props) => {
   const joinedGroups = groupMembers.map((item) => item.group_id);
 
   const posts = await prisma.post.findMany({
-    include: { user: true, group: true, file: true },
+    include: {
+      user: true,
+      group: true,
+      file: true,
+      reactions: {
+        where: { user_id: userId, comment_id: null, reply_id: null },
+        take: 1,
+      },
+      _count: {
+        select: {
+          comments: true,
+          reactions: { where: { comment_id: null, reply_id: null } },
+        },
+      },
+    },
     where: { group_id: { in: joinedGroups } },
     orderBy: { created_at: "desc" },
   });

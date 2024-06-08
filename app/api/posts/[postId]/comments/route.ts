@@ -22,10 +22,10 @@ export async function GET(
       include: {
         user: true,
         file: true,
-        reacts: { where: { user_id: userId, reply_id: null }, take: 1 },
+        reactions: { where: { user_id: userId, reply_id: null }, take: 1 },
         _count: {
           select: {
-            reacts: { where: { reply_id: null } },
+            reactions: { where: { reply_id: null } },
             commentReplies: true,
           },
         },

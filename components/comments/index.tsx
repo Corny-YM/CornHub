@@ -28,8 +28,8 @@ interface Props {
   data: Comment & {
     user: User;
     file?: IFile | null;
-    reacts: Reaction[];
-    _count: { reacts: number; commentReplies: number };
+    reactions: Reaction[];
+    _count: { reactions: number; commentReplies: number };
   };
   dataPost: Post & {
     user: User;
@@ -40,19 +40,22 @@ interface Props {
 
 const CommentItem = ({ data, dataPost, className }: Props) => {
   const { userId } = useAuth();
-  const { user, created_at, reacts, _count } = data;
+  const { user, created_at, reactions, _count } = data;
 
   const { isPendingDeleteReaction, isPendingStoreReaction, onDelete, onStore } =
     useMutates();
 
-  const [totalReactions, setTotalReactions] = useState(_count.reacts);
+  const [totalReactions, setTotalReactions] = useState(_count.reactions);
+  const [totalCommentReplies, setTotalCommentReplies] = useState(
+    _count.commentReplies
+  );
   const [modalReaction, toggleModalReaction] = useToggle(false);
   const [currentUserReaction, setCurrentUserReaction] =
-    useState<Reaction | null>(reacts?.[0]);
+    useState<Reaction | null>(reactions?.[0]);
 
   useEffect(() => {
-    setTotalReactions(_count.reacts);
-    setCurrentUserReaction(reacts?.[0]);
+    setTotalReactions(_count.reactions);
+    setCurrentUserReaction(reactions?.[0]);
   }, [data]);
 
   const handleClickEmotion = useCallback(
@@ -95,7 +98,6 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
   const button = useMemo(() => {
     const typeBtn = currentUserReaction?.type;
     const emo = emotions.find((item) => item.type === typeBtn) || emotions[0];
-    if (!emo) return;
     const { color, label } = emo;
     return (
       <Button

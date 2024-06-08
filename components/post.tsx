@@ -24,6 +24,7 @@ interface Props {
     reactions: Reaction[];
     _count: { comments: number; reactions: number };
   };
+  onSuccessDelete?: () => void;
 }
 
 const PostItem = ({
@@ -32,6 +33,7 @@ const PostItem = ({
   isModal,
   isGroupOwner,
   isGroupOwnerPost,
+  onSuccessDelete,
 }: Props) => {
   const [modalReactions, toggleModalReactions] = useToggle(false);
   const [modalComments, toggleModalComments] = useToggle(false);
@@ -52,6 +54,7 @@ const PostItem = ({
         isModal={isModal}
         isGroupOwner={isGroupOwner}
         isGroupOwnerPost={isGroupOwnerPost}
+        onSuccessDelete={onSuccessDelete}
       />
 
       {/* Content */}
@@ -71,6 +74,7 @@ const PostItem = ({
                   src={path}
                   alt={data.file?.name || `post-img-${data.id}`}
                   fill
+                  priority
                 />
               )}
               {type === "video" && (

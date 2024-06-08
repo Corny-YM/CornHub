@@ -36,7 +36,7 @@ model User {
   groups                Group[]         @relation("UserToGroup")
   posts                 Post[]          @relation("UserToPost")
   comments              Comment[]       @relation("UserToComment")
-  reacts                Reaction[]      @relation("UserToReaction")
+  reactions             Reaction[]      @relation("UserToReaction")
   senderNotifications   Notification[]  @relation("SenderToNotification")
   receiverNotifications Notification[]  @relation("ReceiverToNotification")
   senderReports         Report[]        @relation("SenderToReport")
@@ -131,7 +131,7 @@ model Comment {
   file    File? @relation("FileToComment", fields: [file_id], references: [id])
 
   // 
-  reacts         Reaction[]     @relation("CommentToReaction")
+  reactions      Reaction[]     @relation("CommentToReaction")
   notifications  Notification[] @relation("CommentToNotification")
   reports        Report[]       @relation("CommentToReport")
   commentReplies CommentReply[] @relation("CommentToCommentReply")

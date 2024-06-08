@@ -35,8 +35,8 @@ export const getComments = async (
   (Comment & {
     user: User;
     file?: IFile;
-    reacts: Reaction[];
-    _count: { reacts: number; commentReplies: number };
+    reactions: Reaction[];
+    _count: { reactions: number; commentReplies: number };
   })[]
 > => await defHttp.get(`${indexApi}/${id}/comments`);
 

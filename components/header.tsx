@@ -62,8 +62,8 @@ const Header = () => {
         >
           <Notification />
         </Button>
-        {/* <UserButton /> */}
-        <ClerkNextJs.UserButton />
+        <UserButton />
+        {/* <ClerkNextJs.UserButton /> */}
       </div>
 
       <SearchModal open={modalSearch} onOpenChange={toggleModalSearch} />

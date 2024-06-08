@@ -1,8 +1,8 @@
 import toast from "react-hot-toast";
 import { useAuth } from "@clerk/nextjs";
-import { useCallback, useMemo } from "react";
-import { Group, Post, Reaction, User, File as IFile } from "@prisma/client";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Forward, Info, MessageCircle, ThumbsUp } from "lucide-react";
+import { Group, Post, Reaction, User, File as IFile } from "@prisma/client";
 
 import { emotions } from "@/lib/const";
 import { cn, formatAmounts, getRandomItems } from "@/lib/utils";
@@ -38,8 +38,11 @@ const PostFooter = ({
   const { isPendingDeleteReaction, isPendingStoreReaction, onDelete, onStore } =
     useMutates();
 
-  const currentUserReaction = useMemo(() => {
-    return reactions?.[0];
+  const [currentUserReaction, setCurrentUserReaction] =
+    useState<Reaction | null>(reactions?.[0]);
+
+  useEffect(() => {
+    setCurrentUserReaction(reactions?.[0]);
   }, [reactions]);
 
   const totalReactions = useMemo(() => _count.reactions || 0, [_count]);
@@ -50,7 +53,9 @@ const PostFooter = ({
       const target = e.currentTarget as HTMLDivElement;
       const type = target.dataset.type;
       if (!type || !userId) return;
-      await onStore({ type, post_id: id, user_id: userId }, () => {});
+      await onStore({ type, post_id: id, user_id: userId }, (res) => {
+        setCurrentUserReaction(res);
+      });
     },
     [id, userId, onStore]
   );
@@ -58,19 +63,22 @@ const PostFooter = ({
   const handleClickReaction = useCallback(async () => {
     if (!userId) return;
     if (currentUserReaction) {
-      await onDelete(currentUserReaction.id, () => {});
+      await onDelete(currentUserReaction.id, () => {
+        setCurrentUserReaction(null);
+      });
       return;
     }
     await onStore(
       { type: emotions[0].type, post_id: id, user_id: userId },
-      () => {}
+      (res) => {
+        setCurrentUserReaction(res);
+      }
     );
   }, [id, userId, currentUserReaction, onStore, onDelete]);
 
   const button = useMemo(() => {
     const typeBtn = currentUserReaction?.type;
     const emo = emotions.find((item) => item.type === typeBtn) || emotions[0];
-    if (!emo) return;
     const { color, label, icon: Icon } = emo;
     return (
       <Button

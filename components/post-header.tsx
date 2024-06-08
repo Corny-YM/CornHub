@@ -28,6 +28,7 @@ interface Props {
   isGroupOwner?: boolean;
   isGroupOwnerPost?: boolean;
   data: Post & { user: User; group: Group | null };
+  onSuccessDelete?: () => void;
 }
 
 const PostHeader = ({
@@ -35,6 +36,7 @@ const PostHeader = ({
   isModal,
   isGroupOwner,
   isGroupOwnerPost,
+  onSuccessDelete,
 }: Props) => {
   const router = useRouter();
   const { userId } = useAuth();
@@ -48,6 +50,7 @@ const PostHeader = ({
     onSuccess() {
       toast.success("Xóa post thành công");
       router.refresh();
+      onSuccessDelete?.();
     },
     onError() {
       toast.error("Xóa post thất bại. Vui lòng thử lại sau");

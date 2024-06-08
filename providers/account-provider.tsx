@@ -56,7 +56,7 @@ export const AccountProvider = ({ children, accountData }: Props) => {
     isLoading: isLoadingStatusFollowers,
     refetch: refetchStatusFollowers,
   } = useQuery({
-    enabled: isOwner && !!accountData.id,
+    enabled: isOwner && !!accountData.id && userId !== accountData.id,
     queryKey: ["account", "status", "followers", accountData.id],
     queryFn: () => getStatusFollowers(accountData.id),
   });
