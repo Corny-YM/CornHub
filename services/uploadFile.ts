@@ -36,7 +36,7 @@ export default async function (
       ext: fileExtension,
       user_id: userId,
       actual_name: file.name,
-      path: `${pathDir}/${fileName}`,
+      path: `/${pathDir}/${fileName}`,
     },
   });
 

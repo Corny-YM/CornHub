@@ -41,9 +41,7 @@ const PostItem = ({
   const file = useMemo(() => data.file, [data]);
   const type = useMemo(() => file?.type, [file]);
   const path = useMemo(() => {
-    const tmp = file?.path;
-    if (!tmp) return;
-    return tmp?.[0] === "/" ? tmp : `/${tmp}`;
+    return file?.path;
   }, [file]);
 
   return (

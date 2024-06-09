@@ -80,7 +80,7 @@ const ModalFiles = ({ open, onSelect, onOpenChange }: Props) => {
             >
               <Image
                 className="absolute w-full h-full object-cover"
-                src={`/${path}`}
+                src={path}
                 alt={name}
                 fill
                 sizes="100%"

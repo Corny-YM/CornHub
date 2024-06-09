@@ -43,6 +43,9 @@ export const store = async (user: {
 export const removeCover = async (): Promise<User> =>
   defHttp.delete(`${indexApi}/remove/cover`);
 
+export const removeAvatar = async (): Promise<User> =>
+  defHttp.delete(`${indexApi}/remove/avatar`);
+
 export const getFiles = async (data: {
   userId: string;
   type?: "image" | "video";

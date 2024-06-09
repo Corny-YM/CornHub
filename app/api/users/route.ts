@@ -47,6 +47,7 @@ export async function PUT(req: Request) {
 
     let fileCoverDB: IFile | null = null;
     let fileAvatarDB: IFile | null = null;
+
     if (typeof cover !== "string" && cover) {
       fileCoverDB = await uploadFile(cover, userId);
     }
@@ -61,7 +62,7 @@ export async function PUT(req: Request) {
     else if (typeof cover === "string") data.cover = cover;
 
     // Update user avatar img from update File | string
-    if (fileAvatarDB) data.cover = fileAvatarDB.path;
+    if (fileAvatarDB) data.avatar = fileAvatarDB.path;
     else if (typeof avatar === "string") data.avatar = avatar;
 
     if (last_name) data.last_name = last_name;

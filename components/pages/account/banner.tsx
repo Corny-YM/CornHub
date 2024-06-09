@@ -40,6 +40,7 @@ const Banner = () => {
       router.refresh();
       setFile(null);
       setCover(res?.cover);
+      setIsSelecting(false);
     },
     onError() {
       toast.error("Cập nhật ảnh bìa thất bại. Vui lòng thử lại sau");
@@ -55,6 +56,7 @@ const Banner = () => {
         router.refresh();
         setFile(null);
         setCover(null);
+        setIsSelecting(false);
       },
       onError() {
         toast.error("Xóa ảnh bìa thất bại. Vui lòng thử lại sau");
@@ -72,12 +74,6 @@ const Banner = () => {
     else if (cover && isSelecting) return false;
     return true;
   }, [isOwner, file, cover, isSelecting]);
-
-  const src = useMemo(() => {
-    if (cover && file) return cover;
-    if (cover) return `/${cover}`;
-    return NoBackground;
-  }, [cover, file, isSelecting]);
 
   const actions = useMemo(() => {
     const result: IDropdownAction[] = [
@@ -138,7 +134,7 @@ const Banner = () => {
       <div className="relative w-full h-96 aspect-video flex items-center justify-center">
         <Image
           className="absolute w-full h-full object-cover"
-          src={src}
+          src={cover || NoBackground}
           alt="banner"
           sizes="100%"
           fill

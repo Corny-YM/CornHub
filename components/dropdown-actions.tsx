@@ -19,15 +19,17 @@ export interface IDropdownAction {
 }
 
 interface Props {
-  icon: React.ReactNode;
-  actions: IDropdownAction[];
   className?: string;
   disabled?: boolean;
+  icon: React.ReactNode;
+  actions: IDropdownAction[];
+  align?: "end" | "center" | "start" | undefined;
   size?: "icon" | "default" | "sm" | "lg" | null;
 }
 
 export const DropdownActions = ({
   icon,
+  align = "end",
   size = "icon",
   actions,
   disabled,
@@ -51,7 +53,7 @@ export const DropdownActions = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         className="z-[999999] flex flex-col gap-y-2 p-2"
-        align="end"
+        align={align}
       >
         {actions.map(
           (
