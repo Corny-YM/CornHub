@@ -14,6 +14,7 @@ import {
 } from "react";
 
 import { store } from "@/actions/user";
+import { IDispatchState } from "@/types";
 
 interface Props {
   children: React.ReactNode;
@@ -21,6 +22,7 @@ interface Props {
 
 type Context = {
   currentUser?: User | null;
+  setCurrentUser: IDispatchState;
   toastFeatureUpdating: () => void;
 };
 
@@ -30,6 +32,7 @@ const queryClient = new QueryClient({
 
 const AppContext = createContext<Context>({
   currentUser: null,
+  setCurrentUser: () => {},
   toastFeatureUpdating: () => {},
 });
 
@@ -75,7 +78,9 @@ export const AppProvider = ({ children }: Props) => {
 
   // if (!user) return null; // this bull-shit make me tired
   return (
-    <AppContext.Provider value={{ currentUser, toastFeatureUpdating }}>
+    <AppContext.Provider
+      value={{ currentUser, setCurrentUser, toastFeatureUpdating }}
+    >
       <QueryClientProvider client={queryClient}>
         <Toaster containerStyle={{ zIndex: 99999 }} />
         {children}

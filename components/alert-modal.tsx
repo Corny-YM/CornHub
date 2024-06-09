@@ -44,7 +44,7 @@ const AlertModal = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>Hủy bỏ</AlertDialogCancel>
           <AlertDialogAction
             className={cn(
               destructive &&
@@ -53,7 +53,7 @@ const AlertModal = ({
             disabled={disabled}
             onClick={onClick}
           >
-            Confirm
+            Xác nhận
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

@@ -1,33 +1,165 @@
 "use client";
 
 import Image from "next/image";
-import { Camera } from "lucide-react";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
+import { Camera, Images, Trash2, Upload } from "lucide-react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
-import { Button } from "@/components/ui/button";
+import { removeCover, update } from "@/actions/user";
+import { useToggle } from "@/hooks/useToggle";
+import { useAppContext } from "@/providers/app-provider";
 import { useAccountContext } from "@/providers/account-provider";
+import { Button } from "@/components/ui/button";
+import AlertModal from "@/components/alert-modal";
+import DropdownActions, {
+  IDropdownAction,
+} from "@/components/dropdown-actions";
 import NoBackground from "@/public/no-background.jpg";
 
 const Banner = () => {
+  const router = useRouter();
+  const { currentUser } = useAppContext();
   const { accountData, isOwner } = useAccountContext();
+
+  const [confirmModal, toggleConfirmModal] = useToggle(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [cover, setCover] = useState<string | null>(accountData?.cover);
+
+  const inputFileRef = useRef<HTMLInputElement | null>(null);
+
+  const { mutate: mutateUpdate, isPending: isPendingUpdate } = useMutation({
+    mutationKey: ["account", "update", "cover", accountData],
+    mutationFn: update,
+    onSuccess(res) {
+      toast.success("Cập nhật ảnh bìa thành công");
+      router.refresh();
+      setFile(null);
+      setCover(res?.cover);
+    },
+    onError() {
+      toast.error("Cập nhật ảnh bìa thất bại. Vui lòng thử lại sau");
+    },
+  });
+
+  const { mutate: mutateRemoveCover, isPending: isPendingRemoveCover } =
+    useMutation({
+      mutationKey: ["account", "update", "cover", accountData],
+      mutationFn: removeCover,
+      onSuccess() {
+        toast.success("Xóa ảnh bìa thành công");
+        router.refresh();
+        setFile(null);
+        setCover(null);
+      },
+      onError() {
+        toast.error("Xóa ảnh bìa thất bại. Vui lòng thử lại sau");
+      },
+    });
+
+  const disabled = useMemo(
+    () => isPendingUpdate || isPendingRemoveCover,
+    [isPendingUpdate, isPendingRemoveCover]
+  );
+
+  const actions = useMemo(() => {
+    const result: IDropdownAction[] = [
+      { label: "Chọn ảnh bìa", icon: <Images className="mr-2" /> },
+      {
+        label: "Tải ảnh lên",
+        icon: <Upload className="mr-2" />,
+        onClick: () => inputFileRef.current?.click(),
+      },
+    ] as IDropdownAction[];
+    if (accountData.cover)
+      result.push({
+        label: "Gỡ",
+        destructive: true,
+        icon: <Trash2 className="mr-2" />,
+        onClick: () => toggleConfirmModal(true),
+      });
+    return result;
+  }, [accountData, currentUser]);
+
+  const handleChangeFile = useCallback((e: React.ChangeEvent) => {
+    const target = e.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if (!file) return;
+    const previewUrl = URL.createObjectURL(file);
+    setFile(file);
+    setCover(previewUrl);
+  }, []);
+
+  const handleUpdateCover = useCallback(() => {
+    if (currentUser?.id !== accountData.id) return;
+    mutateUpdate({ cover: file });
+  }, [file, accountData, currentUser]);
+
+  const handleRemovePreviewCover = useCallback(() => {
+    if (currentUser?.id !== accountData.id) return;
+    setFile(null);
+    setCover(accountData?.cover);
+  }, [accountData, currentUser]);
+
+  const handleRemoveCover = useCallback(() => {
+    if (currentUser?.id !== accountData.id) return;
+    mutateRemoveCover();
+  }, [accountData, currentUser]);
 
   return (
     <div className="relative w-full flex items-center justify-center shadow-2xl rounded-b-lg overflow-hidden dark:border dark:border-solid dark:border-neutral-600/50">
       <div className="relative w-full h-96 aspect-video flex items-center justify-center">
         <Image
           className="absolute w-full h-full object-cover"
-          src={accountData?.cover || NoBackground}
+          src={cover || NoBackground}
           alt="banner"
-          fill
           sizes="100%"
+          fill
+          priority
         />
       </div>
-      {isOwner && (
-        <div className="absolute right-4 bottom-4">
-          <Button variant="outline">
-            <Camera size={20} className="mr-2" /> Chỉnh sửa ảnh bìa
-          </Button>
-        </div>
-      )}
+
+      <div className="absolute right-4 bottom-4 flex items-center gap-x-2">
+        {file && (
+          <div className="flex items-center gap-x-2">
+            <Button variant="destructive" onClick={handleRemovePreviewCover}>
+              Loại bỏ
+            </Button>
+            <Button onClick={handleUpdateCover}>Lưu thay đổi</Button>
+          </div>
+        )}
+
+        {isOwner && !file && (
+          <DropdownActions
+            size="default"
+            disabled={disabled}
+            actions={actions}
+            icon={
+              <>
+                <Camera size={20} className="mr-2" /> Chỉnh sửa ảnh bìa
+              </>
+            }
+          />
+        )}
+      </div>
+
+      <input
+        ref={inputFileRef}
+        hidden
+        multiple={false}
+        style={{ display: "none" }}
+        accept="image/*"
+        type="file"
+        onChange={handleChangeFile}
+      />
+
+      <AlertModal
+        destructive
+        open={confirmModal}
+        onClick={handleRemoveCover}
+        onOpenChange={toggleConfirmModal}
+      />
     </div>
   );
 };

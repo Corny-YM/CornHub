@@ -12,6 +12,24 @@ import defHttp from "@/lib/defHttp";
 
 const indexApi = "users";
 
+export const update = async (
+  data: Record<string, any> & {
+    cover?: File | null;
+    avatar?: File | null;
+    first_name?: string | null;
+    last_name?: string | null;
+    full_name?: string | null;
+  }
+): Promise<User> => {
+  const formData = new FormData();
+  Object.keys(data).forEach((key) => {
+    const value = data?.[key];
+    if (!value) return;
+    formData.append(key, value);
+  });
+  return defHttp.put(indexApi, formData);
+};
+
 export const store = async (user: {
   id: string;
   email: string;
@@ -21,6 +39,9 @@ export const store = async (user: {
   avatar?: string | null;
   last_sign_in?: Date | null;
 }): Promise<User> => defHttp.post(indexApi, { user });
+
+export const removeCover = async (): Promise<User> =>
+  defHttp.delete(`${indexApi}/remove/cover`);
 
 export const getPosts = async (
   userId: string
