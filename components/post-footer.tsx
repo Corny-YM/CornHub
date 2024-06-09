@@ -38,15 +38,14 @@ const PostFooter = ({
   const { isPendingDeleteReaction, isPendingStoreReaction, onDelete, onStore } =
     useMutates();
 
+  const [totalReactions, setTotalReactions] = useState(_count.reactions);
+  const [totalComments, setTotalComments] = useState(_count.comments);
   const [currentUserReaction, setCurrentUserReaction] =
     useState<Reaction | null>(reactions?.[0]);
 
-  useEffect(() => {
-    setCurrentUserReaction(reactions?.[0]);
-  }, [reactions]);
-
-  const totalReactions = useMemo(() => _count.reactions || 0, [_count]);
-  const totalComments = useMemo(() => _count.comments || 0, [_count]);
+  useEffect(() => setTotalReactions(_count.reactions), [_count.reactions]);
+  useEffect(() => setTotalComments(_count.comments), [_count.comments]);
+  useEffect(() => setCurrentUserReaction(reactions?.[0]), [reactions]);
 
   const handleClickEmotion = useCallback(
     async (e: React.MouseEvent) => {
@@ -55,6 +54,7 @@ const PostFooter = ({
       if (!type || !userId) return;
       await onStore({ type, post_id: id, user_id: userId }, (res) => {
         setCurrentUserReaction(res);
+        setTotalReactions((prev) => prev + 1);
       });
     },
     [id, userId, onStore]
@@ -65,6 +65,7 @@ const PostFooter = ({
     if (currentUserReaction) {
       await onDelete(currentUserReaction.id, () => {
         setCurrentUserReaction(null);
+        setTotalReactions((prev) => prev - 1);
       });
       return;
     }
@@ -72,6 +73,7 @@ const PostFooter = ({
       { type: emotions[0].type, post_id: id, user_id: userId },
       (res) => {
         setCurrentUserReaction(res);
+        setTotalReactions((prev) => prev + 1);
       }
     );
   }, [id, userId, currentUserReaction, onStore, onDelete]);
