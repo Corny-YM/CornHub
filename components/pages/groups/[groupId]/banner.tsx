@@ -18,6 +18,7 @@ const Banner = () => {
           src={groupData.cover || NoBackground}
           alt="banner"
           fill
+          sizes="100%"
         />
       </div>
       {isGroupOwner && (

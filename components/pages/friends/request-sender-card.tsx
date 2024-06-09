@@ -104,6 +104,7 @@ const RequestSenderCard = ({ data }: Props) => {
           src={senderData.avatar || NoAvatar}
           alt={senderData.full_name || "avatar-friends"}
           fill
+          sizes="100%"
         />
       </div>
       <div className="w-full flex flex-col p-3 gap-y-1">

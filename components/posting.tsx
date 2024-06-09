@@ -47,6 +47,7 @@ const Posting = ({ className, groupId, onPostingSuccess }: Props) => {
                   src={currentUser.avatar || "/no-avatar.jpg"}
                   alt={currentUser.full_name || "user-avatar"}
                   fill
+                  sizes="w-9"
                 />
               </div>
             </div>

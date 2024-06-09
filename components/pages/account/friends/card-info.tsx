@@ -136,6 +136,7 @@ const CardInfo = ({ data, accountId, queryKey }: Props) => {
           src={avatar || NoAvatar}
           alt={full_name || `friend-avatar-${id}`}
           fill
+          sizes="w-20"
         />
       </div>
       {/* info */}

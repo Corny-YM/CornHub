@@ -75,6 +75,7 @@ const Info = () => {
           src={item.avatar || NoAvatar}
           alt={item.full_name || "member-avatar"}
           fill
+          sizes="w-8"
         />
       </div>
     ));

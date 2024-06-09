@@ -61,6 +61,7 @@ const Info = () => {
             src={accountData.avatar || NoAvatar}
             alt={accountData.full_name || "account-avatar"}
             fill
+            sizes="w-40"
           />
         </div>
         {isOwner && (

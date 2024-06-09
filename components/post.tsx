@@ -75,6 +75,7 @@ const PostItem = ({
                   alt={data.file?.name || `post-img-${data.id}`}
                   fill
                   priority
+                  sizes="100%"
                 />
               )}
               {type === "video" && (

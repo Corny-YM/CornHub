@@ -32,6 +32,7 @@ const PostingPreviewFile = ({ file, setFile }: Props) => {
             src={fileUrl}
             alt="preview-img"
             fill
+            sizes="100%"
           />
         </div>
       )}

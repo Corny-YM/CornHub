@@ -139,6 +139,7 @@ const FriendCard = ({ data }: Props) => {
           src={friendData.avatar || NoAvatar}
           alt={friendData.full_name || "avatar-friends"}
           fill
+          sizes="100%"
         />
       </div>
       <div className="w-full flex flex-col p-3 gap-y-1">

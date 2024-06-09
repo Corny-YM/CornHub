@@ -37,6 +37,7 @@ const Content = ({ data }: Props) => {
         alt={file.name}
         src={path}
         fill
+        sizes="100%"
       />
     );
   }, [isVideo, type, file, path]);

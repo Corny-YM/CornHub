@@ -39,6 +39,7 @@ const UserButton = ({ className }: Props) => {
               src={user.imageUrl}
               alt={user.fullName || "user-avatar"}
               fill
+              sizes="100%"
             />
           </div>
         </Button>
@@ -59,6 +60,7 @@ const UserButton = ({ className }: Props) => {
                 src={user.imageUrl!}
                 alt={user.fullName || ""}
                 fill
+                sizes="w-9"
               />
             </div>
             <div className="font-semibold">{user.fullName || "---"}</div>

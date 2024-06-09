@@ -32,6 +32,7 @@ const ListGroups = ({ groups }: Props) => {
                 src={item.cover || NoBackground}
                 alt={"Group"}
                 fill
+                sizes="w-9"
               />
             </div>
             <div className="font-semibold line-clamp-2 py-3 text-sm">

@@ -23,6 +23,7 @@ const CardMember = () => {
           src="https://i.pravatar.cc/150?img=3"
           alt="member_avatar"
           fill
+          sizes="w-14"
         />
       </div>
       <div className="flex-1 px-3 line-clamp-2">Nguyễn Thế Anh</div>

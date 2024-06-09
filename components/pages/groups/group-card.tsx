@@ -136,6 +136,7 @@ const GroupCard = ({ data, member, request, following }: Props) => {
             src={cover || NoCover}
             alt="avatar_group"
             fill
+            sizes="w-20"
           />
         </div>
         <div className="pl-3 flex flex-col justify-center">

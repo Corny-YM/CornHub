@@ -38,6 +38,7 @@ const ListFriends = ({ friends }: Props) => {
                   src={person.avatar || ""}
                   alt={person.full_name || `friend-avatar-${id}`}
                   fill
+                  sizes="w-9"
                 />
               </div>
               <div className="font-semibold line-clamp-2 py-3 text-sm">

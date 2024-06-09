@@ -127,11 +127,14 @@ const PostFooter = ({
         {/* Comments */}
         {!!totalComments && (
           <div className="flex-1 flex justify-end items-center">
-            <div className="w-fit flex items-center" onClick={onClickComment}>
-              <span className="cursor-pointer hover:underline">
-                {formatAmounts(totalComments)} bình luận
-              </span>
-            </div>
+            <Button
+              className="px-2 py-1 w-fit h-[30px] text-xs rounded-full leading-normal dark:hover:bg-primary-foreground hover:underline"
+              variant="outline"
+              size="sm"
+              onClick={onClickComment}
+            >
+              {formatAmounts(totalComments)} bình luận
+            </Button>
           </div>
         )}
       </div>

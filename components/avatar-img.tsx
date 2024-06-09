@@ -26,6 +26,7 @@ const AvatarImg = ({ className, isGroup, src, alt, fallback }: Props) => {
               alt="no-avatar-friend"
               src={!isGroup ? NoAvatar : NoBackground}
               fill
+              sizes="100%"
             />
           )}
         </div>

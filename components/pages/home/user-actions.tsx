@@ -42,6 +42,7 @@ const UserActions = () => {
               src={user.imageUrl!}
               alt={user.fullName || ""}
               fill
+              sizes="w-9"
             />
           </div>
           <div className="font-semibold">{user.fullName || "---"}</div>
