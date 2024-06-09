@@ -31,7 +31,7 @@ const ReactionsButton = ({ totalReactions, onClick }: Props) => {
   if (!totalReactions) return null;
   return (
     <Button
-      className="px-2 py-1 h-fit flex items-center gap-1 text-xs text-inherit cursor-pointer select-none rounded-full leading-normal hover:bg-primary-foreground"
+      className="px-2 py-1 h-fit flex items-center gap-1 text-xs text-inherit cursor-pointer select-none rounded-full leading-normal dark:hover:bg-primary-foreground"
       variant="outline"
       size="sm"
       onClick={onClick}

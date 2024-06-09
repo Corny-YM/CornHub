@@ -62,7 +62,8 @@ export const DropdownActions = ({
               key={index}
               className={cn(
                 "min-w-40 cursor-pointer px-4 py-2",
-                destructive && "bg-rose-800 hover:!bg-rose-900",
+                destructive &&
+                  "bg-rose-800 hover:!bg-rose-900 text-neutral-200 hover:!text-neutral-300",
                 className
               )}
               disabled={disabled}

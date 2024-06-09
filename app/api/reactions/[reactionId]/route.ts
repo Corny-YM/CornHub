@@ -13,7 +13,19 @@ export async function DELETE(
     if (!userId) return new NextResponse("Unauthenticated", { status: 401 });
 
     if (!params.reactionId)
-      return new NextResponse("Reaction ID is required", { status: 400 });
+      return new NextResponse("Reaction ID is required", { status: 404 });
+
+    const reaction = await prisma.reaction.findFirst({
+      where: { id: +params.reactionId },
+    });
+
+    if (!reaction)
+      return new NextResponse("Reaction does not exist", { status: 404 });
+
+    if (reaction.user_id !== userId)
+      return new NextResponse("You don't have this permission", {
+        status: 404,
+      });
 
     const res = await prisma.reaction.deleteMany({
       where: { id: +params.reactionId },

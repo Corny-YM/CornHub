@@ -56,8 +56,7 @@ const ReactionsModal = ({
 
   // Get all reactions of currentType
   const { data: dataReactions, isLoading: isLoadingReactions } = useQuery({
-    enabled:
-      !!data.id && !!dataReactionTypes && !!dataReactionTypes.length && open,
+    enabled: !!data.id && open,
     queryKey: ["post", "getReactions", currentType, ...dynamicKeys],
     queryFn: () =>
       index({ postId: data.id, commentId, replyId, type: currentType }),

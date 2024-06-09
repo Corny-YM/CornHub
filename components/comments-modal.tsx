@@ -48,8 +48,6 @@ const CommentsModal = ({ data, open, children, onOpenChange }: Props) => {
   const router = useRouter();
   const { currentUser } = useAppContext();
 
-  const [inputValue, setInputValue] = useState("");
-
   const {
     data: commentData,
     isLoading,
@@ -60,12 +58,11 @@ const CommentsModal = ({ data, open, children, onOpenChange }: Props) => {
     queryFn: () => getComments(data.id),
   });
 
-  const { mutate, isPending } = useMutation({
+  const { mutateAsync, isPending } = useMutation({
     mutationKey: ["post", "comments", "store", data.id],
     mutationFn: store,
     onSuccess() {
       refetch();
-      setInputValue("");
       router.refresh();
       toast.success("Bình luận bài viết thành công");
     },
@@ -73,37 +70,6 @@ const CommentsModal = ({ data, open, children, onOpenChange }: Props) => {
       toast.error("Bình luận bài viết thất bại. Vui lòng thử lại sau");
     },
   });
-
-  const isDisabled = useMemo(
-    () => !inputValue.trim() || isPending,
-    [inputValue, isPending]
-  );
-
-  const handleChange = useCallback((e: React.ChangeEvent) => {
-    const target = e.target as HTMLInputElement;
-    const val = target.value;
-    setInputValue(val);
-  }, []);
-
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key.toLowerCase() !== "enter" || isDisabled || !currentUser) return;
-      console.log(inputValue);
-      mutate({
-        postId: data.id,
-        content: inputValue,
-      });
-    },
-    [inputValue, isDisabled, currentUser, data]
-  );
-
-  const handleClickSend = useCallback(() => {
-    if (!currentUser) return;
-    mutate({
-      postId: data.id,
-      content: inputValue,
-    });
-  }, [inputValue, currentUser, data]);
 
   const content = useMemo(() => {
     if (isLoading)
@@ -117,6 +83,14 @@ const CommentsModal = ({ data, open, children, onOpenChange }: Props) => {
       return <CommentItem key={item.id} data={item} dataPost={data} />;
     });
   }, [commentData, isLoading]);
+
+  const handleClickSend = useCallback(
+    (inputData: { value: string }) => {
+      if (!currentUser) return;
+      return mutateAsync({ postId: data.id, content: inputData.value });
+    },
+    [currentUser, data]
+  );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -144,13 +118,7 @@ const CommentsModal = ({ data, open, children, onOpenChange }: Props) => {
 
         {currentUser && (
           <DialogFooter>
-            <UserInputSending
-              value={inputValue}
-              disabled={isDisabled}
-              onChange={handleChange}
-              onKeyDown={handleKeyDown}
-              onSend={handleClickSend}
-            />
+            <UserInputSending disabled={isPending} onSend={handleClickSend} />
           </DialogFooter>
         )}
       </DialogContent>

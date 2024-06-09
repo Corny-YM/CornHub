@@ -1,6 +1,5 @@
 "use client";
 
-import toast from "react-hot-toast";
 import {
   User,
   Post,
@@ -8,14 +7,13 @@ import {
   Comment,
   Reaction,
   File as IFile,
+  CommentReply,
 } from "@prisma/client";
 import { useAuth } from "@clerk/nextjs";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { store } from "@/actions/replies";
 import { emotions } from "@/lib/const";
-import { cn, formatAmounts, getRelativeTime } from "@/lib/utils";
+import { cn, getRelativeTime } from "@/lib/utils";
 import { useToggle } from "@/hooks/useToggle";
 import { useMutates } from "@/hooks/mutations/reaction/useMutates";
 import { Button } from "@/components/ui/button";
@@ -23,18 +21,22 @@ import AvatarImg from "@/components/avatar-img";
 import TooltipButton from "@/components/tooltip-button";
 import ReactionsModal from "@/components/reactions-modal";
 import ReactionsButton from "@/components/reactions-button";
-import UserInputSending from "@/components/user-input-sending";
 import Content from "./content";
 import Actions from "./actions";
-import CommentRepliesList from "../comment-replies";
 
 interface Props {
   className?: string;
-  data: Comment & {
+  data: CommentReply & {
     user: User;
     file?: IFile | null;
     reactions: Reaction[];
-    _count: { reactions: number; commentReplies: number };
+    _count: { reactions: number };
+  };
+  dataComment: Comment & {
+    user: User;
+    file?: IFile | null;
+    reactions: Reaction[];
+    _count: { reactions: number };
   };
   dataPost: Post & {
     user: User;
@@ -43,46 +45,27 @@ interface Props {
   };
 }
 
-const CommentItem = ({ data, dataPost, className }: Props) => {
+const CommentRepliesItem = ({
+  data,
+  dataComment,
+  dataPost,
+  className,
+}: Props) => {
   const { userId } = useAuth();
   const { user, created_at, reactions, _count } = data;
 
   const { isPendingDeleteReaction, isPendingStoreReaction, onDelete, onStore } =
     useMutates();
 
-  const [isReply, toggleIsReply] = useToggle(false);
-  const [showReplies, toggleShowReplies] = useToggle(false);
-
   const [totalReactions, setTotalReactions] = useState(_count.reactions);
-  const [totalCommentReplies, setTotalCommentReplies] = useState(
-    _count.commentReplies
-  );
   const [modalReaction, toggleModalReaction] = useToggle(false);
   const [currentUserReaction, setCurrentUserReaction] =
     useState<Reaction | null>(reactions?.[0]);
 
-  useEffect(
-    () => setTotalCommentReplies(_count.commentReplies),
-    [_count.commentReplies]
-  );
-  useEffect(() => setTotalReactions(_count.reactions), [_count.reactions]);
-  useEffect(() => setCurrentUserReaction(reactions?.[0]), [reactions]);
-
-  const queryClient = useQueryClient();
-  const { mutateAsync, isPending } = useMutation({
-    mutationKey: ["comments", "replying", data.id],
-    mutationFn: store,
-    onSuccess() {
-      queryClient.invalidateQueries({
-        queryKey: ["comment", "replies", dataPost.id, data.id, userId],
-      });
-      toast.success("Tạo phản hồi thành công");
-      setTotalCommentReplies((prev) => prev + 1);
-    },
-    onError() {
-      toast.error("Tạo phản hồi thất bại. Vui lòng thử lại sau");
-    },
-  });
+  useEffect(() => {
+    setTotalReactions(_count.reactions);
+    setCurrentUserReaction(reactions?.[0]);
+  }, [data]);
 
   const handleClickEmotion = useCallback(
     async (e: React.MouseEvent) => {
@@ -90,7 +73,13 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
       const type = target.dataset.type;
       if (!type || !userId || !dataPost.id) return;
       await onStore(
-        { type, user_id: userId, post_id: dataPost.id, comment_id: data.id },
+        {
+          type,
+          user_id: userId,
+          post_id: dataPost.id,
+          comment_id: dataComment.id,
+          reply_id: data.id,
+        },
         (res) => {
           setCurrentUserReaction(res);
           setTotalReactions((prev) => prev + 1);
@@ -112,7 +101,8 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
         type: emotions[0].type,
         user_id: userId,
         post_id: dataPost.id,
-        comment_id: data.id,
+        comment_id: dataComment.id,
+        reply_id: data.id,
       },
       (res) => {
         setCurrentUserReaction(res);
@@ -120,22 +110,6 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
       }
     );
   }, [currentUserReaction, data, dataPost, userId, onDelete, onStore]);
-
-  const handleClickReply = useCallback((e: React.MouseEvent) => {
-    toggleIsReply();
-  }, []);
-
-  const handleSend = useCallback(
-    (inputData: { value: string }) => {
-      if (!data || !dataPost || isPending) return;
-      return mutateAsync({
-        postId: dataPost.id,
-        commentId: data.id,
-        content: inputData.value,
-      });
-    },
-    [data, dataPost, isPending]
-  );
 
   const button = useMemo(() => {
     const typeBtn = currentUserReaction?.type;
@@ -166,7 +140,7 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
         <div className="flex-1 flex flex-col items-center mr-2">
           <AvatarImg src={user.avatar!} />
           <div className="flex-1 py-1">
-            <div className="w-1 h-full bg-primary-foreground/50"></div>
+            <div className="w-1 h-full bg-primary-foreground/40"></div>
           </div>
         </div>
 
@@ -198,14 +172,6 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
                 ))}
               </div>
             </TooltipButton>
-            <Button
-              className="px-1 text-xs text-inherit cursor-pointer select-none leading-normal hover:underline"
-              variant="link"
-              size="sm"
-              onClick={handleClickReply}
-            >
-              Phản hồi
-            </Button>
             {totalReactions > 0 && (
               <ReactionsButton
                 totalReactions={totalReactions}
@@ -213,35 +179,13 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
               />
             )}
           </div>
-
-          {/* Content Replies */}
-          {!!totalCommentReplies && (
-            <CommentRepliesList dataComment={data} dataPost={dataPost}>
-              <Button
-                className="w-fit text-inherit cursor-pointer select-none leading-normal hover:underline"
-                variant="ghost"
-                size="sm"
-                onClick={() => toggleShowReplies()}
-              >
-                {formatAmounts(totalCommentReplies)} phản hồi
-              </Button>
-            </CommentRepliesList>
-          )}
-
-          {/* Reply input */}
-          {isReply && (
-            <UserInputSending
-              className="mt-1"
-              disabled={isPending}
-              onSend={handleSend}
-            />
-          )}
         </div>
       </div>
 
       <ReactionsModal
         data={dataPost}
-        commentId={data.id}
+        replyId={data.id}
+        commentId={dataComment.id}
         open={modalReaction}
         onOpenChange={toggleModalReaction}
       />
@@ -249,4 +193,4 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
   );
 };
 
-export default CommentItem;
+export default CommentRepliesItem;

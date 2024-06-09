@@ -1,13 +1,19 @@
-import { Comment } from "@prisma/client";
+import {
+  User,
+  Comment,
+  Reaction,
+  CommentReply,
+  File as IFile,
+} from "@prisma/client";
 
 import defHttp from "@/lib/defHttp";
 
 const indexApi = "comments";
 
 interface ICommentData extends Record<string, any> {
-  content?: string;
   postId: number;
   commentId?: number;
+  content?: string;
   file?: File;
 }
 
@@ -19,4 +25,21 @@ export const store = async (data: ICommentData): Promise<Comment> => {
     formData.append(key, value);
   });
   return defHttp.put(indexApi, formData);
+};
+
+export const getReplies = async (data: {
+  postId: number;
+  commentId: number;
+}): Promise<
+  (CommentReply & {
+    user: User;
+    file?: IFile;
+    reactions: Reaction[];
+    _count: { reactions: number };
+  })[]
+> => {
+  const { commentId, postId } = data;
+  return defHttp.get(`${indexApi}/${commentId}/replies`, {
+    params: { postId },
+  });
 };
