@@ -16,9 +16,8 @@ export async function DELETE(req: Request) {
 
     if (!user.cover) return NextResponse.json(user);
 
-    // Remove the char "/" from path user cover
     const file = await prisma.file.findFirst({
-      where: { path: { contains: user.cover.substring(1) } },
+      where: { path: { contains: user.cover } },
     });
 
     if (!file) return new NextResponse("File does not exist", { status: 404 });

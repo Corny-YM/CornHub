@@ -43,6 +43,14 @@ export const store = async (user: {
 export const removeCover = async (): Promise<User> =>
   defHttp.delete(`${indexApi}/remove/cover`);
 
+export const getFiles = async (data: {
+  userId: string;
+  type?: "image" | "video";
+}): Promise<IFile[]> => {
+  const { userId, type } = data;
+  return defHttp.get(`${indexApi}/${userId}/files`, { params: { type } });
+};
+
 export const getPosts = async (
   userId: string
 ): Promise<

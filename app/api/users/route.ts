@@ -50,8 +50,8 @@ export async function PUT(req: Request) {
 
     const data: Record<string, any> = {};
 
-    if (fileCoverDB) data.cover = `/${fileCoverDB.path}`;
-    if (fileAvatarDB) data.cover = `/${fileAvatarDB.path}`;
+    if (fileCoverDB) data.cover = fileCoverDB.path;
+    if (fileAvatarDB) data.cover = fileAvatarDB.path;
     if (last_name) data.last_name = last_name;
     if (first_name) data.first_name = first_name;
     if (full_name) data.full_name = full_name;

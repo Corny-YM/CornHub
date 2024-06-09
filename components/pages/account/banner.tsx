@@ -17,13 +17,15 @@ import DropdownActions, {
   IDropdownAction,
 } from "@/components/dropdown-actions";
 import NoBackground from "@/public/no-background.jpg";
+import ModalFiles from "./modal-files";
 
 const Banner = () => {
   const router = useRouter();
   const { currentUser } = useAppContext();
   const { accountData, isOwner } = useAccountContext();
 
-  const [confirmModal, toggleConfirmModal] = useToggle(false);
+  const [modalConfirm, toggleModalConfirm] = useToggle(false);
+  const [modalFiles, toggleModalFiles] = useToggle(false);
   const [file, setFile] = useState<File | null>(null);
   const [cover, setCover] = useState<string | null>(accountData?.cover);
 
@@ -65,7 +67,11 @@ const Banner = () => {
 
   const actions = useMemo(() => {
     const result: IDropdownAction[] = [
-      { label: "Chọn ảnh bìa", icon: <Images className="mr-2" /> },
+      {
+        label: "Chọn ảnh bìa",
+        icon: <Images className="mr-2" />,
+        onClick: () => toggleModalFiles(true),
+      },
       {
         label: "Tải ảnh lên",
         icon: <Upload className="mr-2" />,
@@ -77,10 +83,12 @@ const Banner = () => {
         label: "Gỡ",
         destructive: true,
         icon: <Trash2 className="mr-2" />,
-        onClick: () => toggleConfirmModal(true),
+        onClick: () => toggleModalConfirm(true),
       });
     return result;
   }, [accountData, currentUser]);
+
+  const handleSelectImage = useCallback(() => {}, []);
 
   const handleChangeFile = useCallback((e: React.ChangeEvent) => {
     const target = e.target as HTMLInputElement;
@@ -112,7 +120,7 @@ const Banner = () => {
       <div className="relative w-full h-96 aspect-video flex items-center justify-center">
         <Image
           className="absolute w-full h-full object-cover"
-          src={cover || NoBackground}
+          src={cover ? `/${cover}` : NoBackground}
           alt="banner"
           sizes="100%"
           fill
@@ -156,9 +164,15 @@ const Banner = () => {
 
       <AlertModal
         destructive
-        open={confirmModal}
+        open={modalConfirm}
         onClick={handleRemoveCover}
-        onOpenChange={toggleConfirmModal}
+        onOpenChange={toggleModalConfirm}
+      />
+
+      <ModalFiles
+        open={modalFiles}
+        onOpenChange={toggleModalFiles}
+        onSelect={handleSelectImage}
       />
     </div>
   );
