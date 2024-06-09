@@ -36,8 +36,8 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
   try {
     const formData = await req.formData();
-    const cover = formData.get("cover") as File | null;
-    const avatar = formData.get("avatar") as File | null;
+    const cover = formData.get("cover") as File | string | null;
+    const avatar = formData.get("avatar") as File | string | null;
     const last_name = formData.get("last_name") as string | null;
     const first_name = formData.get("first_name") as string | null;
     const full_name = formData.get("full_name") as string | null;
@@ -45,13 +45,25 @@ export async function PUT(req: Request) {
     const { userId } = auth();
     if (!userId) return new NextResponse("Unauthenticated", { status: 401 });
 
-    const fileCoverDB: IFile | null = await uploadFile(cover, userId);
-    const fileAvatarDB: IFile | null = await uploadFile(avatar, userId);
+    let fileCoverDB: IFile | null = null;
+    let fileAvatarDB: IFile | null = null;
+    if (typeof cover !== "string" && cover) {
+      fileCoverDB = await uploadFile(cover, userId);
+    }
+    if (typeof avatar !== "string" && avatar) {
+      fileAvatarDB = await uploadFile(avatar, userId);
+    }
 
     const data: Record<string, any> = {};
 
+    // Update user cover img from update File | string
     if (fileCoverDB) data.cover = fileCoverDB.path;
+    else if (typeof cover === "string") data.cover = cover;
+
+    // Update user avatar img from update File | string
     if (fileAvatarDB) data.cover = fileAvatarDB.path;
+    else if (typeof avatar === "string") data.avatar = avatar;
+
     if (last_name) data.last_name = last_name;
     if (first_name) data.first_name = first_name;
     if (full_name) data.full_name = full_name;

@@ -17,25 +17,22 @@ export async function DELETE(req: Request) {
     if (!user.cover) return NextResponse.json(user);
 
     const file = await prisma.file.findFirst({
-      where: { path: { contains: user.cover } },
+      where: { path: { contains: user.cover }, user_id: userId },
     });
 
     if (!file) return new NextResponse("File does not exist", { status: 404 });
 
-    try {
-      const filePath = path.join(process.cwd(), "public", user.cover);
-      await fs.unlink(filePath);
-      await prisma.file.deleteMany({ where: { id: file.id } });
+    // try {
+    //   const filePath = path.join(process.cwd(), "public", user.cover);
+    //   await fs.unlink(filePath);
+    //   await prisma.file.deleteMany({ where: { id: file.id } });
+    // } catch (error) {
+    //   console.log("[FILE_DELETE_ERROR]", error);
+    //   // Handle error, e.g., file might not exist, log it, etc.
+    // }
 
-      // Update user when delete file successful
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { cover: null },
-      });
-    } catch (error) {
-      console.log("[FILE_DELETE_ERROR]", error);
-      // Handle error, e.g., file might not exist, log it, etc.
-    }
+    // Update user when delete file successful
+    await prisma.user.update({ where: { id: user.id }, data: { cover: null } });
 
     return NextResponse.json(user);
   } catch (err) {

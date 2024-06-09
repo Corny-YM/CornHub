@@ -14,8 +14,8 @@ const indexApi = "users";
 
 export const update = async (
   data: Record<string, any> & {
-    cover?: File | null;
-    avatar?: File | null;
+    cover?: File | string | null;
+    avatar?: File | string | null;
     first_name?: string | null;
     last_name?: string | null;
     full_name?: string | null;

@@ -47,6 +47,12 @@ const ModalFiles = ({ open, onSelect, onOpenChange }: Props) => {
     [selectedImage]
   );
 
+  const handleClickSelect = useCallback(() => {
+    if (!selectedImage) return;
+    onOpenChange(false);
+    onSelect(selectedImage);
+  }, [selectedImage, onSelect]);
+
   const content = useMemo(() => {
     if (isLoading)
       return (
@@ -106,7 +112,9 @@ const ModalFiles = ({ open, onSelect, onOpenChange }: Props) => {
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Đóng
           </Button>
-          <Button disabled={!selectedImage}>Chọn</Button>
+          <Button disabled={!selectedImage} onClick={handleClickSelect}>
+            Chọn
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

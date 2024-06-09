@@ -38,7 +38,7 @@ export const DropdownActions = ({
       <DropdownMenuTrigger asChild>
         <Button
           className={cn(
-            "flex justify-center items-center",
+            "flex justify-center items-center select-none",
             size === "icon" && "rounded-full",
             className
           )}

@@ -24,8 +24,9 @@ const Banner = () => {
   const { currentUser } = useAppContext();
   const { accountData, isOwner } = useAccountContext();
 
-  const [modalConfirm, toggleModalConfirm] = useToggle(false);
+  const [isSelecting, setIsSelecting] = useState(false);
   const [modalFiles, toggleModalFiles] = useToggle(false);
+  const [modalConfirm, toggleModalConfirm] = useToggle(false);
   const [file, setFile] = useState<File | null>(null);
   const [cover, setCover] = useState<string | null>(accountData?.cover);
 
@@ -65,6 +66,19 @@ const Banner = () => {
     [isPendingUpdate, isPendingRemoveCover]
   );
 
+  const isShowEdit = useMemo(() => {
+    if (!isOwner) return false;
+    else if (file) return false;
+    else if (cover && isSelecting) return false;
+    return true;
+  }, [isOwner, file, cover, isSelecting]);
+
+  const src = useMemo(() => {
+    if (cover && file) return cover;
+    if (cover) return `/${cover}`;
+    return NoBackground;
+  }, [cover, file, isSelecting]);
+
   const actions = useMemo(() => {
     const result: IDropdownAction[] = [
       {
@@ -88,7 +102,10 @@ const Banner = () => {
     return result;
   }, [accountData, currentUser]);
 
-  const handleSelectImage = useCallback(() => {}, []);
+  const handleSelectImage = useCallback((url: string) => {
+    setCover(url);
+    setIsSelecting(true);
+  }, []);
 
   const handleChangeFile = useCallback((e: React.ChangeEvent) => {
     const target = e.target as HTMLInputElement;
@@ -101,12 +118,13 @@ const Banner = () => {
 
   const handleUpdateCover = useCallback(() => {
     if (currentUser?.id !== accountData.id) return;
-    mutateUpdate({ cover: file });
-  }, [file, accountData, currentUser]);
+    mutateUpdate({ cover: file || cover });
+  }, [file, accountData, cover, currentUser]);
 
   const handleRemovePreviewCover = useCallback(() => {
     if (currentUser?.id !== accountData.id) return;
     setFile(null);
+    setIsSelecting(false);
     setCover(accountData?.cover);
   }, [accountData, currentUser]);
 
@@ -120,7 +138,7 @@ const Banner = () => {
       <div className="relative w-full h-96 aspect-video flex items-center justify-center">
         <Image
           className="absolute w-full h-full object-cover"
-          src={cover ? `/${cover}` : NoBackground}
+          src={src}
           alt="banner"
           sizes="100%"
           fill
@@ -129,7 +147,7 @@ const Banner = () => {
       </div>
 
       <div className="absolute right-4 bottom-4 flex items-center gap-x-2">
-        {file && (
+        {(file || (cover && isSelecting)) && (
           <div className="flex items-center gap-x-2">
             <Button variant="destructive" onClick={handleRemovePreviewCover}>
               Loại bỏ
@@ -138,15 +156,15 @@ const Banner = () => {
           </div>
         )}
 
-        {isOwner && !file && (
+        {isShowEdit && (
           <DropdownActions
             size="default"
             disabled={disabled}
             actions={actions}
             icon={
-              <>
+              <div className="select-none flex items-center">
                 <Camera size={20} className="mr-2" /> Chỉnh sửa ảnh bìa
-              </>
+              </div>
             }
           />
         )}
