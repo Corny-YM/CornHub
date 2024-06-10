@@ -46,7 +46,7 @@ interface IAction {
 
 const InfoActions = () => {
   const { userId } = useAuth();
-  const { accountData, isOwner } = useAccountContext();
+  const { accountData, isOwner, toggleModalEdit } = useAccountContext();
 
   const {
     data: dataFriendStatus,
@@ -183,6 +183,7 @@ const InfoActions = () => {
         id: "edit",
         label: "Chỉnh sửa trang cá nhân",
         icon: Pencil,
+        onClick: () => toggleModalEdit(true),
       });
     } else if (dataFriendStatus?.friendRequest) {
       if (userId === dataFriendStatus.friendRequest.sender_id) {

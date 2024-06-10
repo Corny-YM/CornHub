@@ -15,6 +15,7 @@ interface Props {
 
 const UserLayout = async ({ children, params }: Props) => {
   const accountData = await prisma.user.findUnique({
+    include: { userDetails: true },
     where: { id: params.userId },
   });
 
@@ -25,7 +26,7 @@ const UserLayout = async ({ children, params }: Props) => {
       <Header />
 
       <div className="w-full h-full flex items-center justify-center relative pt-14 overflow-hidden overflow-y-auto">
-        <AccountProvider accountData={accountData}>
+        <AccountProvider data={accountData}>
           <div className="w-full h-full max-w-[1250px] flex flex-col items-center">
             <Banner />
 

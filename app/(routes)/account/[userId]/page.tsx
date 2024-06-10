@@ -45,7 +45,7 @@ const UserPage = ({ params }: Props) => {
       {/* Info Detail */}
       <div className="w-1/3 flex-shrink relative">
         <div className="w-full h-0"></div>
-        <InfoDetail data={accountData} />
+        <InfoDetail />
       </div>
 
       {/* Posts */}

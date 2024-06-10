@@ -53,8 +53,31 @@ model User {
   receiverGroupRequest  GroupRequest[]  @relation("ReceiverToGroupRequest")
   files                 File[]          @relation("UserToFile")
   commentReplies        CommentReply[]  @relation("UserToCommentReply")
+  userDetails           UserDetail[]    @relation("UserToUserDetail")
 
   @@map("users")
+}
+
+model UserDetail {
+  id           Int       @id @default(autoincrement())
+  gender       Int?      @db.TinyInt
+  biography    String?
+  work         String?
+  education    String?
+  living       String?
+  country      String?
+  relationship String?
+  portfolio    String?
+  birth        DateTime?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+
+  // relation
+  user_id String
+  user    User   @relation("UserToUserDetail", fields: [user_id], references: [id])
+
+  @@unique([user_id])
+  @@map("user_details")
 }
 
 model Group {

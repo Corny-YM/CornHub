@@ -9,6 +9,15 @@ export function isUndefined(value: any): boolean {
   return typeof value === "undefined";
 }
 
+export function isValidURL(url: string) {
+  try {
+    new URL(url);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
 export const getRelativeTime = (date: Date, suffix = true) => {
   const now = new Date().getTime();
   const past = new Date(date).getTime();
@@ -32,6 +41,19 @@ export const getRelativeTime = (date: Date, suffix = true) => {
   }
 
   return "vừa xong"; // Just now
+};
+
+export const formatDate = (value: Date | string, seperator = "/") => {
+  if (!value) return "---";
+  const date = new Date(value);
+  const day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+  const month =
+    date.getMonth() < 9 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1;
+  const year = date.getFullYear();
+  const hour = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+  const minute =
+    date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+  return `${day}${seperator}${month}${seperator}${year} ${hour}:${minute}`;
 };
 
 export const formatAmounts = (viewCount: number, fixed: number = 1) => {
