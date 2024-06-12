@@ -1,10 +1,24 @@
-import Like from "@/components/icons/like";
-import Heart from "@/components/icons/heart";
-import Love from "@/components/icons/love";
-import Smile from "@/components/icons/smile";
+import { StatusGenderEnum, StatusRelationEnum } from "@/lib/enum";
 import Wow from "@/components/icons/wow";
 import Sad from "@/components/icons/sad";
+import Love from "@/components/icons/love";
+import Like from "@/components/icons/like";
+import Heart from "@/components/icons/heart";
 import Angry from "@/components/icons/angry";
+import Smile from "@/components/icons/smile";
+
+export const genderOptions = [
+  { label: "---", value: "empty" },
+  { label: "Nam", value: StatusGenderEnum.male },
+  { label: "Nữ", value: StatusGenderEnum.female },
+];
+
+export const relationOptions = [
+  { label: "---", value: "empty" },
+  { label: "Độc thân", value: StatusRelationEnum.single },
+  { label: "Hẹn hò", value: StatusRelationEnum.dating },
+  { label: "Kết hôn", value: StatusRelationEnum.marriage },
+];
 
 export const emotions = [
   { label: "Thích", type: "like", color: "#0866ff", icon: Like },

@@ -17,6 +17,7 @@ import InfoDetailContent from "./info-detail-content";
 import { useMemo } from "react";
 import { UserDetail } from "@prisma/client";
 import { formatDate } from "@/lib/utils";
+import { StatusRelationEnum } from "@/lib/enum";
 
 interface Props {}
 
@@ -27,6 +28,14 @@ const InfoDetail = ({}: Props) => {
     const result = accountData.userDetails?.[0] as UserDetail | undefined;
     return result;
   }, [accountData.userDetails]);
+
+  const labelRelation = useMemo(() => {
+    let label = infoDetails?.relationship;
+    if (label === StatusRelationEnum.single) return "Độc thân";
+    if (label === StatusRelationEnum.dating) return "Hẹn hò";
+    if (label === StatusRelationEnum.marriage) return "Kết hôn";
+    return null;
+  }, [infoDetails]);
 
   return (
     <div className="sticky top-0" style={{ position: "-webkit-sticky" }}>
@@ -74,7 +83,7 @@ const InfoDetail = ({}: Props) => {
               icon={GraduationCap}
               label={
                 <>
-                  Học{" "}
+                  Học tại{" "}
                   <span className="font-semibold">{infoDetails.education}</span>
                 </>
               }
@@ -111,7 +120,7 @@ const InfoDetail = ({}: Props) => {
           {!!infoDetails?.relationship && (
             <InfoDetailContent
               icon={HandHeart} // Gem | Heart | HandHeart
-              label={infoDetails?.relationship}
+              label={labelRelation}
             />
           )}
 

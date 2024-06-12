@@ -21,7 +21,7 @@ interface Props {
 const InputSelect = forwardRef<HTMLButtonElement, Props>(
   ({ selectLabel, placeholder, options, value, onValueChange }, ref) => {
     return (
-      <Select value={value} onValueChange={onValueChange}>
+      <Select value={value || options[0].value} onValueChange={onValueChange}>
         <SelectTrigger className="w-full">
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>

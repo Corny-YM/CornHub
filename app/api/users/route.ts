@@ -36,11 +36,24 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
   try {
     const formData = await req.formData();
+
+    // User
     const cover = formData.get("cover") as File | string | null;
     const avatar = formData.get("avatar") as File | string | null;
     const last_name = formData.get("last_name") as string | null;
     const first_name = formData.get("first_name") as string | null;
     const full_name = formData.get("full_name") as string | null;
+
+    // User Detail
+    const gender = formData.get("gender") as string | null;
+    const biography = formData.get("biography") as string | null;
+    const work = formData.get("work") as string | null;
+    const education = formData.get("education") as string | null;
+    const living = formData.get("living") as string | null;
+    const country = formData.get("country") as string | null;
+    const relationship = formData.get("relationship") as string | null;
+    const portfolio = formData.get("portfolio") as string | null;
+    const birth = formData.get("birth") as string | null;
 
     const { userId } = auth();
     if (!userId) return new NextResponse("Unauthenticated", { status: 401 });
@@ -56,6 +69,17 @@ export async function PUT(req: Request) {
     }
 
     const data: Record<string, any> = {};
+    const dataUserDetail = {
+      gender: gender && !isNaN(+gender) ? +gender : null,
+      biography,
+      work,
+      education,
+      living,
+      country,
+      relationship,
+      portfolio,
+      birth,
+    };
 
     // Update user cover img from update File | string
     if (fileCoverDB) data.cover = fileCoverDB.path;
@@ -69,7 +93,19 @@ export async function PUT(req: Request) {
     if (first_name) data.first_name = first_name;
     if (full_name) data.full_name = full_name;
 
-    const user = await prisma.user.update({ where: { id: userId }, data });
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...data,
+        userDetails: {
+          upsert: {
+            where: { user_id: userId },
+            update: dataUserDetail,
+            create: dataUserDetail,
+          },
+        },
+      },
+    });
 
     return NextResponse.json(user);
   } catch (err) {

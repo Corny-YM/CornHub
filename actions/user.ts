@@ -6,28 +6,43 @@ import {
   Follower,
   Reaction,
   File as IFile,
+  UserDetail,
 } from "@prisma/client";
 
 import defHttp from "@/lib/defHttp";
 
 const indexApi = "users";
 
+interface IUpdateDate extends Record<string, any> {
+  // User
+  cover?: File | string | null;
+  avatar?: File | string | null;
+  first_name?: string | null;
+  last_name?: string | null;
+  full_name?: string | null;
+
+  // User details
+  gender?: string | null;
+  biography?: string | null;
+  work?: string | null;
+  education?: string | null;
+  living?: string | null;
+  country?: string | null;
+  relationship?: string | null;
+  portfolio?: string | null;
+  birth?: Date | null;
+}
+
 export const update = async (
-  data: Record<string, any> & {
-    cover?: File | string | null;
-    avatar?: File | string | null;
-    first_name?: string | null;
-    last_name?: string | null;
-    full_name?: string | null;
-  }
-): Promise<User> => {
+  data: IUpdateDate
+): Promise<User & { userDetails: UserDetail[] }> => {
   const formData = new FormData();
   Object.keys(data).forEach((key) => {
     const value = data?.[key];
     if (!value) return;
     formData.append(key, value);
   });
-  return defHttp.put(indexApi, formData);
+  return await defHttp.put(indexApi, formData);
 };
 
 export const store = async (user: {
