@@ -101,7 +101,7 @@ const ModalInfoDetails = ({ open, onOpenChange }: Props) => {
     (values: z.infer<typeof formSchema>) => {
       if (!clerkUser) return;
       // console.log(values);
-      mutate({ ...values });
+      mutate({ ...values, birth: form.getValues("birth")?.toISOString() });
     },
     [clerkUser]
   );

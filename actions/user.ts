@@ -30,7 +30,7 @@ interface IUpdateDate extends Record<string, any> {
   country?: string | null;
   relationship?: string | null;
   portfolio?: string | null;
-  birth?: Date | null;
+  birth?: string | null;
 }
 
 export const update = async (

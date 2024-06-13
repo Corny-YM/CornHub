@@ -1,23 +1,23 @@
 import {
-  BriefcaseBusiness,
+  Gem,
+  Home,
   Clock,
   Earth,
-  Gem,
-  GraduationCap,
-  HandHeart,
   Heart,
-  Home,
   MapPin,
+  HandHeart,
+  GraduationCap,
+  BriefcaseBusiness,
 } from "lucide-react";
+import { useMemo } from "react";
+import { UserDetail } from "@prisma/client";
 
+import { formatDate } from "@/lib/utils";
+import { StatusRelationEnum } from "@/lib/enum";
 import { useAccountContext } from "@/providers/account-provider";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import InfoDetailContent from "./info-detail-content";
-import { useMemo } from "react";
-import { UserDetail } from "@prisma/client";
-import { formatDate } from "@/lib/utils";
-import { StatusRelationEnum } from "@/lib/enum";
 
 interface Props {}
 
@@ -29,6 +29,13 @@ const InfoDetail = ({}: Props) => {
     return result;
   }, [accountData.userDetails]);
 
+  const iconRelation = useMemo(() => {
+    // Gem | Heart | HandHeart
+    const relationship = infoDetails?.relationship;
+    if (relationship === StatusRelationEnum.marriage) return Gem;
+    if (relationship === StatusRelationEnum.dating) return Heart;
+    return HandHeart;
+  }, [infoDetails]);
   const labelRelation = useMemo(() => {
     let label = infoDetails?.relationship;
     if (label === StatusRelationEnum.single) return "Độc thân";
@@ -118,10 +125,7 @@ const InfoDetail = ({}: Props) => {
 
           {/* relationship */}
           {!!infoDetails?.relationship && (
-            <InfoDetailContent
-              icon={HandHeart} // Gem | Heart | HandHeart
-              label={labelRelation}
-            />
+            <InfoDetailContent icon={iconRelation} label={labelRelation} />
           )}
 
           {/* portfolio */}

@@ -43,7 +43,11 @@ export const getRelativeTime = (date: Date, suffix = true) => {
   return "vừa xong"; // Just now
 };
 
-export const formatDate = (value: Date | string, seperator = "/") => {
+export const formatDate = (
+  value: Date | string,
+  seperator = "/",
+  suffix = true
+) => {
   if (!value) return "---";
   const date = new Date(value);
   const day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
@@ -53,7 +57,10 @@ export const formatDate = (value: Date | string, seperator = "/") => {
   const hour = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
   const minute =
     date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
-  return `${day}${seperator}${month}${seperator}${year} ${hour}:${minute}`;
+  const formattedDate = `${day}${seperator}${month}${seperator}${year}`;
+  const formattedHour = `${hour}:${minute}`;
+  if (!suffix) return formattedDate;
+  return `${formattedDate} ${formattedHour}`;
 };
 
 export const formatAmounts = (viewCount: number, fixed: number = 1) => {
