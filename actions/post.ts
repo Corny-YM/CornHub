@@ -1,4 +1,11 @@
-import { Post, Reaction, Comment, User, File as IFile } from "@prisma/client";
+import {
+  Post,
+  User,
+  Group,
+  Comment,
+  Reaction,
+  File as IFile,
+} from "@prisma/client";
 
 import defHttp from "@/lib/defHttp";
 
@@ -12,7 +19,9 @@ interface IPostData extends Record<string, any> {
 
 const indexApi = "posts";
 
-export const store = async (data: IPostData): Promise<Post> => {
+export const store = async (
+  data: IPostData
+): Promise<Post & { user: User; group: Group | null; file: IFile | null }> => {
   const formData = new FormData();
   Object.keys(data).forEach((key) => {
     const value = data?.[key];
@@ -22,14 +31,20 @@ export const store = async (data: IPostData): Promise<Post> => {
   return defHttp.put(indexApi, formData);
 };
 
-export const update = async (data: IPostData): Promise<Post> => {
+export const update = async ({
+  postId,
+  data,
+}: {
+  postId: number;
+  data: IPostData;
+}): Promise<Post & { user: User; group: Group | null; file: IFile | null }> => {
   const formData = new FormData();
   Object.keys(data).forEach((key) => {
     const value = data?.[key];
     if (!value) return;
     formData.append(key, value);
   });
-  return defHttp.put(`${indexApi}/update`, formData);
+  return defHttp.put(`${indexApi}/${postId}`, formData);
 };
 
 export const destroy = async (id: number): Promise<number> =>

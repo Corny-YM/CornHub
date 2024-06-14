@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Group, Post, User, File as IFile, Reaction } from "@prisma/client";
 
 import { cn } from "@/lib/utils";
@@ -35,10 +35,15 @@ const PostItem = ({
   isGroupOwnerPost,
   onSuccessDelete,
 }: Props) => {
+  const [dataPost, setDataPost] = useState(data);
   const [modalReactions, toggleModalReactions] = useToggle(false);
   const [modalComments, toggleModalComments] = useToggle(false);
 
-  const file = useMemo(() => data.file, [data]);
+  useEffect(() => {
+    setDataPost(data);
+  }, [data]);
+
+  const file = useMemo(() => dataPost.file, [dataPost]);
   const type = useMemo(() => file?.type, [file]);
   const path = useMemo(() => {
     return file?.path;
@@ -48,11 +53,16 @@ const PostItem = ({
     <div className={cn("post-item", isModal && "popup", className)}>
       {/* Header */}
       <PostHeader
-        data={data}
+        data={dataPost}
         isModal={isModal}
         isGroupOwner={isGroupOwner}
         isGroupOwnerPost={isGroupOwnerPost}
         onSuccessDelete={onSuccessDelete}
+        onSuccessUpdate={(newPostData) => {
+          setDataPost((prev) => {
+            return { ...prev, ...newPostData };
+          });
+        }}
       />
 
       {/* Content */}
@@ -60,7 +70,7 @@ const PostItem = ({
         {/* content */}
         <div
           className={cn("px-4 pb-4 pt-1", isModal && "px-0")}
-          dangerouslySetInnerHTML={{ __html: data.content || "" }}
+          dangerouslySetInnerHTML={{ __html: dataPost.content || "" }}
         />
 
         {file && path && (
@@ -70,7 +80,7 @@ const PostItem = ({
                 <Image
                   className="absolute w-full h-full object-cover"
                   src={path}
-                  alt={data.file?.name || `post-img-${data.id}`}
+                  alt={dataPost.file?.name || `post-img-${dataPost.id}`}
                   fill
                   priority
                   sizes="100%"
@@ -90,7 +100,7 @@ const PostItem = ({
 
       {/* Footer */}
       <PostFooter
-        data={data}
+        data={dataPost}
         isModal={isModal}
         onClickReaction={() => toggleModalReactions(true)}
         onClickComment={() => !isModal && toggleModalComments(true)}
@@ -98,13 +108,13 @@ const PostItem = ({
 
       {/* Modals */}
       <ReactionsModal
-        data={data}
+        data={dataPost}
         open={modalReactions}
         onOpenChange={toggleModalReactions}
       />
       {!isModal && (
         <CommentsModal
-          data={data}
+          data={dataPost}
           open={modalComments}
           onOpenChange={toggleModalComments}
         />

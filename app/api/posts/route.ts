@@ -37,6 +37,7 @@ export async function PUT(req: Request) {
     });
 
     const post = await prisma.post.create({
+      include: { user: true, group: true, file: true },
       data: {
         status,
         content,

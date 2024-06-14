@@ -29,7 +29,9 @@ interface Props {
   open: boolean;
   data?: Post & { user: User; group: Group | null; file: IFile | null };
   toggleOpen: (val?: boolean) => void;
-  onSuccess?: () => void;
+  onSuccess?: (
+    res: Post & { user: User; group: Group | null; file: IFile | null }
+  ) => void;
 }
 
 const actions: ISelectAction[] = [
@@ -101,7 +103,7 @@ const PostingModal = ({
       setFile(null);
       setStatus(defaultStatus);
       toggleOpen(false);
-      onSuccess?.();
+      onSuccess?.(res);
     },
     onError() {
       toast.error("Tạo bài viết thất bại. Vui lòng thử lại sau");
@@ -112,16 +114,16 @@ const PostingModal = ({
     mutationKey: ["store", "post", currentUser?.id],
     mutationFn: update,
     onSuccess(res) {
-      toast.success("Tạo bài viết thành công");
+      toast.success("Cập nhật bài viết thành công");
       router.refresh();
       setContent("");
       setFile(null);
       setStatus(defaultStatus);
       toggleOpen(false);
-      onSuccess?.();
+      onSuccess?.(res);
     },
     onError() {
-      toast.error("Tạo bài viết thất bại. Vui lòng thử lại sau");
+      toast.error("Cập nhật bài viết thất bại. Vui lòng thử lại sau");
     },
   });
 
@@ -152,7 +154,10 @@ const PostingModal = ({
   }, [content, status, file, currentUser, mutateStore]);
   const handleUpdatePost = useCallback(() => {
     if (!currentUser || !data) return;
-    mutateUpdate({ groupId, content, status, file, userId: currentUser.id });
+    mutateUpdate({
+      postId: data.id,
+      data: { groupId, content, status, file, userId: currentUser.id },
+    });
   }, [content, status, data, file, currentUser, mutateUpdate]);
 
   const handleOpenChange = useCallback(

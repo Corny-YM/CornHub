@@ -32,6 +32,9 @@ interface Props {
   isGroupOwnerPost?: boolean;
   data: Post & { user: User; group: Group | null; file: IFile | null };
   onSuccessDelete?: () => void;
+  onSuccessUpdate?: (
+    res: Post & { user: User; group: Group | null; file: IFile | null }
+  ) => void;
 }
 
 const PostHeader = ({
@@ -40,6 +43,7 @@ const PostHeader = ({
   isGroupOwner,
   isGroupOwnerPost,
   onSuccessDelete,
+  onSuccessUpdate,
 }: Props) => {
   const router = useRouter();
   const { userId } = useAuth();
@@ -218,6 +222,7 @@ const PostHeader = ({
         open={modalUpdate}
         data={data}
         toggleOpen={toggleModalUpdate}
+        onSuccess={onSuccessUpdate}
       />
     </div>
   );
