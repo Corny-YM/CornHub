@@ -3,9 +3,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { DoorOpen } from "lucide-react";
-import { SignOutButton, useUser } from "@clerk/nextjs";
+import { SignOutButton } from "@clerk/nextjs";
 
 import { cn } from "@/lib/utils";
+import { useAppContext } from "@/providers/app-provider";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -13,15 +14,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import AvatarImg from "./avatar-img";
 
 interface Props {
   className?: string;
 }
 
 const UserButton = ({ className }: Props) => {
-  const { user } = useUser();
+  const { currentUser } = useAppContext();
 
-  if (!user) return;
+  if (!currentUser) return;
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -33,15 +35,7 @@ const UserButton = ({ className }: Props) => {
           variant="outline"
           size="icon"
         >
-          <div className="w-full h-full flex justify-center items-center relative rounded-full overflow-hidden">
-            <Image
-              className="absolute w-full h-full"
-              src={user.imageUrl}
-              alt={user.fullName || "user-avatar"}
-              fill
-              sizes="100%"
-            />
-          </div>
+          <AvatarImg src={currentUser?.avatar} />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
@@ -51,19 +45,15 @@ const UserButton = ({ className }: Props) => {
         <DropdownMenuItem className={cn("cursor-pointer p-0", className)}>
           <Link
             className="w-full flex items-center px-2 rounded-md transition select-none cursor-pointer"
-            href={`/account/${user.id}`}
+            href={`/account/${currentUser.id}`}
           >
-            <div className="relative flex justify-center items-center w-9 h-9 my-2 mr-3 overflow-hidden rounded-full">
-              <Image
-                className="absolute w-full h-full aspect-square"
-                priority
-                src={user.imageUrl!}
-                alt={user.fullName || ""}
-                fill
-                sizes="w-9"
-              />
+            <AvatarImg
+              className="relative flex justify-center items-center w-9 h-9 my-2 mr-3 overflow-hidden rounded-full"
+              src={currentUser?.avatar}
+            />
+            <div className="font-semibold">
+              {currentUser?.full_name || "---"}
             </div>
-            <div className="font-semibold">{user.fullName || "---"}</div>
           </Link>
         </DropdownMenuItem>
 

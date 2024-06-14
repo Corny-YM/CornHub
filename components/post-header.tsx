@@ -13,21 +13,24 @@ import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { Group, Post, User } from "@prisma/client";
+import { Group, Post, User, File as IFile } from "@prisma/client";
 
 import { destroy } from "@/actions/post";
 import { useToggle } from "@/hooks/useToggle";
 import { cn, getRelativeTime } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import DropdownActions, {
+  IDropdownAction,
+} from "@/components/dropdown-actions";
 import AvatarImg from "@/components/avatar-img";
 import AlertModal from "@/components/alert-modal";
-import DropdownActions from "@/components/dropdown-actions";
+import PostingModal from "@/components/posting-modal";
 
 interface Props {
   isModal?: boolean;
   isGroupOwner?: boolean;
   isGroupOwnerPost?: boolean;
-  data: Post & { user: User; group: Group | null };
+  data: Post & { user: User; group: Group | null; file: IFile | null };
   onSuccessDelete?: () => void;
 }
 
@@ -43,6 +46,7 @@ const PostHeader = ({
   const { id, user, group, group_id, created_at } = data;
 
   const [confirmDelete, toggleConfirmDelete] = useToggle(false);
+  const [modalUpdate, toggleModalUpdate] = useToggle(false);
 
   const { mutate, isPending } = useMutation({
     mutationKey: ["post", "destroy", data.id],
@@ -75,7 +79,7 @@ const PostHeader = ({
   }, [group_id, group, user, isGroupOwnerPost]);
 
   const actions = useMemo(() => {
-    const groupActions = [];
+    const groupActions: IDropdownAction[] = [];
     if (group_id && group) {
       if (!isGroupOwner) {
         groupActions.push({
@@ -91,12 +95,13 @@ const PostHeader = ({
       }
     }
 
-    const userActions = [];
+    const userActions: IDropdownAction[] = [];
     if (isPostOwner) {
       userActions.push(
         {
           label: "Chỉnh sửa bài viết",
           icon: <Pencil className="mr-2" size={20} />,
+          onClick: () => toggleModalUpdate(true),
         },
         {
           label: "Xóa bài viết",
@@ -120,7 +125,7 @@ const PostHeader = ({
       );
     }
 
-    return [...groupActions, ...userActions];
+    return [...groupActions, ...userActions] as IDropdownAction[];
   }, [group_id, group, user, isPostOwner, isGroupOwner, isPending]);
 
   const handleDeletePost = useCallback(() => {
@@ -206,6 +211,13 @@ const PostHeader = ({
         open={confirmDelete}
         onOpenChange={toggleConfirmDelete}
         onClick={handleDeletePost}
+      />
+
+      <PostingModal
+        groupId={group_id}
+        open={modalUpdate}
+        data={data}
+        toggleOpen={toggleModalUpdate}
       />
     </div>
   );

@@ -4,6 +4,7 @@ import { File as IFile } from "@prisma/client";
 
 import prisma from "@/lib/prisma";
 import uploadFile from "@/services/uploadFile";
+import { UsedForEnum } from "@/lib/enum";
 
 export async function PUT(req: Request) {
   try {
@@ -31,7 +32,12 @@ export async function PUT(req: Request) {
     if (!comment)
       return new NextResponse("Comment does not exist", { status: 404 });
 
-    const fileDB: IFile | null = await uploadFile(file, userId);
+    const fileDB: IFile | null = await uploadFile({
+      file,
+      userId,
+      used_for: UsedForEnum.reply,
+      group_id: post.group_id || undefined,
+    });
 
     const reply = await prisma.commentReply.create({
       data: {

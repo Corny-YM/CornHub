@@ -9,23 +9,20 @@ export async function GET(
 ) {
   try {
     const url = new URL(req.url);
-    const limit = url.searchParams.get("limit");
+    const type = url.searchParams.get("type");
 
     const { userId } = auth();
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 400 });
     }
 
-    const groupMembers = await prisma.groupMember.findMany({
-      include: { member: true },
-      take: limit && !isNaN(+limit) ? +limit : undefined,
+    const files = await prisma.file.findMany({
+      where: { group_id: +params.groupId, ...(type && { type }) },
     });
 
-    const members = groupMembers.map((item) => item.member);
-
-    return NextResponse.json(members);
+    return NextResponse.json(files);
   } catch (err) {
-    console.log("[GROUP_MEMBERS_GET]", err);
+    console.log("[GROUP_FILES_GET]", err);
     return new NextResponse("Internal error", { status: 500 });
   }
 }

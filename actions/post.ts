@@ -22,6 +22,16 @@ export const store = async (data: IPostData): Promise<Post> => {
   return defHttp.put(indexApi, formData);
 };
 
+export const update = async (data: IPostData): Promise<Post> => {
+  const formData = new FormData();
+  Object.keys(data).forEach((key) => {
+    const value = data?.[key];
+    if (!value) return;
+    formData.append(key, value);
+  });
+  return defHttp.put(`${indexApi}/update`, formData);
+};
+
 export const destroy = async (id: number): Promise<number> =>
   defHttp.delete(`${indexApi}/${id}`);
 

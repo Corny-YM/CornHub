@@ -5,6 +5,7 @@ import { File as IFile } from "@prisma/client";
 
 import prisma from "@/lib/prisma";
 import uploadFile from "@/services/uploadFile";
+import { UsedForEnum } from "@/lib/enum";
 
 interface IBody {
   groupId?: number;
@@ -29,14 +30,18 @@ export async function PUT(req: Request) {
       return new NextResponse("Unauthenticated", { status: 400 });
     }
 
-    const fileDB: IFile | null = await uploadFile(file, userServerId);
+    const fileDB: IFile | null = await uploadFile({
+      file,
+      userId: userServerId,
+      group_id: groupId && !isNaN(+groupId) ? +groupId : undefined,
+    });
 
     const post = await prisma.post.create({
       data: {
         status,
         content,
         user_id: userServerId,
-        group_id: groupId ? +groupId : null,
+        group_id: groupId && !isNaN(+groupId) ? +groupId : null,
         file_id: fileDB ? fileDB.id : null,
       },
     });

@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import CardFile from "@/components/card-file";
 import EmptyData from "@/components/empty-data";
 import Loading from "@/components/icons/loading";
 
@@ -66,27 +67,13 @@ const ModalFiles = ({ open, onSelect, onOpenChange }: Props) => {
         {fileData.map((file) => {
           const { id, path, name } = file;
           return (
-            <div
+            <CardFile
               key={id}
-              data-path={path}
-              className={cn(
-                "group relative w-full h-24",
-                "flex justify-center items-center",
-                "rounded-md overflow-hidden cursor-pointer transition",
-                "border-2 border-solid border-transparent",
-                selectedImage === path && "border-primary"
-              )}
+              src={path}
+              alt={name}
+              className={cn("h-24", selectedImage === path && "border-primary")}
               onClick={handleClick}
-            >
-              <Image
-                className="absolute w-full h-full object-cover"
-                src={path}
-                alt={name}
-                fill
-                sizes="100%"
-              />
-              <div className="absolute inset-0 group-hover:bg-slate-200/10 transition"></div>
-            </div>
+            />
           );
         })}
       </div>

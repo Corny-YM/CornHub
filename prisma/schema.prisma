@@ -102,6 +102,7 @@ model Group {
   groupMembers  GroupMember[]   @relation("GroupToGroupMember")
   groupFollower GroupFollower[]
   groupRequests GroupRequest[]  @relation("GroupToGroupRequest")
+  files         File[]          @relation("GroupToFile")
 
   @@index([owner_id])
   @@map("groups")
@@ -407,16 +408,21 @@ model File {
   path        String
   ext         String
   type        String
+  used_for    String   @default("post")
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
   // Relation
-  user_id        String
-  user           User           @relation("UserToFile", fields: [user_id], references: [id])
+  user_id  String
+  user     User   @relation("UserToFile", fields: [user_id], references: [id])
+  group_id Int?
+  group    Group? @relation("GroupToFile", fields: [group_id], references: [id])
+
   post_id        Post[]         @relation("FileToPost")
   comments       Comment[]      @relation("FileToComment")
   commentReplies CommentReply[] @relation("FileToCommentReply")
 
   @@index([user_id])
+  @@index([group_id])
   @@map("files")
 }

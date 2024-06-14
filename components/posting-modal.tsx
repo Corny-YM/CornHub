@@ -1,16 +1,14 @@
 "use client";
 
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import { Group, Post, User, File as IFile } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Earth, ImagePlus, Lock, UsersRound } from "lucide-react";
 
-import { store } from "@/actions/post";
+import { store, update } from "@/actions/post";
 import { useAppContext } from "@/providers/app-provider";
-import { Button } from "@/components/ui/button";
-import CustomEditor from "@/components/custom-editor";
-import SelectActions, { ISelectAction } from "@/components/select-actions";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Dialog,
   DialogContent,
@@ -18,12 +16,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import PostingPreviewFile from "./posting-preview-file";
-import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import SelectActions, { ISelectAction } from "@/components/select-actions";
+import PostingPreviewFile from "@/components/posting-preview-file";
+import CustomEditor from "@/components/custom-editor";
+import { useToggle } from "@/hooks/useToggle";
+import AlertModal from "./alert-modal";
 
 interface Props {
-  groupId?: number;
+  groupId?: number | null;
   open: boolean;
+  data?: Post & { user: User; group: Group | null; file: IFile | null };
   toggleOpen: (val?: boolean) => void;
   onSuccess?: () => void;
 }
@@ -58,17 +62,36 @@ const actions: ISelectAction[] = [
   },
 ];
 
-const PostingModal = ({ groupId, open, toggleOpen, onSuccess }: Props) => {
+const defaultStatus = actions[0].value;
+
+const PostingModal = ({
+  groupId,
+  data,
+  open,
+  toggleOpen,
+  onSuccess,
+}: Props) => {
   const router = useRouter();
   const { currentUser } = useAppContext();
 
   const [content, setContent] = useState("");
+  const [mediaUrl, setMediaUrl] = useState("");
   const [file, setFile] = useState<File | null>(null);
-  const [status, setStatus] = useState(actions[0].value);
+  const [status, setStatus] = useState(defaultStatus);
+  const [modalConfirm, toggleModalConfirm] = useToggle(false);
 
   const inputFileRef = useRef<HTMLInputElement | null>(null);
 
-  const { mutate, isPending } = useMutation({
+  const isUpdating = !!data?.id;
+
+  useEffect(() => {
+    if (!data) return;
+    setStatus(data.status);
+    setContent(data.content || "");
+    setMediaUrl(data.file?.path || "");
+  }, [data, open]);
+
+  const { mutate: mutateStore, isPending: isPendingStore } = useMutation({
     mutationKey: ["store", "post", currentUser?.id],
     mutationFn: store,
     onSuccess(res) {
@@ -76,7 +99,7 @@ const PostingModal = ({ groupId, open, toggleOpen, onSuccess }: Props) => {
       router.refresh();
       setContent("");
       setFile(null);
-      setStatus(actions[0].value);
+      setStatus(defaultStatus);
       toggleOpen(false);
       onSuccess?.();
     },
@@ -85,6 +108,27 @@ const PostingModal = ({ groupId, open, toggleOpen, onSuccess }: Props) => {
     },
   });
 
+  const { mutate: mutateUpdate, isPending: isPendingUpdate } = useMutation({
+    mutationKey: ["store", "post", currentUser?.id],
+    mutationFn: update,
+    onSuccess(res) {
+      toast.success("Tạo bài viết thành công");
+      router.refresh();
+      setContent("");
+      setFile(null);
+      setStatus(defaultStatus);
+      toggleOpen(false);
+      onSuccess?.();
+    },
+    onError() {
+      toast.error("Tạo bài viết thất bại. Vui lòng thử lại sau");
+    },
+  });
+
+  const handleClearFile = useCallback(() => {
+    setFile(null);
+    setMediaUrl("");
+  }, []);
   const handleShowAddFile = useCallback(() => {
     inputFileRef.current?.click();
   }, []);
@@ -92,7 +136,9 @@ const PostingModal = ({ groupId, open, toggleOpen, onSuccess }: Props) => {
     const target = e.target as HTMLInputElement;
     const file = target.files?.[0];
     if (!file) return;
+    const url = URL.createObjectURL(file);
     setFile(file);
+    setMediaUrl(url);
   }, []);
   const handleChangeSelect = useCallback((val: string) => {
     setStatus(val);
@@ -102,8 +148,23 @@ const PostingModal = ({ groupId, open, toggleOpen, onSuccess }: Props) => {
   }, []);
   const handleStorePost = useCallback(() => {
     if (!currentUser) return;
-    mutate({ groupId, content, status, file, userId: currentUser.id });
-  }, [content, status, file, currentUser, mutate]);
+    mutateStore({ groupId, content, status, file, userId: currentUser.id });
+  }, [content, status, file, currentUser, mutateStore]);
+  const handleUpdatePost = useCallback(() => {
+    if (!currentUser || !data) return;
+    mutateUpdate({ groupId, content, status, file, userId: currentUser.id });
+  }, [content, status, data, file, currentUser, mutateUpdate]);
+
+  const handleOpenChange = useCallback(
+    (val: boolean) => {
+      if (!data) return toggleOpen(val);
+      const isDirty =
+        data?.content !== content || data?.file?.path !== mediaUrl;
+      if (isDirty) return toggleModalConfirm(true);
+      toggleOpen(val);
+    },
+    [data, content, file, mediaUrl, toggleOpen, toggleModalConfirm]
+  );
 
   const userName = useMemo(() => {
     if (!currentUser) return;
@@ -124,18 +185,20 @@ const PostingModal = ({ groupId, open, toggleOpen, onSuccess }: Props) => {
         </Avatar>
         <div className="flex-1 flex items-center justify-between">
           <div className="font-semibold">{userName}</div>
-          <SelectActions
-            defaultValue={actions[0].value}
-            actions={actions}
-            onChange={handleChangeSelect}
-          />
+          {!groupId && (
+            <SelectActions
+              defaultValue={defaultStatus}
+              actions={actions}
+              onChange={handleChangeSelect}
+            />
+          )}
         </div>
       </div>
     );
-  }, [currentUser, userName, handleChangeSelect]);
+  }, [currentUser, groupId, userName, handleChangeSelect]);
 
   return (
-    <Dialog open={open} onOpenChange={toggleOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:w-[600px] sm:max-w-none flex flex-col">
         <DialogHeader>
           <DialogTitle>Tạo bài viết</DialogTitle>
@@ -153,9 +216,15 @@ const PostingModal = ({ groupId, open, toggleOpen, onSuccess }: Props) => {
               />
 
               {/* PreviewFile: Image or Video */}
-              {file && <PostingPreviewFile file={file} setFile={setFile} />}
+              {(!!file || !!mediaUrl) && (
+                <PostingPreviewFile
+                  path={mediaUrl}
+                  type={data?.file?.type || file?.type}
+                  onClear={handleClearFile}
+                />
+              )}
 
-              {!file && (
+              {!file && !mediaUrl && (
                 <div className="flex items-center justify-between gap-2 p-2 mt-4 border border-solid rounded-lg">
                   <div>Thêm vào bài viết của bạn</div>
                   <div className="flex items-center gap-2">
@@ -185,16 +254,41 @@ const PostingModal = ({ groupId, open, toggleOpen, onSuccess }: Props) => {
         </div>
 
         <DialogFooter>
-          <Button
-            className="w-full"
-            type="submit"
-            size="sm"
-            disabled={isPending || !content}
-            onClick={handleStorePost}
-          >
-            Đăng
-          </Button>
+          {!isUpdating && (
+            <Button
+              className="w-full"
+              type="submit"
+              size="sm"
+              disabled={isPendingStore || (!content && !mediaUrl)}
+              onClick={handleStorePost}
+            >
+              Đăng
+            </Button>
+          )}
+          {isUpdating && (
+            <Button
+              className="w-full"
+              type="submit"
+              size="sm"
+              disabled={isPendingUpdate || (!content && !mediaUrl)}
+              onClick={handleUpdatePost}
+            >
+              Đăng
+            </Button>
+          )}
         </DialogFooter>
+
+        <AlertModal
+          open={modalConfirm}
+          onOpenChange={toggleModalConfirm}
+          onClick={() => {
+            setContent("");
+            setMediaUrl("");
+            setFile(null);
+            toggleOpen(false);
+            setStatus(defaultStatus);
+          }}
+        />
       </DialogContent>
     </Dialog>
   );

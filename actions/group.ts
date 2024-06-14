@@ -1,5 +1,6 @@
 import { Group, Post, Reaction, User, File as IFile } from "@prisma/client";
 
+import { TypeFileEnum } from "@/lib/enum";
 import defHttp from "@/lib/defHttp";
 
 const indexApi = "groups";
@@ -30,6 +31,12 @@ export const getPosts = async (
     _count: { comments: number; reactions: number };
   })[]
 > => await defHttp.get(`${indexApi}/${groupId}/posts`, { params });
+
+export const getFiles = async (
+  groupId: number,
+  params?: { type: TypeFileEnum.image | TypeFileEnum.video }
+): Promise<IFile[]> =>
+  await defHttp.get(`${indexApi}/${groupId}/files`, { params });
 
 export const userJoinGroup = async ({
   groupId,

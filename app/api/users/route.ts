@@ -4,6 +4,7 @@ import { User, File as IFile } from "@prisma/client";
 
 import prisma from "@/lib/prisma";
 import uploadFile from "@/services/uploadFile";
+import { UsedForEnum } from "@/lib/enum";
 
 // STORE
 export async function POST(req: Request) {
@@ -62,10 +63,18 @@ export async function PUT(req: Request) {
     let fileAvatarDB: IFile | null = null;
 
     if (typeof cover !== "string" && cover) {
-      fileCoverDB = await uploadFile(cover, userId);
+      fileCoverDB = await uploadFile({
+        file: cover,
+        userId,
+        used_for: UsedForEnum.cover,
+      });
     }
     if (typeof avatar !== "string" && avatar) {
-      fileAvatarDB = await uploadFile(avatar, userId);
+      fileAvatarDB = await uploadFile({
+        file: avatar,
+        userId,
+        used_for: UsedForEnum.avatar,
+      });
     }
 
     const data: Record<string, any> = {};

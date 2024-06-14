@@ -1,13 +1,20 @@
 import fs from "node:fs/promises";
 import { File as IFile } from "@prisma/client";
 import prisma from "@/lib/prisma";
+import { UsedForEnum } from "@/lib/enum";
 
 type Return = IFile | null;
 
-export default async function (
-  file: File | null,
-  userId: string
-): Promise<Return> {
+interface IData {
+  file: File | null;
+  userId: string;
+  used_for?: UsedForEnum;
+  group_id?: number;
+}
+
+export default async function (data: IData): Promise<Return> {
+  const { userId, file, used_for, group_id } = data;
+
   let fileDB: IFile | null = null;
   if (!file) return fileDB;
 
@@ -37,6 +44,8 @@ export default async function (
       user_id: userId,
       actual_name: file.name,
       path: `/${pathDir}/${fileName}`,
+      used_for,
+      group_id,
     },
   });
 
