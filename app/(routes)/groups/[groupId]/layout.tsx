@@ -20,7 +20,7 @@ const GroupIdLayout = async ({ children, params }: Props) => {
   const { userId } = auth();
 
   const group = await prisma.group.findFirst({
-    include: { _count: { select: { groupMembers: true } } },
+    include: { owner: true, _count: { select: { groupMembers: true } } },
     where: { id: +params.groupId },
   });
 
@@ -40,7 +40,7 @@ const GroupIdLayout = async ({ children, params }: Props) => {
   });
 
   const isMember = !!member || userId === group?.owner_id;
-  const isFollowing = !!follower;
+  const isFollowing = !!follower?.status;
   const isRequested = !!groupRequest;
 
   return (

@@ -19,7 +19,7 @@ interface Props {
   disabled?: boolean;
   destructive?: boolean;
   children?: React.ReactNode;
-  onClick: (e?: React.MouseEvent) => void;
+  onClick?: (e?: React.MouseEvent) => void;
   onOpenChange?: (val?: boolean) => void;
 }
 
