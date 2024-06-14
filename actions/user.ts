@@ -10,10 +10,11 @@ import {
 } from "@prisma/client";
 
 import defHttp from "@/lib/defHttp";
+import { TypeFileEnum } from "@/lib/enum";
 
 const indexApi = "users";
 
-interface IUpdateDate extends Record<string, any> {
+interface IUpdateData extends Record<string, any> {
   // User
   cover?: File | string | null;
   avatar?: File | string | null;
@@ -34,7 +35,7 @@ interface IUpdateDate extends Record<string, any> {
 }
 
 export const update = async (
-  data: IUpdateDate
+  data: IUpdateData
 ): Promise<User & { userDetails: UserDetail[] }> => {
   const formData = new FormData();
   Object.keys(data).forEach((key) => {
@@ -63,7 +64,7 @@ export const removeAvatar = async (): Promise<User> =>
 
 export const getFiles = async (data: {
   userId: string;
-  type?: "image" | "video";
+  type?: TypeFileEnum.image | TypeFileEnum.video;
 }): Promise<IFile[]> => {
   const { userId, type } = data;
   return defHttp.get(`${indexApi}/${userId}/files`, { params: { type } });

@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image";
-import { useCallback, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useCallback, useMemo, useState } from "react";
 
 import { cn } from "@/lib/utils";
-import { getFiles } from "@/actions/user";
+import { TypeFileEnum } from "@/lib/enum";
+import { getFiles } from "@/actions/group";
 import { useAppContext } from "@/providers/app-provider";
 import {
   Dialog,
@@ -20,7 +20,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import CardFile from "@/components/card-file";
 import EmptyData from "@/components/empty-data";
 import Loading from "@/components/icons/loading";
-import { TypeFileEnum } from "@/lib/enum";
+import { useGroupContext } from "@/providers/group-provider";
 
 interface Props {
   open: boolean;
@@ -31,13 +31,14 @@ interface Props {
 const ModalFiles = ({ open, onSelect, onOpenChange }: Props) => {
   const { currentUser } = useAppContext();
 
+  const { groupData } = useGroupContext();
+
   const [selectedImage, setSelectedImage] = useState("");
 
   const { data: fileData, isLoading } = useQuery({
-    enabled: !!currentUser && open,
-    queryKey: ["account", "files", currentUser?.id],
-    queryFn: () =>
-      getFiles({ userId: currentUser?.id!, type: TypeFileEnum.image }),
+    enabled: !!currentUser && open && !!groupData.id,
+    queryKey: ["group", "files", groupData.id, currentUser?.id],
+    queryFn: () => getFiles(groupData?.id, { type: TypeFileEnum.image }),
   });
 
   const handleClick = useCallback(

@@ -12,6 +12,9 @@ import { cn } from "@/lib/utils";
 import { useGroupsContext } from "@/providers/groups-provider";
 import { Button } from "@/components/ui/button";
 import ModalCreate from "./modal-create";
+import { Group } from "@prisma/client";
+import AvatarImg from "@/components/avatar-img";
+import { Separator } from "@/components/ui/separator";
 
 const actions = [
   { label: "Nhóm của bạn", url: "joins", icon: Boxes },
@@ -23,8 +26,13 @@ const actions = [
   },
 ];
 
-const SidebarLeft = () => {
+interface Props {
+  groups: Group[];
+}
+
+const SidebarLeft = ({ groups }: Props) => {
   const { pathname } = useGroupsContext();
+
   return (
     <div className="side-bar">
       <div className="w-full flex flex-col px-2 pb-4">
@@ -41,7 +49,7 @@ const SidebarLeft = () => {
               variant="outline"
               asChild
             >
-              <Link key={url} href={url}>
+              <Link href={url}>
                 <Icon className="mr-2" size={20} />
                 {label}
               </Link>
@@ -53,6 +61,27 @@ const SidebarLeft = () => {
               <Plus className="mr-2" size={20} /> Tạo nhóm mới
             </Button>
           </ModalCreate>
+
+          {/*  */}
+          <Separator className="my-2" />
+          <div className="font-semibold px-2">Nhóm của bạn</div>
+
+          {groups.map((group) => (
+            <Button
+              key={group.id}
+              className="w-full h-fit flex items-center p-2"
+              variant="outline"
+              asChild
+            >
+              <Link
+                className="w-full flex items-center justify-between"
+                href={`/groups/${group.id}`}
+              >
+                <AvatarImg className="mr-2" src={group.cover} isGroup />
+                <div className="flex-1 font-semibold">{group.group_name}</div>
+              </Link>
+            </Button>
+          ))}
         </div>
       </div>
     </div>
