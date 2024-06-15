@@ -1,7 +1,8 @@
 import { Group, Post, Reaction, User, File as IFile } from "@prisma/client";
 
-import { TypeFileEnum } from "@/lib/enum";
 import defHttp from "@/lib/defHttp";
+import { TypeFileEnum } from "@/lib/enum";
+import { IGroupWithCountMember } from "@/providers/group-provider";
 
 interface IUpdateData extends Record<string, any> {
   group_name?: string;
@@ -17,19 +18,24 @@ const indexApi = "groups";
 export const store = async (data: any): Promise<Group> =>
   await defHttp.post(indexApi, data);
 
-export const update = async (data: IUpdateData): Promise<Group> => {
+export const update = async ({
+  data,
+  groupId,
+}: {
+  groupId: number;
+  data: IUpdateData;
+}): Promise<IGroupWithCountMember> => {
   const formData = new FormData();
   Object.keys(data).forEach((key) => {
     const value = data?.[key];
     if (!value) return;
     formData.append(key, value);
   });
-  return await defHttp.put(indexApi, formData);
+  return await defHttp.put(`${indexApi}/${groupId}`, formData);
 };
 
-// TODO: api for remove cover
-export const removeCover = async (): Promise<Group> =>
-  defHttp.delete(`${indexApi}/remove/cover`);
+export const removeCover = async (groupId: number): Promise<Group> =>
+  defHttp.delete(`${indexApi}/${groupId}/remove/cover`);
 
 export const sendGroupRequest = async (data: {
   ids: string[];

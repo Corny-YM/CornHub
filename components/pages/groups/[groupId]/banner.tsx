@@ -38,7 +38,7 @@ const Banner = () => {
   }, [groupData]);
 
   const { mutate: mutateUpdate, isPending: isPendingUpdate } = useMutation({
-    mutationKey: ["group", "update", "cover", groupData],
+    mutationKey: ["group", "update", "cover", groupData?.id],
     mutationFn: update,
     onSuccess(res) {
       toast.success("Cập nhật ảnh bìa thành công");
@@ -54,7 +54,7 @@ const Banner = () => {
 
   const { mutate: mutateRemoveCover, isPending: isPendingRemoveCover } =
     useMutation({
-      mutationKey: ["group", "update", "cover", groupData],
+      mutationKey: ["group", "update", "cover", groupData?.id],
       mutationFn: removeCover,
       onSuccess() {
         toast.success("Xóa ảnh bìa thành công");
@@ -78,8 +78,8 @@ const Banner = () => {
   }, []);
 
   const handleUpdateCover = useCallback(() => {
-    if (currentUser?.id !== groupData?.owner_id) return;
-    mutateUpdate({ cover: file || cover });
+    if (currentUser?.id !== groupData?.owner_id || !groupData) return;
+    mutateUpdate({ groupId: groupData.id, data: { cover: file || cover } });
   }, [file, groupData, cover, currentUser]);
 
   const handleRemovePreviewCover = useCallback(() => {
@@ -90,13 +90,16 @@ const Banner = () => {
   }, [groupData, currentUser]);
 
   const handleRemoveCover = useCallback(() => {
-    if (currentUser?.id !== groupData?.owner_id) return;
-    mutateRemoveCover();
+    if (currentUser?.id !== groupData?.owner_id || !groupData) return;
+    mutateRemoveCover(groupData.id);
   }, [groupData, currentUser]);
 
   const handleSelectImage = useCallback((url: string) => {
     setCover(url);
     setIsSelecting(true);
+    if (inputFileRef.current) {
+      inputFileRef.current.value = "";
+    }
   }, []);
 
   const isShowEdit = useMemo(() => {
@@ -139,7 +142,7 @@ const Banner = () => {
       <div className="relative w-full h-96 aspect-video flex items-center justify-center">
         <Image
           className="absolute w-full h-full object-cover"
-          src={groupData.cover || NoBackground}
+          src={cover || NoBackground}
           alt="banner"
           fill
           sizes="100%"

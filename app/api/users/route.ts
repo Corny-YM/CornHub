@@ -118,7 +118,7 @@ export async function PUT(req: Request) {
 
     return NextResponse.json(user);
   } catch (err) {
-    console.log("[REPLIES_PUT]", err);
+    console.log("[USERS_PUT]", err);
     return new NextResponse("Internal error", { status: 500 });
   }
 }
