@@ -16,9 +16,9 @@ export async function PUT(
     // User
     const cover = formData.get("cover") as File | string | null;
     const group_name = formData.get("group_name") as File | string | null;
-    const status = formData.get("status") as Boolean | null;
-    const approve_members = formData.get("approve_members") as Boolean | null;
-    const approve_posts = formData.get("approve_posts") as Boolean | null;
+    const status = formData.get("status") as string | null;
+    const approve_members = formData.get("approve_members") as string | null;
+    const approve_posts = formData.get("approve_posts") as string | null;
     const description = formData.get("description") as string | null;
 
     const { userId } = auth();
@@ -46,9 +46,9 @@ export async function PUT(
     else if (typeof cover === "string") data.cover = cover;
 
     if (group_name) data.group_name = group_name;
-    if (status) data.status = status;
-    if (approve_members) data.approve_members = approve_members;
-    if (approve_posts) data.approve_posts = approve_posts;
+    if (status) data.status = status === "true";
+    if (approve_members) data.approve_members = approve_members === "true";
+    if (approve_posts) data.approve_posts = approve_posts === "true";
     if (description) data.description = description;
 
     group = await prisma.group.update({

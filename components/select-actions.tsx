@@ -40,7 +40,7 @@ const SelectActions = ({
       >
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
-      <SelectContent className="">
+      <SelectContent className="z-[9999]">
         <SelectGroup>
           {actions.map(({ value, label, icon: Icon }) => (
             <SelectItem key={value} value={value}>

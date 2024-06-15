@@ -1,14 +1,16 @@
 import EditorBuild from "ckeditor5-custom-build";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import { useCallback } from "react";
+import { cn } from "@/lib/utils";
 
 interface Props {
   data: string;
   placeholder?: string;
+  className?: string;
   onChange?: (val: string) => void;
 }
 
-const Editor = ({ data, placeholder, onChange }: Props) => {
+const Editor = ({ data, placeholder, className, onChange }: Props) => {
   const handleReady = useCallback((e: any) => {
     // console.log(e);
   }, []);
@@ -21,7 +23,12 @@ const Editor = ({ data, placeholder, onChange }: Props) => {
   );
 
   return (
-    <div className="flex items-center flex-shrink flex-grow">
+    <div
+      className={cn(
+        "h-auto flex items-center flex-shrink flex-grow",
+        className
+      )}
+    >
       <CKEditor
         editor={EditorBuild}
         config={{ placeholder, removePlugins: ["Heading"] }}

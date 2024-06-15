@@ -18,7 +18,9 @@ export async function GET(
 
     const groupMembers = await prisma.groupMember.findMany({
       include: { member: true },
+      where: { group_id: +params.groupId },
       take: limit && !isNaN(+limit) ? +limit : undefined,
+      orderBy: { created_at: "desc" },
     });
 
     const members = groupMembers.map((item) => item.member);

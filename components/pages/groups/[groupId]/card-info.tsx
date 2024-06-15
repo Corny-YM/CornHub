@@ -1,13 +1,16 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { cn, formatDate } from "@/lib/utils";
+import { useGroupContext } from "@/providers/group-provider";
+import { CalendarPlus2 } from "lucide-react";
 
 interface Props {
   className?: string;
 }
 
 const CardInfo = ({ className }: Props) => {
+  const { groupData } = useGroupContext();
+
   return (
     <div
       className={cn(
@@ -18,30 +21,19 @@ const CardInfo = ({ className }: Props) => {
       )}
     >
       <div className="font-semibold">Giới thiệu</div>
-      <div className="max-w-full break-words text-sm flex flex-col">
-        <div className="mt-2">
-          Group này được lập ra để anh em cùng hỏi đáp, trao đổi chia sẻ và show
-          thành quả anh em đã làm được khi học lập trình tại F8
+      {!groupData.description && (
+        <div className="flex items-center">
+          <CalendarPlus2 className="mr-2 " />
+          <span>
+            Đã tạo vào ngày{" "}
+            <b>{formatDate(groupData.created_at, "/", false)}</b>
+          </span>
         </div>
-        <div className="mt-2">
-          Nội quy nhóm:{" "}
-          <Link href="https://docs.google.com/document/d/1SwtVOoq9gFba6e36DPOeboZzVWDDbOcEMwroVoVgbAw/edit?usp=sharing">
-            https://docs.google.com/document/d/1SwtVOoq9gFba6e36DPOeboZzVWDDbOcEMwroVoVgbAw/edit?usp=sharing
-          </Link>
-        </div>
-        <div className="mt-2">
-          Website:{" "}
-          <Link href="https://fullstack.edu.vn/">
-            https://fullstack.edu.vn/
-          </Link>
-        </div>
-        <div className="mt-2">
-          Youtube:{" "}
-          <Link href="https://www.youtube.com/@F8VNOfficial">
-            https://www.youtube.com/@F8VNOfficial
-          </Link>
-        </div>
-      </div>
+      )}
+      <div
+        className="max-w-full break-words text-sm flex flex-col"
+        dangerouslySetInnerHTML={{ __html: groupData.description || "" }}
+      ></div>
     </div>
   );
 };

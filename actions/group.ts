@@ -7,10 +7,10 @@ import { IGroupWithCountMember } from "@/providers/group-provider";
 interface IUpdateData extends Record<string, any> {
   group_name?: string;
   cover?: File | string | null;
-  status?: Boolean;
-  approve_members?: Boolean;
-  approve_posts?: Boolean;
-  description?: Boolean;
+  status?: boolean | null;
+  approve_members?: boolean | null;
+  approve_posts?: boolean | null;
+  description?: boolean | null;
 }
 
 const indexApi = "groups";
@@ -28,7 +28,6 @@ export const update = async ({
   const formData = new FormData();
   Object.keys(data).forEach((key) => {
     const value = data?.[key];
-    if (!value) return;
     formData.append(key, value);
   });
   return await defHttp.put(`${indexApi}/${groupId}`, formData);

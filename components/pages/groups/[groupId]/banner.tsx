@@ -146,6 +146,7 @@ const Banner = () => {
           alt="banner"
           fill
           sizes="100%"
+          priority
         />
       </div>
 

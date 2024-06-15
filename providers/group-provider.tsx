@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import { createContext, useContext, useMemo, useState } from "react";
 
 import { IDispatchState } from "@/types";
+import { useToggle } from "@/hooks/useToggle";
+import ModalInfoDetails from "@/components/pages/groups/[groupId]/modal-info-details";
 
 export type IGroupWithCountMember = Group & {
   _count: { groupMembers: number };
@@ -29,6 +31,8 @@ export type GroupContext = {
   pathname?: string | null;
   groupData: IGroupWithCountMember;
   tabs: { url: string; label: string }[];
+  modalEdit: boolean;
+  toggleModalEdit: (val?: boolean) => void;
   // Actions
   setGroupData: IDispatchState;
   setIsMember: IDispatchState;
@@ -49,6 +53,8 @@ const GroupContext = createContext<GroupContext>({
   isGroupOwner: false,
   isRequested: false,
   groupData: {} as IGroupWithCountMember,
+  modalEdit: false,
+  toggleModalEdit: () => {},
   setGroupData: () => {},
   setIsMember: () => {},
   setIsFollowing: () => {},
@@ -60,6 +66,7 @@ export const GroupProvider = ({ children, data }: Props) => {
 
   const { userId } = useAuth();
 
+  const [modalEdit, toggleModalEdit] = useToggle(false);
   const [isMember, setIsMember] = useState(data.isMember);
   const [isFollowing, setIsFollowing] = useState(data.isFollowing);
   const [isRequested, setIsRequested] = useState(data.isRequested);
@@ -80,13 +87,16 @@ export const GroupProvider = ({ children, data }: Props) => {
         isMember,
         pathname,
         groupData,
-        setGroupData,
+        modalEdit,
         setIsMember,
         setIsFollowing,
         setIsRequested,
+        setGroupData,
+        toggleModalEdit,
       }}
     >
       {children}
+      <ModalInfoDetails open={modalEdit} onOpenChange={toggleModalEdit} />
     </GroupContext.Provider>
   );
 };

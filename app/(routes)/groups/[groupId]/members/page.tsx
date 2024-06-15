@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import prisma from "@/lib/prisma";
+import EmptyData from "@/components/empty-data";
 import CardMember from "@/components/pages/groups/[groupId]/card-member";
 
 interface Props {
@@ -42,6 +43,7 @@ const GroupIdMembersPage = async ({ params }: Props) => {
         <div className="w-full flex flex-col justify-center">
           <div className="font-semibold px-2 mb-2">Thành viên</div>
           <div className="w-full flex flex-col gap-2">
+            {!members?.length && <EmptyData />}
             {members.map((item) => (
               <CardMember key={item.id} groupId={group.id} data={item.member} />
             ))}

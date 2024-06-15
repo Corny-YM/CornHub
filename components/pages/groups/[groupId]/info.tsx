@@ -31,13 +31,15 @@ const Info = () => {
   const { userId } = useAuth();
   const {
     groupData,
+    modalEdit,
     isMember,
     isRequested,
-    isGroupOwner,
     isFollowing,
+    isGroupOwner,
     setIsMember,
     setIsRequested,
     setIsFollowing,
+    toggleModalEdit,
   } = useGroupContext();
 
   const {
@@ -183,7 +185,7 @@ const Info = () => {
           </>
         )}
         {isGroupOwner && (
-          <Button variant="outline">
+          <Button variant="outline" onClick={() => toggleModalEdit(true)}>
             <Pencil className="mr-2" size={20} />
             Chỉnh sửa nhóm
           </Button>
