@@ -35,14 +35,21 @@ interface Props {
     group: Group | null;
     file: IFile | null;
   };
+  open: boolean;
+  onOpenChange: (val?: boolean) => void;
 }
 
-const CommentRepliesList = ({ children, dataPost, dataComment }: Props) => {
+const CommentRepliesList = ({
+  open,
+  children,
+  dataPost,
+  dataComment,
+  onOpenChange,
+}: Props) => {
   const { userId } = useAuth();
-  const [isOpen, setIsOpen] = useState(false);
 
   const { data: commentReplyData, isLoading } = useQuery({
-    enabled: !!userId,
+    enabled: !!userId && open,
     queryKey: ["comment", "replies", dataPost.id, dataComment.id, userId],
     queryFn: () =>
       getReplies({ commentId: dataComment.id, postId: dataPost.id }),
@@ -69,8 +76,8 @@ const CommentRepliesList = ({ children, dataPost, dataComment }: Props) => {
 
   return (
     <Collapsible
-      open={isOpen}
-      onOpenChange={setIsOpen}
+      open={open}
+      onOpenChange={onOpenChange}
       className="w-[350px] space-y-2"
     >
       <CollapsibleTrigger asChild>{children}</CollapsibleTrigger>

@@ -10,7 +10,7 @@ import defHttp from "@/lib/defHttp";
 
 const indexApi = "comments";
 
-interface ICommentData extends Record<string, any> {
+export interface ICommentData extends Record<string, any> {
   postId: number;
   commentId?: number;
   content?: string;
@@ -26,6 +26,25 @@ export const store = async (data: ICommentData): Promise<Comment> => {
   });
   return defHttp.put(indexApi, formData);
 };
+
+export const update = async ({
+  commentId,
+  data,
+}: {
+  commentId: number;
+  data: ICommentData;
+}): Promise<Comment> => {
+  const formData = new FormData();
+  Object.keys(data).forEach((key) => {
+    const value = data?.[key];
+    if (!value) return;
+    formData.append(key, value);
+  });
+  return defHttp.put(`${indexApi}/${commentId}`, formData);
+};
+
+export const destroy = async (commentId: number): Promise<Reaction> =>
+  defHttp.delete(`${indexApi}/${commentId}`);
 
 export const getReplies = async (data: {
   postId: number;

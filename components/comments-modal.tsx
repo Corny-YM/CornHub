@@ -1,19 +1,13 @@
 "use client";
 
-import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
-import { SendHorizontal } from "lucide-react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useCallback, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Group, Post, User, File as IFile, Reaction } from "@prisma/client";
-import { ChangeEvent, useCallback, useMemo, useState } from "react";
 
-import { cn } from "@/lib/utils";
-import { store } from "@/actions/comments";
 import { getComments } from "@/actions/post";
 import { useAppContext } from "@/providers/app-provider";
+import { useMutates } from "@/hooks/mutations/comment/useMutates";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Dialog,
@@ -25,11 +19,10 @@ import {
   DialogOverlay,
 } from "@/components/ui/dialog";
 import PostItem from "@/components/post";
-import AvatarImg from "@/components/avatar-img";
 import EmptyData from "@/components/empty-data";
 import CommentItem from "@/components/comments";
 import Loading from "@/components/icons/loading";
-import UserInputSending from "./user-input-sending";
+import UserInputSending from "@/components/user-input-sending";
 
 interface Props {
   data: Post & {
@@ -45,8 +38,9 @@ interface Props {
 }
 
 const CommentsModal = ({ data, open, children, onOpenChange }: Props) => {
-  const router = useRouter();
   const { currentUser } = useAppContext();
+
+  const { isPendingStoreComment, onStore } = useMutates();
 
   const {
     data: commentData,
@@ -56,19 +50,6 @@ const CommentsModal = ({ data, open, children, onOpenChange }: Props) => {
     enabled: !!open && !!data.id && !!currentUser,
     queryKey: ["post", "comment", data.id, currentUser?.id],
     queryFn: () => getComments(data.id),
-  });
-
-  const { mutateAsync, isPending } = useMutation({
-    mutationKey: ["post", "comments", "store", data.id],
-    mutationFn: store,
-    onSuccess() {
-      refetch();
-      router.refresh();
-      toast.success("Bình luận bài viết thành công");
-    },
-    onError() {
-      toast.error("Bình luận bài viết thất bại. Vui lòng thử lại sau");
-    },
   });
 
   const content = useMemo(() => {
@@ -85,11 +66,13 @@ const CommentsModal = ({ data, open, children, onOpenChange }: Props) => {
   }, [commentData, isLoading]);
 
   const handleClickSend = useCallback(
-    (inputData: { value: string }) => {
+    async (inputData: { value: string }) => {
       if (!currentUser) return;
-      return mutateAsync({ postId: data.id, content: inputData.value });
+      await onStore({ postId: data.id, content: inputData.value }, () => {
+        refetch();
+      });
     },
-    [currentUser, data]
+    [currentUser, data, onStore]
   );
 
   return (
@@ -118,7 +101,10 @@ const CommentsModal = ({ data, open, children, onOpenChange }: Props) => {
 
         {currentUser && (
           <DialogFooter>
-            <UserInputSending disabled={isPending} onSend={handleClickSend} />
+            <UserInputSending
+              disabled={isPendingStoreComment}
+              onSend={handleClickSend}
+            />
           </DialogFooter>
         )}
       </DialogContent>

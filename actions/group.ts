@@ -10,7 +10,7 @@ interface IUpdateData extends Record<string, any> {
   status?: boolean | null;
   approve_members?: boolean | null;
   approve_posts?: boolean | null;
-  description?: boolean | null;
+  description?: string | null;
 }
 
 const indexApi = "groups";

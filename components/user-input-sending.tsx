@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { SendHorizontal } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -10,18 +10,33 @@ import { Input } from "@/components/ui/input";
 import AvatarImg from "@/components/avatar-img";
 
 interface Props {
+  value?: string | null;
+  showAvatar?: boolean;
   className?: string;
   disabled?: boolean;
   onSend?: (data: { value: string }) => Promise<any> | undefined;
 }
 
-const UserInputSending = ({ disabled, className, onSend }: Props) => {
+const UserInputSending = ({
+  value,
+  disabled,
+  className,
+  showAvatar = true,
+  onSend,
+}: Props) => {
   const { currentUser } = useAppContext();
 
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState(value || "");
 
-  // TODO: check if empty data (no value & file)
-  const isDisabled = useMemo(() => disabled, [disabled, inputValue]);
+  const isDisabled = useMemo(
+    () => disabled || !inputValue.trim(),
+    [disabled, inputValue]
+  );
+
+  useEffect(() => {
+    if (!value) return;
+    setInputValue(value || "");
+  }, [value]);
 
   const handleClearData = useCallback(() => {
     setInputValue("");
@@ -49,7 +64,7 @@ const UserInputSending = ({ disabled, className, onSend }: Props) => {
   if (!currentUser) return null;
   return (
     <div className={cn("flex w-full items-center gap-x-2", className)}>
-      <AvatarImg src={currentUser.avatar} />
+      {showAvatar && <AvatarImg src={currentUser.avatar} />}
       <Input
         className="flex-1 !ring-0 !ring-offset-0 rounded-full outline-none"
         placeholder="Viết bình luận"

@@ -18,9 +18,10 @@ interface Props {
     group: Group | null;
     file: IFile | null;
   };
+  toggleIsEdit?: (val?: boolean) => void;
 }
 
-const Actions = ({ data, dataPost }: Props) => {
+const Actions = ({ data, dataPost, toggleIsEdit }: Props) => {
   const { userId } = useAuth();
   const { user } = data;
   const { group } = dataPost;
@@ -36,7 +37,7 @@ const Actions = ({ data, dataPost }: Props) => {
 
     if (isOwner) {
       result.push(
-        { label: "Chỉnh sửa", onClick: () => {} },
+        { label: "Chỉnh sửa", onClick: () => toggleIsEdit?.(true) },
         {
           label: "Xóa",
           destructive: true,

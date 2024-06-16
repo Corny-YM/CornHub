@@ -17,7 +17,8 @@ import { store } from "@/actions/replies";
 import { emotions } from "@/lib/const";
 import { cn, formatAmounts, getRelativeTime } from "@/lib/utils";
 import { useToggle } from "@/hooks/useToggle";
-import { useMutates } from "@/hooks/mutations/reaction/useMutates";
+import { useMutates as useMutatesReaction } from "@/hooks/mutations/reaction/useMutates";
+import { useMutates as useMutatesComment } from "@/hooks/mutations/comment/useMutates";
 import { Button } from "@/components/ui/button";
 import AvatarImg from "@/components/avatar-img";
 import TooltipButton from "@/components/tooltip-button";
@@ -28,14 +29,16 @@ import Content from "./content";
 import Actions from "./actions";
 import CommentRepliesList from "../comment-replies";
 
+type CommentWithInfoDetails = Comment & {
+  user: User;
+  file?: IFile | null;
+  reactions: Reaction[];
+  _count: { reactions: number; commentReplies: number };
+};
+
 interface Props {
   className?: string;
-  data: Comment & {
-    user: User;
-    file?: IFile | null;
-    reactions: Reaction[];
-    _count: { reactions: number; commentReplies: number };
-  };
+  data: CommentWithInfoDetails;
   dataPost: Post & {
     user: User;
     group: Group | null;
@@ -45,14 +48,20 @@ interface Props {
 
 const CommentItem = ({ data, dataPost, className }: Props) => {
   const { userId } = useAuth();
-  const { user, created_at, reactions, _count } = data;
 
   const { isPendingDeleteReaction, isPendingStoreReaction, onDelete, onStore } =
-    useMutates();
+    useMutatesReaction();
 
+  const { isPendingUpdateComment, onUpdate: onUpdateComment } =
+    useMutatesComment();
+
+  const [dataComment, setDataComment] = useState<CommentWithInfoDetails>(data);
+
+  const { _count, reactions, user, created_at } = dataComment;
+
+  const [isEdit, toggleIsEdit] = useToggle(false);
   const [isReply, toggleIsReply] = useToggle(false);
   const [showReplies, toggleShowReplies] = useToggle(false);
-
   const [totalReactions, setTotalReactions] = useState(_count.reactions);
   const [totalCommentReplies, setTotalCommentReplies] = useState(
     _count.commentReplies
@@ -61,6 +70,7 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
   const [currentUserReaction, setCurrentUserReaction] =
     useState<Reaction | null>(reactions?.[0]);
 
+  useEffect(() => setDataComment(data), [data]);
   useEffect(
     () => setTotalCommentReplies(_count.commentReplies),
     [_count.commentReplies]
@@ -70,11 +80,11 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
 
   const queryClient = useQueryClient();
   const { mutateAsync, isPending } = useMutation({
-    mutationKey: ["comments", "replying", data.id],
+    mutationKey: ["comments", "replying", dataComment.id],
     mutationFn: store,
     onSuccess() {
       queryClient.invalidateQueries({
-        queryKey: ["comment", "replies", dataPost.id, data.id, userId],
+        queryKey: ["comment", "replies", dataPost.id, dataComment.id, userId],
       });
       toast.success("Tạo phản hồi thành công");
       setTotalCommentReplies((prev) => prev + 1);
@@ -90,14 +100,19 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
       const type = target.dataset.type;
       if (!type || !userId || !dataPost.id) return;
       await onStore(
-        { type, user_id: userId, post_id: dataPost.id, comment_id: data.id },
+        {
+          type,
+          user_id: userId,
+          post_id: dataPost.id,
+          comment_id: dataComment.id,
+        },
         (res) => {
           setCurrentUserReaction(res);
           setTotalReactions((prev) => prev + 1);
         }
       );
     },
-    [data, dataPost, userId]
+    [dataComment, dataPost, userId]
   );
 
   const handleClickReaction = useCallback(async () => {
@@ -112,14 +127,14 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
         type: emotions[0].type,
         user_id: userId,
         post_id: dataPost.id,
-        comment_id: data.id,
+        comment_id: dataComment.id,
       },
       (res) => {
         setCurrentUserReaction(res);
         setTotalReactions((prev) => prev + 1);
       }
     );
-  }, [currentUserReaction, data, dataPost, userId, onDelete, onStore]);
+  }, [currentUserReaction, dataComment, dataPost, userId, onDelete, onStore]);
 
   const handleClickReply = useCallback((e: React.MouseEvent) => {
     toggleIsReply();
@@ -127,14 +142,32 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
 
   const handleSend = useCallback(
     (inputData: { value: string }) => {
-      if (!data || !dataPost || isPending) return;
+      if (!dataComment || !dataPost || isPending) return;
       return mutateAsync({
         postId: dataPost.id,
-        commentId: data.id,
+        commentId: dataComment.id,
         content: inputData.value,
       });
     },
-    [data, dataPost, isPending]
+    [dataComment, dataPost, isPending]
+  );
+
+  const handleUpdateComment = useCallback(
+    async (inputData: { value: string }) => {
+      if (!dataComment || !inputData.value.trim()) return;
+      await onUpdateComment(
+        {
+          commentId: dataComment.id,
+          postId: dataComment.post_id,
+          content: inputData.value,
+        },
+        (res) => {
+          toggleIsEdit(false);
+          setDataComment((prev) => ({ ...prev, content: res.content }));
+        }
+      );
+    },
+    [dataComment]
   );
 
   const button = useMemo(() => {
@@ -154,7 +187,7 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
       </Button>
     );
   }, [
-    data,
+    dataComment,
     currentUserReaction,
     isPendingStoreReaction,
     isPendingDeleteReaction,
@@ -171,52 +204,86 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
         </div>
 
         <div className="w-full flex flex-col">
-          <div className="w-fit flex items-center gap-1">
-            {/* Content */}
-            <Content data={data} />
-
-            {/* Actions */}
-            <div className="group-hover:opacity-100 opacity-0 h-full flex-grow flex-shrink flex justify-center items-center transition">
-              <Actions data={data} dataPost={dataPost} />
-            </div>
-          </div>
-
-          {/* Interactions */}
-          <div className="w-full flex items-center gap-x-4 text-xs px-2">
-            <div>{getRelativeTime(created_at, false)}</div>
-            <TooltipButton className="rounded-full" button={button}>
-              <div className="flex items-center justify-center gap-1">
-                {emotions.map(({ label, type, icon: Icon }) => (
-                  <div
-                    key={label}
-                    data-type={type}
-                    className="w-10 h-10 flex justify-center items-center rounded-full overflow-hidden border border-solid cursor-pointer transition-all hover:scale-110"
-                    onClick={handleClickEmotion}
-                  >
-                    <Icon />
-                  </div>
-                ))}
-              </div>
-            </TooltipButton>
-            <Button
-              className="px-1 text-xs text-inherit cursor-pointer select-none leading-normal hover:underline"
-              variant="link"
-              size="sm"
-              onClick={handleClickReply}
-            >
-              Phản hồi
-            </Button>
-            {totalReactions > 0 && (
-              <ReactionsButton
-                totalReactions={totalReactions}
-                onClick={() => toggleModalReaction(true)}
+          {isEdit && (
+            <div className="px-2">
+              <UserInputSending
+                value={dataComment.content}
+                showAvatar={false}
+                disabled={isPendingUpdateComment}
+                onSend={handleUpdateComment}
               />
-            )}
-          </div>
+              <div className="text-xs leading-normal">
+                <Button
+                  className="p-0 h-fit"
+                  variant="link"
+                  size="icon"
+                  onClick={() => toggleIsEdit(false)}
+                >
+                  Hủy
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {!isEdit && (
+            <>
+              <div className="w-fit flex items-center gap-1">
+                {/* Content */}
+                <Content data={dataComment} />
+
+                {/* Actions */}
+                <div className="group-hover:opacity-100 opacity-0 h-full flex-grow flex-shrink flex justify-center items-center transition">
+                  <Actions
+                    data={dataComment}
+                    dataPost={dataPost}
+                    toggleIsEdit={toggleIsEdit}
+                  />
+                </div>
+              </div>
+
+              {/* Interactions */}
+              <div className="w-full flex items-center gap-x-4 text-xs px-2">
+                <div>{getRelativeTime(created_at, false)}</div>
+                <TooltipButton className="rounded-full" button={button}>
+                  <div className="flex items-center justify-center gap-1">
+                    {emotions.map(({ label, type, icon: Icon }) => (
+                      <div
+                        key={label}
+                        data-type={type}
+                        className="w-10 h-10 flex justify-center items-center rounded-full overflow-hidden border border-solid cursor-pointer transition-all hover:scale-110"
+                        onClick={handleClickEmotion}
+                      >
+                        <Icon />
+                      </div>
+                    ))}
+                  </div>
+                </TooltipButton>
+                <Button
+                  className="px-1 text-xs text-inherit cursor-pointer select-none leading-normal hover:underline"
+                  variant="link"
+                  size="sm"
+                  onClick={handleClickReply}
+                >
+                  Phản hồi
+                </Button>
+                {totalReactions > 0 && (
+                  <ReactionsButton
+                    totalReactions={totalReactions}
+                    onClick={() => toggleModalReaction(true)}
+                  />
+                )}
+              </div>
+            </>
+          )}
 
           {/* Content Replies */}
           {!!totalCommentReplies && (
-            <CommentRepliesList dataComment={data} dataPost={dataPost}>
+            <CommentRepliesList
+              open={showReplies}
+              dataComment={dataComment}
+              dataPost={dataPost}
+              onOpenChange={toggleShowReplies}
+            >
               <Button
                 className="w-fit text-inherit cursor-pointer select-none leading-normal hover:underline"
                 variant="ghost"
@@ -241,7 +308,7 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
 
       <ReactionsModal
         data={dataPost}
-        commentId={data.id}
+        commentId={dataComment.id}
         open={modalReaction}
         onOpenChange={toggleModalReaction}
       />
