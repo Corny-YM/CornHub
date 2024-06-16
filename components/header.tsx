@@ -52,8 +52,11 @@ const Header = () => {
           className="z-50 flex justify-center items-center w-10 h-10 p-2 rounded-full outline-none hover:bg-primary/50"
           variant="outline"
           size="icon"
+          asChild
         >
-          <Message />
+          <Link href="/messages">
+            <Message />
+          </Link>
         </Button>
         <Button
           className="z-50 flex justify-center items-center w-10 h-10 p-2 rounded-full outline-none hover:bg-primary/50"
