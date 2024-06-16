@@ -19,9 +19,10 @@ interface Props {
     file: IFile | null;
   };
   toggleIsEdit?: (val?: boolean) => void;
+  onDelete?: () => void;
 }
 
-const Actions = ({ data, dataPost, toggleIsEdit }: Props) => {
+const Actions = ({ data, dataPost, toggleIsEdit, onDelete }: Props) => {
   const { userId } = useAuth();
   const { user } = data;
   const { group } = dataPost;
@@ -67,7 +68,7 @@ const Actions = ({ data, dataPost, toggleIsEdit }: Props) => {
         destructive
         open={confirmModal}
         onOpenChange={toggleConfirmModal}
-        onClick={() => {}}
+        onClick={onDelete}
       />
       <DropdownActions
         size="icon"

@@ -52,13 +52,17 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
   const { isPendingDeleteReaction, isPendingStoreReaction, onDelete, onStore } =
     useMutatesReaction();
 
-  const { isPendingUpdateComment, onUpdate: onUpdateComment } =
-    useMutatesComment();
+  const {
+    isPendingUpdateComment,
+    onUpdate: onUpdateComment,
+    onDelete: onDeleteComment,
+  } = useMutatesComment();
 
   const [dataComment, setDataComment] = useState<CommentWithInfoDetails>(data);
 
   const { _count, reactions, user, created_at } = dataComment;
 
+  const [isDeleted, setIsDeleted] = useState(false);
   const [isEdit, toggleIsEdit] = useToggle(false);
   const [isReply, toggleIsReply] = useToggle(false);
   const [showReplies, toggleShowReplies] = useToggle(false);
@@ -136,10 +140,6 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
     );
   }, [currentUserReaction, dataComment, dataPost, userId, onDelete, onStore]);
 
-  const handleClickReply = useCallback((e: React.MouseEvent) => {
-    toggleIsReply();
-  }, []);
-
   const handleSend = useCallback(
     (inputData: { value: string }) => {
       if (!dataComment || !dataPost || isPending) return;
@@ -151,6 +151,12 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
     },
     [dataComment, dataPost, isPending]
   );
+
+  const handleDeleteComment = useCallback(async () => {
+    await onDeleteComment(dataComment.id, () => {
+      setIsDeleted(true);
+    });
+  }, [dataComment]);
 
   const handleUpdateComment = useCallback(
     async (inputData: { value: string }) => {
@@ -193,6 +199,7 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
     isPendingDeleteReaction,
   ]);
 
+  if (isDeleted) return null;
   return (
     <div className={cn("w-full flex flex-col px-2 pt-1", className)}>
       <div className="w-full h-fit flex items-stretch group">
@@ -237,6 +244,7 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
                     data={dataComment}
                     dataPost={dataPost}
                     toggleIsEdit={toggleIsEdit}
+                    onDelete={handleDeleteComment}
                   />
                 </div>
               </div>
@@ -262,7 +270,7 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
                   className="px-1 text-xs text-inherit cursor-pointer select-none leading-normal hover:underline"
                   variant="link"
                   size="sm"
-                  onClick={handleClickReply}
+                  onClick={() => toggleIsReply()}
                 >
                   Phản hồi
                 </Button>
