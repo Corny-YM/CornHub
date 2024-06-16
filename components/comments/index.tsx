@@ -1,6 +1,5 @@
 "use client";
 
-import toast from "react-hot-toast";
 import {
   User,
   Post,
@@ -10,24 +9,24 @@ import {
   File as IFile,
 } from "@prisma/client";
 import { useAuth } from "@clerk/nextjs";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { store } from "@/actions/replies";
 import { emotions } from "@/lib/const";
-import { cn, formatAmounts, getRelativeTime } from "@/lib/utils";
 import { useToggle } from "@/hooks/useToggle";
+import { cn, formatAmounts, getRelativeTime } from "@/lib/utils";
 import { useMutates as useMutatesReaction } from "@/hooks/mutations/reaction/useMutates";
 import { useMutates as useMutatesComment } from "@/hooks/mutations/comment/useMutates";
+import { useMutates as useMutatesReply } from "@/hooks/mutations/commentReply/useMutates";
 import { Button } from "@/components/ui/button";
 import AvatarImg from "@/components/avatar-img";
 import TooltipButton from "@/components/tooltip-button";
 import ReactionsModal from "@/components/reactions-modal";
 import ReactionsButton from "@/components/reactions-button";
+import CommentRepliesList from "@/components/comment-replies";
 import UserInputSending from "@/components/user-input-sending";
 import Content from "./content";
 import Actions from "./actions";
-import CommentRepliesList from "../comment-replies";
 
 type CommentWithInfoDetails = Comment & {
   user: User;
@@ -47,16 +46,23 @@ interface Props {
 }
 
 const CommentItem = ({ data, dataPost, className }: Props) => {
+  const queryClient = useQueryClient();
   const { userId } = useAuth();
 
-  const { isPendingDeleteReaction, isPendingStoreReaction, onDelete, onStore } =
-    useMutatesReaction();
+  const {
+    isPendingDeleteReaction,
+    isPendingStoreReaction,
+    onStore: onStoreReaction,
+    onDelete: onDeleteReaction,
+  } = useMutatesReaction();
 
   const {
     isPendingUpdateComment,
     onUpdate: onUpdateComment,
     onDelete: onDeleteComment,
   } = useMutatesComment();
+
+  const { isPendingStoreReply, onStore: onStoreReply } = useMutatesReply();
 
   const [dataComment, setDataComment] = useState<CommentWithInfoDetails>(data);
 
@@ -82,28 +88,12 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
   useEffect(() => setTotalReactions(_count.reactions), [_count.reactions]);
   useEffect(() => setCurrentUserReaction(reactions?.[0]), [reactions]);
 
-  const queryClient = useQueryClient();
-  const { mutateAsync, isPending } = useMutation({
-    mutationKey: ["comments", "replying", dataComment.id],
-    mutationFn: store,
-    onSuccess() {
-      queryClient.invalidateQueries({
-        queryKey: ["comment", "replies", dataPost.id, dataComment.id, userId],
-      });
-      toast.success("Tạo phản hồi thành công");
-      setTotalCommentReplies((prev) => prev + 1);
-    },
-    onError() {
-      toast.error("Tạo phản hồi thất bại. Vui lòng thử lại sau");
-    },
-  });
-
   const handleClickEmotion = useCallback(
     async (e: React.MouseEvent) => {
       const target = e.currentTarget as HTMLDivElement;
       const type = target.dataset.type;
       if (!type || !userId || !dataPost.id) return;
-      await onStore(
+      await onStoreReaction(
         {
           type,
           user_id: userId,
@@ -116,17 +106,17 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
         }
       );
     },
-    [dataComment, dataPost, userId]
+    [dataComment, dataPost, userId, onStoreReaction]
   );
 
   const handleClickReaction = useCallback(async () => {
     if (!userId || !dataPost.id) return;
     if (currentUserReaction)
-      return onDelete(currentUserReaction.id, () => {
+      return onDeleteReaction(currentUserReaction.id, () => {
         setCurrentUserReaction(null);
         setTotalReactions((prev) => prev - 1);
       });
-    await onStore(
+    await onStoreReaction(
       {
         type: emotions[0].type,
         user_id: userId,
@@ -138,18 +128,38 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
         setTotalReactions((prev) => prev + 1);
       }
     );
-  }, [currentUserReaction, dataComment, dataPost, userId, onDelete, onStore]);
+  }, [
+    userId,
+    dataPost,
+    dataComment,
+    currentUserReaction,
+    onStoreReaction,
+    onDeleteReaction,
+  ]);
 
   const handleSend = useCallback(
-    (inputData: { value: string }) => {
-      if (!dataComment || !dataPost || isPending) return;
-      return mutateAsync({
-        postId: dataPost.id,
-        commentId: dataComment.id,
-        content: inputData.value,
-      });
+    async (inputData: { value: string }) => {
+      if (!dataComment || !dataPost || isPendingStoreReply) return;
+      return await onStoreReply(
+        {
+          postId: dataPost.id,
+          commentId: dataComment.id,
+          content: inputData.value,
+        },
+        () => {
+          const queryKey = [
+            "comment",
+            "replies",
+            dataPost.id,
+            dataComment.id,
+            userId,
+          ];
+          queryClient.invalidateQueries({ queryKey });
+          setTotalCommentReplies((prev) => prev + 1);
+        }
+      );
     },
-    [dataComment, dataPost, isPending]
+    [dataComment, dataPost, isPendingStoreReply]
   );
 
   const handleDeleteComment = useCallback(async () => {
@@ -307,7 +317,7 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
           {isReply && (
             <UserInputSending
               className="mt-1"
-              disabled={isPending}
+              disabled={isPendingStoreReply}
               onSend={handleSend}
             />
           )}

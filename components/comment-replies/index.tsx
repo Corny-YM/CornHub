@@ -78,7 +78,7 @@ const CommentRepliesList = ({
     <Collapsible
       open={open}
       onOpenChange={onOpenChange}
-      className="w-[350px] space-y-2"
+      className="w-full space-y-2"
     >
       <CollapsibleTrigger asChild>{children}</CollapsibleTrigger>
       <CollapsibleContent className="space-y-2">{content}</CollapsibleContent>

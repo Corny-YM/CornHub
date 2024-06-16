@@ -17,7 +17,7 @@ interface Props {
 const AvatarImg = ({ className, isGroup, src, alt, fallback }: Props) => {
   return (
     <Avatar className={cn("select-none", className)}>
-      <AvatarImage src={src!} alt={alt!} />
+      <AvatarImage className="object-cover" src={src!} alt={alt!} />
       <AvatarFallback>
         <div className="relative w-full h-full dark:bg-primary/50 bg-slate-400/50 flex justify-center items-center select-none rounded-full overflow-hidden">
           {fallback || (

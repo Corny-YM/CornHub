@@ -43,7 +43,7 @@ export const update = async ({
   return defHttp.put(`${indexApi}/${commentId}`, formData);
 };
 
-export const destroy = async (commentId: number): Promise<Reaction> =>
+export const destroy = async (commentId: number): Promise<Comment> =>
   defHttp.delete(`${indexApi}/${commentId}`);
 
 export const getReplies = async (data: {

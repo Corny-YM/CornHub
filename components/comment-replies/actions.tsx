@@ -18,9 +18,11 @@ interface Props {
     group: Group | null;
     file: IFile | null;
   };
+  toggleIsEdit?: (val?: boolean) => void;
+  onDelete?: () => void;
 }
 
-const Actions = ({ data, dataPost }: Props) => {
+const Actions = ({ data, dataPost, toggleIsEdit, onDelete }: Props) => {
   const { userId } = useAuth();
   const { user } = data;
   const { group } = dataPost;
@@ -36,7 +38,7 @@ const Actions = ({ data, dataPost }: Props) => {
 
     if (isOwner) {
       result.push(
-        { label: "Chỉnh sửa", onClick: () => {} },
+        { label: "Chỉnh sửa", onClick: () => toggleIsEdit?.(true) },
         {
           label: "Xóa",
           destructive: true,
@@ -66,7 +68,7 @@ const Actions = ({ data, dataPost }: Props) => {
         destructive
         open={confirmModal}
         onOpenChange={toggleConfirmModal}
-        onClick={() => {}}
+        onClick={onDelete}
       />
       <DropdownActions
         size="icon"
