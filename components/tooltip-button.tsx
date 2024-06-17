@@ -1,26 +1,36 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
 
 interface Props {
   className?: string;
-  children: React.ReactNode;
+  delayDuration?: number;
   button: React.ReactNode;
+  children: React.ReactNode;
+  side?: "top" | "right" | "bottom" | "left";
 }
 
-export const TooltipButton = ({ className, button, children }: Props) => {
+export const TooltipButton = ({
+  button,
+  children,
+  className,
+  side = "top",
+  delayDuration = 250,
+}: Props) => {
   return (
     <TooltipProvider>
       {/* ms */}
-      <Tooltip delayDuration={250}>
+      <Tooltip delayDuration={delayDuration}>
         <TooltipTrigger asChild>{button}</TooltipTrigger>
-        <TooltipContent className={cn(className)}>{children}</TooltipContent>
+        <TooltipContent side={side} className={cn(className)}>
+          {children}
+        </TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );
