@@ -4,7 +4,7 @@ import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { CommentReply, Conversation } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
-import { IConversationData, storeConversation } from "@/actions/message";
+import { IStoreData, store } from "@/actions/conversation";
 
 export const useMutates = () => {
   const router = useRouter();
@@ -14,8 +14,8 @@ export const useMutates = () => {
     mutateAsync: mutateAsyncStoreConversation,
     isPending: isPendingStoreConversation,
   } = useMutation({
-    mutationKey: ["message", "store", "conversation", userId],
-    mutationFn: storeConversation,
+    mutationKey: ["conversation", "store", , userId],
+    mutationFn: store,
     onSuccess() {
       toast.success("Tạo cuộc hội thoại thành công");
       router.refresh();
@@ -26,10 +26,7 @@ export const useMutates = () => {
   });
 
   const onStoreConversation = useCallback(
-    async (
-      data: IConversationData,
-      callback?: (val: Conversation) => void | null
-    ) => {
+    async (data: IStoreData, callback?: (val: Conversation) => void | null) => {
       const { name, ids } = data;
       if (!name) return;
       await mutateAsyncStoreConversation({ name, ids: ids || [] }).then((res) =>
