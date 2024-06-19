@@ -26,7 +26,7 @@ const SidebarLeft = ({ conversations }: Props) => {
   const { toggleModalAdd } = useMessageContext();
 
   return (
-    <div className="side-bar">
+    <div className="side-bar basis-[360px]">
       <div className="w-full h-full flex flex-col px-2 border-r border-r-stone-600/30">
         <div className="text-2xl font-bold mb-4">Đoạn chat</div>
         <div className="relative w-full">
@@ -87,8 +87,14 @@ const SidebarLeft = ({ conversations }: Props) => {
                   <div className="font-semibold text-sm">
                     {conversationName}
                   </div>
-                  <div className="text-xs opacity-75">
-                    {last_message} • {getRelativeTime(last_time_online)}
+                  <div className="flex w-full text-xs opacity-75 space-x-1">
+                    <span className="max-w-full line-clamp-1 break-all">
+                      {last_message || "Bắt đầu cuộc trò chuyện"}
+                    </span>
+                    <span>•</span>
+                    <span className="min-w-fit">
+                      {getRelativeTime(last_time_online)}
+                    </span>
                   </div>
                 </div>
               </Link>

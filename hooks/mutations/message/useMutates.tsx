@@ -2,8 +2,9 @@ import toast from "react-hot-toast";
 import { useCallback } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { CommentReply, Conversation } from "@prisma/client";
+import { Conversation } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
+
 import { IStoreData, store } from "@/actions/conversation";
 
 export const useMutates = () => {

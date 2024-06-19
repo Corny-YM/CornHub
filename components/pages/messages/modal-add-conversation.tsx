@@ -4,7 +4,10 @@ import { User } from "@prisma/client";
 import { useAuth } from "@clerk/nextjs";
 import { useCallback, useState } from "react";
 
+import { useMutates } from "@/hooks/mutations/message/useMutates";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -15,9 +18,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import SelectFriends from "./select-friends";
-import { useMutates } from "@/hooks/mutations/message/useMutates";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 interface Props {
   open: boolean;
@@ -39,18 +39,22 @@ const ModalAddConversation = ({ open, onOpenChange }: Props) => {
     setName(value);
   }, []);
 
+  const handleReset = useCallback(() => {
+    setName("");
+    setSelectedIds({});
+    onOpenChange(false);
+  }, []);
+
   const handleSendGroupRequest = useCallback(async () => {
     if (!userId || !name.trim()) return;
     const ids = Object.keys(selectedIds);
     await onStoreConversation({ name, ids }, () => {
-      setSelectedIds({});
-      onOpenChange(false);
+      handleReset();
     });
   }, [userId, name, selectedIds, onStoreConversation]);
 
   const handleCancel = useCallback(() => {
-    setSelectedIds({});
-    onOpenChange(false);
+    handleReset();
   }, []);
 
   return (
