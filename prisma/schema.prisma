@@ -33,27 +33,31 @@ model User {
 
   // 
   // groups Group[] @relation("UserToGroup")
-  groups                Group[]         @relation("UserToGroup")
-  posts                 Post[]          @relation("UserToPost")
-  comments              Comment[]       @relation("UserToComment")
-  reactions             Reaction[]      @relation("UserToReaction")
-  senderNotifications   Notification[]  @relation("SenderToNotification")
-  receiverNotifications Notification[]  @relation("ReceiverToNotification")
-  senderReports         Report[]        @relation("SenderToReport")
-  userReports           Report[]        @relation("UserToReport")
-  friends               Friend[]        @relation("UserToFriend")
+  groups                Group[]              @relation("UserToGroup")
+  posts                 Post[]               @relation("UserToPost")
+  comments              Comment[]            @relation("UserToComment")
+  reactions             Reaction[]           @relation("UserToReaction")
+  senderNotifications   Notification[]       @relation("SenderToNotification")
+  receiverNotifications Notification[]       @relation("ReceiverToNotification")
+  senderReports         Report[]             @relation("SenderToReport")
+  userReports           Report[]             @relation("UserToReport")
+  friends               Friend[]             @relation("UserToFriend")
   friendUserInfo        Friend[]
-  senderFriendRequest   FriendRequest[] @relation("SenderToFriendRequest")
-  receiverFriendRequest FriendRequest[] @relation("ReceiverToFriendRequest")
+  senderFriendRequest   FriendRequest[]      @relation("SenderToFriendRequest")
+  receiverFriendRequest FriendRequest[]      @relation("ReceiverToFriendRequest")
   followerUserInfo      Follower[]
-  followers             Follower[]      @relation("UserToFollower")
-  groupMembers          GroupMember[]   @relation("MemberToGroupMember")
+  followers             Follower[]           @relation("UserToFollower")
+  groupMembers          GroupMember[]        @relation("MemberToGroupMember")
   groupFollowers        GroupFollower[]
-  senderGroupRequest    GroupRequest[]  @relation("SenderToGroupRequest")
-  receiverGroupRequest  GroupRequest[]  @relation("ReceiverToGroupRequest")
-  files                 File[]          @relation("UserToFile")
-  commentReplies        CommentReply[]  @relation("UserToCommentReply")
-  userDetails           UserDetail[]    @relation("UserToUserDetail")
+  senderGroupRequest    GroupRequest[]       @relation("SenderToGroupRequest")
+  receiverGroupRequest  GroupRequest[]       @relation("ReceiverToGroupRequest")
+  files                 File[]               @relation("UserToFile")
+  commentReplies        CommentReply[]       @relation("UserToCommentReply")
+  userDetails           UserDetail[]         @relation("UserToUserDetail")
+  createdConversations  Conversation[]
+  conversations         Conversation[]       @relation("UserToConversation")
+  messages              Message[]            @relation("UserToMessage")
+  conversationMembers   ConversationMember[] @relation("UserToConversationMember")
 
   @@map("users")
 }
@@ -421,8 +425,80 @@ model File {
   post_id        Post[]         @relation("FileToPost")
   comments       Comment[]      @relation("FileToComment")
   commentReplies CommentReply[] @relation("FileToCommentReply")
+  conversations  Conversation[] @relation("FileToConversation")
+  messages       Message[]      @relation("FileToMessage")
 
   @@index([user_id])
   @@index([group_id])
   @@map("files")
+}
+
+model Conversation {
+  id               String   @id @default(uuid())
+  name             String? // for GROUP chat
+  emoji_id         String? // for GROUP chat
+  emoji_skin       String? // for GROUP chat
+  type             String   @default("group")
+  last_message     String   @default("")
+  last_time_online DateTime @default(now())
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  file_id Int? // Avatar for GROUP chat
+  file    File? @relation("FileToConversation", fields: [file_id], references: [id])
+
+  created_by String // Person who create conversation (GROUP or PRIVATE)
+  createdBy  User   @relation(fields: [created_by], references: [id])
+
+  user_id String? // Person who's get the message from the first time (PRIVATE)
+  user    User?   @relation("UserToConversation", fields: [user_id], references: [id])
+
+  messages            Message[]            @relation("ConversationToMessage")
+  conversationMembers ConversationMember[]
+
+  @@index([user_id])
+  @@index([file_id])
+  @@index([created_by])
+  @@map("conversations")
+}
+
+model ConversationMember {
+  id         Int      @id @default(autoincrement())
+  nickname   String?
+  role       String   @default("member")
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  conversation_id String
+  conversation    Conversation @relation(fields: [conversation_id], references: [id])
+
+  member_id String
+  member    User   @relation("UserToConversationMember", fields: [member_id], references: [id])
+
+  @@index([conversation_id])
+  @@index([member_id])
+  @@map("conversation_members")
+}
+
+model Message {
+  id         Int      @id @default(autoincrement())
+  content    String?  @default("") @db.Text
+  deleted    Boolean  @default(false)
+  type       String   @default("message")
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  file_id Int?
+  file    File? @relation("FileToMessage", fields: [file_id], references: [id])
+
+  conversation_id String
+  conversation    Conversation @relation("ConversationToMessage", fields: [conversation_id], references: [id])
+
+  sender_id String
+  sender    User   @relation("UserToMessage", fields: [sender_id], references: [id])
+
+  @@index([file_id])
+  @@index([sender_id])
+  @@index([conversation_id])
+  @@map("messages")
 }

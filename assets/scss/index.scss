@@ -2,6 +2,16 @@ a {
   // @apply text-blue-400 hover:underline;
 }
 
+input {
+  --tw-ring-offset-width: 0px !important;
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0
+    var(--tw-ring-offset-width) var(--tw-ring-offset-color) !important;
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0
+    calc(0px + var(--tw-ring-offset-width)) var(--tw-ring-color) !important;
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
+    var(--tw-shadow, 0 0 #0000) !important;
+}
+
 .side-bar {
   @apply sticky top-14 h-[calc(100vh-56px)] basis-80 flex flex-col overflow-hidden overflow-y-auto py-4;
 

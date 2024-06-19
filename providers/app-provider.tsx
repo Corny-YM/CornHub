@@ -42,7 +42,7 @@ export const AppProvider = ({ children }: Props) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   useEffect(() => {
-    if (!session || !isSignedIn || !user) return;
+    if (!session || !isSignedIn || !user || currentUser) return;
     // Upsert user
     const {
       id,
@@ -67,7 +67,7 @@ export const AppProvider = ({ children }: Props) => {
       setCurrentUser(res);
     };
     fetch();
-  }, [session, isSignedIn, user]);
+  }, [session, isSignedIn, user, currentUser]);
 
   const toastFeatureUpdating = useCallback(() => {
     toast(<div className="text-sm font-semibold">Coming soon!</div>, {

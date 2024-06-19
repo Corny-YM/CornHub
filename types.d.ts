@@ -1,3 +1,5 @@
+import { Dispatch, SetStateAction } from "react";
+
 export type ILucideIcon = ForwardRefExoticComponent<Omit<LucideProps, "ref">>;
 
-export type IDispatchState = Dispatch<SetStateAction<T>>;
+export type IDispatchState<T = any> = Dispatch<SetStateAction<T>>;

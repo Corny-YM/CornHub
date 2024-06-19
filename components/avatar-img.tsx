@@ -1,20 +1,37 @@
 "use client";
 
+import Image from "next/image";
+import { useMemo } from "react";
+
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import NoAvatar from "@/public/no-avatar.jpg";
 import NoBackground from "@/public/no-background.jpg";
-import Image from "next/image";
+import NoChatAvatar from "@/public/no_chat_avatar.png";
 
 interface Props {
-  className?: string;
+  isChat?: boolean;
   isGroup?: boolean;
+  className?: string;
   src?: string | null;
   alt?: string | null;
   fallback?: React.ReactNode;
 }
 
-const AvatarImg = ({ className, isGroup, src, alt, fallback }: Props) => {
+const AvatarImg = ({
+  src,
+  alt,
+  isChat,
+  isGroup,
+  fallback,
+  className,
+}: Props) => {
+  const fallBackSrc = useMemo(() => {
+    if (isGroup) return NoBackground;
+    if (isChat) return NoChatAvatar;
+    return NoAvatar;
+  }, [isChat, isGroup]);
+
   return (
     <Avatar className={cn("select-none", className)}>
       <AvatarImage className="object-cover" src={src!} alt={alt!} />
@@ -24,7 +41,7 @@ const AvatarImg = ({ className, isGroup, src, alt, fallback }: Props) => {
             <Image
               className="absolute w-full h-full"
               alt="no-avatar-friend"
-              src={!isGroup ? NoAvatar : NoBackground}
+              src={fallBackSrc}
               fill
               sizes="100%"
             />

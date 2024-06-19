@@ -1,12 +1,30 @@
-import { Search } from "lucide-react";
+"use client";
 
-import { Input } from "@/components/ui/input";
-import AvatarImg from "@/components/avatar-img";
 import Link from "next/link";
+import { Search } from "lucide-react";
+import { useAuth } from "@clerk/nextjs";
+import { Conversation, User, File as IFile } from "@prisma/client";
 
-interface Props {}
+import { getRelativeTime } from "@/lib/utils";
+import { TypeConversationEnum } from "@/lib/enum";
+import { useMessageContext } from "@/providers/message-provider";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import AvatarImg from "@/components/avatar-img";
 
-const SidebarLeft = async ({}: Props) => {
+interface Props {
+  conversations: (Conversation & {
+    user?: User | null;
+    createdBy: User;
+    file?: IFile | null;
+  })[];
+}
+
+const SidebarLeft = ({ conversations }: Props) => {
+  const { userId } = useAuth();
+
+  const { toggleModalAdd } = useMessageContext();
+
   return (
     <div className="side-bar">
       <div className="w-full h-full flex flex-col px-2 border-r border-r-stone-600/30">
@@ -20,24 +38,62 @@ const SidebarLeft = async ({}: Props) => {
         </div>
 
         <div className="flex-1 w-full flex flex-col mt-2 space-y-2 h-full overflow-hidden overflow-y-auto">
-          {Array.from([
-            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-            20,
-          ]).map((item) => (
-            <Link
-              key={item}
-              className="p-2 flex items-center space-x-2 rounded-lg select-none cursor-pointer transition hover:bg-primary-foreground"
-              href={`/messages/${item}`}
-            >
-              <AvatarImg />
-              <div className="flex-1 leading-normal">
-                <div className="font-semibold text-sm">Bình Nghiện</div>
-                <div className="text-xs opacity-75">
-                  xem thi biet =))) • 1 giờ
-                </div>
+          {!conversations.length && (
+            <div className="w-full flex flex-col items-center space-y-4 mt-2">
+              <div className="w-full flex items-center justify-center text-justify italic text-xs px-1">
+                Bạn chưa có cuộc hội thoại nào. Hãy tạo nhóm chat hoặc tìm kiếm
+                bạn bè nhé
               </div>
-            </Link>
-          ))}
+              <Button
+                className="w-full"
+                size="sm"
+                onClick={() => toggleModalAdd(true)}
+              >
+                Tạo hội thoại mới
+              </Button>
+            </div>
+          )}
+          {conversations.map((conversation) => {
+            const {
+              id,
+              name,
+              user,
+              file,
+              type,
+              user_id,
+              createdBy,
+              last_message,
+              last_time_online,
+            } = conversation;
+            const isGroupChat = type === TypeConversationEnum.group;
+            const conversationAvatar = isGroupChat
+              ? file?.path
+              : user_id === userId
+              ? user?.avatar
+              : createdBy.avatar;
+            const conversationName = isGroupChat
+              ? name
+              : user_id === userId
+              ? user?.full_name
+              : createdBy.full_name;
+            return (
+              <Link
+                key={id}
+                className="p-2 flex items-center space-x-2 rounded-lg select-none cursor-pointer transition hover:bg-primary-foreground"
+                href={`/messages/${id}`}
+              >
+                <AvatarImg isChat src={conversationAvatar} />
+                <div className="flex-1 leading-normal">
+                  <div className="font-semibold text-sm">
+                    {conversationName}
+                  </div>
+                  <div className="text-xs opacity-75">
+                    {last_message} • {getRelativeTime(last_time_online)}
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </div>

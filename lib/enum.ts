@@ -21,3 +21,8 @@ export enum UsedForEnum {
   comment = "comment",
   reply = "reply",
 }
+
+export enum TypeConversationEnum {
+  group = "group",
+  private = "private",
+}
