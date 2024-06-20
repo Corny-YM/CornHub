@@ -2,7 +2,7 @@
 
 import { User } from "@prisma/client";
 import { useAuth } from "@clerk/nextjs";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { useMutates } from "@/hooks/mutations/message/useMutates";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,14 @@ const ModalAddConversation = ({ open, onOpenChange }: Props) => {
 
   const { isPendingStoreConversation, onStoreConversation } = useMutates();
 
+  const disabled = useMemo(
+    () =>
+      isPendingStoreConversation ||
+      !name.trim() ||
+      !Object.keys(selectedIds).length,
+    [isPendingStoreConversation, name]
+  );
+
   const handleChange = useCallback((e: React.ChangeEvent) => {
     const target = e.target as HTMLInputElement;
     const value = target.value;
@@ -46,8 +54,8 @@ const ModalAddConversation = ({ open, onOpenChange }: Props) => {
   }, []);
 
   const handleSendGroupRequest = useCallback(async () => {
-    if (!userId || !name.trim()) return;
     const ids = Object.keys(selectedIds);
+    if (!userId || !name.trim() || !ids.length) return;
     await onStoreConversation({ name, ids }, () => {
       handleReset();
     });
@@ -96,7 +104,7 @@ const ModalAddConversation = ({ open, onOpenChange }: Props) => {
           </Button>
           <Button
             size="sm"
-            disabled={isPendingStoreConversation || !name.trim()}
+            disabled={disabled}
             onClick={handleSendGroupRequest}
           >
             Tạo cuộc hội thoại

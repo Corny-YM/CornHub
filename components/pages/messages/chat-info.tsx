@@ -12,13 +12,32 @@ import {
   ChevronsUpDown,
   CircleUserRound,
 } from "lucide-react";
+import { useMemo } from "react";
 
+import { useConversationContext } from "@/providers/conversation-provider";
 import { Button } from "@/components/ui/button";
-import SheetButton from "@/components/sheet-button";
 import AvatarImg from "@/components/avatar-img";
+import SheetButton from "@/components/sheet-button";
 import CollapsibleButton from "@/components/collapsible-button";
 
 const ChatInfo = () => {
+  const {
+    userUrl,
+    isGroupChat,
+    conversationData,
+    conversationName,
+    conversationAvatar,
+  } = useConversationContext();
+
+  const content = useMemo(() => {
+    if (isGroupChat) return conversationName;
+    return (
+      <Link href={userUrl || ""} className="font-semibold hover:underline">
+        {conversationName}
+      </Link>
+    );
+  }, [userUrl, isGroupChat, conversationName, conversationData]);
+
   return (
     <SheetButton
       title="Thông tin về cuộc trò chuyện"
@@ -31,38 +50,43 @@ const ChatInfo = () => {
       <div className="w-full h-full">
         {/* User Info */}
         <div className="w-full flex flex-col items-center justify-center">
-          <AvatarImg className="w-20 h-20" />
-          <Link href={`/account`} className="font-semibold hover:underline">
-            Bình nghiện
-          </Link>
-          <div className="flex items-center space-x-4 my-2">
-            <div className="flex flex-col items-center">
-              <Button
-                className="rounded-full w-9 h-9 p-1"
-                variant="outline"
-                size="icon"
-                asChild
-              >
-                <Link href={`/account`}>
-                  <CircleUserRound size={20} />
-                </Link>
-              </Button>
-              <div className="text-sm">Trang cá nhân</div>
+          <AvatarImg
+            className="w-20 h-20"
+            isChat={isGroupChat}
+            src={conversationAvatar}
+            alt={conversationName}
+          />
+          {content}
+          {!isGroupChat && (
+            <div className="flex items-center space-x-4 my-2">
+              <div className="flex flex-col items-center">
+                <Button
+                  className="rounded-full w-9 h-9 p-1"
+                  variant="outline"
+                  size="icon"
+                  asChild
+                >
+                  <Link href={`/account`}>
+                    <CircleUserRound size={20} />
+                  </Link>
+                </Button>
+                <div className="text-sm">Trang cá nhân</div>
+              </div>
+              <div className="flex flex-col items-center">
+                <Button
+                  className="rounded-full w-9 h-9"
+                  variant="outline"
+                  size="icon"
+                  asChild
+                >
+                  <Link href="#">
+                    <BellRing />
+                  </Link>
+                </Button>
+                <div className="text-sm">Thông báo</div>
+              </div>
             </div>
-            <div className="flex flex-col items-center">
-              <Button
-                className="rounded-full w-9 h-9"
-                variant="outline"
-                size="icon"
-                asChild
-              >
-                <Link href="#">
-                  <BellRing />
-                </Link>
-              </Button>
-              <div className="text-sm">Thông báo</div>
-            </div>
-          </div>
+          )}
         </div>
 
         {/* Actions */}
