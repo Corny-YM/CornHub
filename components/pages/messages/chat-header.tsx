@@ -8,6 +8,7 @@ import { useConversationContext } from "@/providers/conversation-provider";
 import { Button } from "@/components/ui/button";
 import AvatarImg from "@/components/avatar-img";
 import ChatInfo from "./chat-info";
+import SocketIndicator from "@/components/socket-indicator";
 
 const ChatHeader = () => {
   const { conversationAvatar, conversationName, isGroupChat } =
@@ -42,6 +43,7 @@ const ChatHeader = () => {
       </Button>
 
       <div className="h-full flex items-center space-x-2">
+        <SocketIndicator />
         <Button className="rounded-full" variant="ghost" size="icon">
           <Phone size={20} />
         </Button>
