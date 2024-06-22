@@ -16,3 +16,12 @@ export const getMembers = async (
   id: string
 ): Promise<(ConversationMember & { member: User })[]> =>
   await defHttp.get(`${indexApi}/${id}/members`);
+
+export const addMembers = async ({
+  conversationId,
+  ids,
+}: {
+  conversationId: string;
+  ids: string[];
+}): Promise<(ConversationMember & { member: User })[]> =>
+  await defHttp.post(`${indexApi}/${conversationId}/members`, { ids });

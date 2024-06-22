@@ -17,19 +17,25 @@ import EmptyData from "@/components/empty-data";
 
 interface Props {
   open: boolean;
+  params?: Record<string, any>;
   selectedIds: Record<string, User>;
   setSelectedIds: IDispatchState<Record<string, User>>;
 }
 
-const SelectFriends = ({ open, selectedIds, setSelectedIds }: Props) => {
+const SelectFriends = ({
+  open,
+  params,
+  selectedIds,
+  setSelectedIds,
+}: Props) => {
   const { userId } = useAuth();
   const [inputValue, setInputValue] = useState("");
   const [searchKey, setSearchKey] = useState("");
 
   const { data, isLoading } = useQuery({
     enabled: open && !!userId,
-    queryKey: ["user", "friends", userId, searchKey],
-    queryFn: () => getFriends(userId!, { limit: 10, searchKey }),
+    queryKey: ["user", "friends", userId, searchKey, params],
+    queryFn: () => getFriends(userId!, { limit: 10, searchKey, ...params }),
   });
 
   useDebounce(() => setSearchKey(inputValue), 250, [inputValue]);

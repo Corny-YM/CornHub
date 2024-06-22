@@ -29,9 +29,17 @@ const ModalMembers = ({ open, onOpenChange }: Props) => {
 
   const [selectedIds, setSelectedIds] = useState<Record<string, User>>({});
 
+  const enabled = useMemo(
+    () =>
+      open &&
+      isGroupChat &&
+      !!conversationData &&
+      !Object.keys(selectedIds).length,
+    [selectedIds, isGroupChat, conversationData, open]
+  );
+
   const { data, isLoading } = useQuery({
-    enabled:
-      !!conversationData && isGroupChat && !Object.keys(selectedIds).length,
+    enabled,
     queryKey: ["conversation", "members", conversationData.id],
     queryFn: () => getMembers(conversationData.id),
   });
@@ -43,8 +51,6 @@ const ModalMembers = ({ open, onOpenChange }: Props) => {
     }, {});
     setSelectedIds(result);
   }, [data]);
-
-  const handleAdd = useCallback(() => {}, []);
 
   const content = useMemo(() => {
     if (isLoading)
@@ -69,7 +75,9 @@ const ModalMembers = ({ open, onOpenChange }: Props) => {
         </DialogHeader>
 
         <div className="flex-1 h-ful flex flex-col">
-          <ScrollArea className="h-[600px] -mx-6 px-6">{content}</ScrollArea>
+          <ScrollArea className="h-[600px] -mx-6 px-6">
+            <div className="space-y-2">{content}</div>
+          </ScrollArea>
         </div>
       </DialogContent>
     </Dialog>

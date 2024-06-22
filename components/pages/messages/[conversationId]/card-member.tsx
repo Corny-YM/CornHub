@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { User } from "@prisma/client";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
@@ -24,11 +24,16 @@ const CardMember = ({ data }: Props) => {
 
   const { isOwner } = useConversationContext();
 
+  const handleUserProfile = useCallback(() => {
+    router.push(`/account/${data.id}`);
+  }, [data]);
+
   const actions = useMemo(() => {
     const arr: IDropdownAction[] = [
       {
         label: "Xem trang cá nhân",
         icon: <CircleUserRound className="mr-2" size={20} />,
+        onClick: handleUserProfile,
       },
     ];
 
@@ -40,7 +45,7 @@ const CardMember = ({ data }: Props) => {
       });
 
     return arr;
-  }, [isOwner]);
+  }, [isOwner, handleUserProfile]);
 
   return (
     <div className="w-full min-h-11 flex items-center p-2 rounded-lg overflow-hidden shadow-lg dark:bg-neutral-800/50 bg-[#f0f2f5]">

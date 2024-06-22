@@ -4,6 +4,7 @@ import Link from "next/link";
 import {
   Info,
   Images,
+  Pencil,
   Palette,
   FileText,
   ThumbsUp,
@@ -11,14 +12,17 @@ import {
   CaseSensitive,
   ChevronsUpDown,
   CircleUserRound,
+  UserRoundPlus,
 } from "lucide-react";
 import { useMemo } from "react";
 
+import { useToggle } from "@/hooks/useToggle";
 import { useConversationContext } from "@/providers/conversation-provider";
 import { Button } from "@/components/ui/button";
 import AvatarImg from "@/components/avatar-img";
 import SheetButton from "@/components/sheet-button";
 import CollapsibleButton from "@/components/collapsible-button";
+import ModalAddMembers from "./modal-add-members";
 
 const ChatInfo = () => {
   const {
@@ -28,6 +32,8 @@ const ChatInfo = () => {
     conversationName,
     conversationAvatar,
   } = useConversationContext();
+
+  const [modalAdd, toggleModalAdd] = useToggle(false);
 
   const content = useMemo(() => {
     if (isGroupChat) return conversationName;
@@ -103,6 +109,17 @@ const ChatInfo = () => {
               </Button>
             }
           >
+            {isGroupChat && (
+              <Button
+                className="w-full flex items-center justify-start"
+                variant="outline"
+                size="sm"
+              >
+                <Pencil size={20} className="mr-2" />
+                Đổi tên đoạn chat
+              </Button>
+            )}
+
             <Button
               className="w-full flex items-center justify-start"
               variant="outline"
@@ -127,6 +144,18 @@ const ChatInfo = () => {
               <CaseSensitive size={20} className="mr-2" />
               Chỉnh sửa biệt danh
             </Button>
+
+            {isGroupChat && (
+              <Button
+                className="w-full flex items-center justify-start"
+                variant="outline"
+                size="sm"
+                onClick={() => toggleModalAdd(true)}
+              >
+                <UserRoundPlus size={20} className="mr-2" />
+                Thêm thành viên
+              </Button>
+            )}
           </CollapsibleButton>
 
           <CollapsibleButton
@@ -160,6 +189,8 @@ const ChatInfo = () => {
           </CollapsibleButton>
         </div>
       </div>
+
+      <ModalAddMembers open={modalAdd} onOpenChange={toggleModalAdd} />
     </SheetButton>
   );
 };

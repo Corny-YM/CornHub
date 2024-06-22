@@ -16,8 +16,21 @@ export async function GET(
     const url = new URL(req.url);
     const type = url.searchParams.get("type");
     const limit = url.searchParams.get("limit");
-    const searchKey = url.searchParams.get("searchKey");
     const exceptId = url.searchParams.get("exceptId");
+    const searchKey = url.searchParams.get("searchKey");
+    const conversationId = url.searchParams.get("conversationId");
+
+    let exceptionIds: string[] = [];
+
+    if (exceptId) exceptionIds.push(exceptId);
+
+    // Get all members in that conversation
+    if (conversationId) {
+      const members = await prisma.conversationMember.findMany({
+        where: { conversation_id: conversationId },
+      });
+      exceptionIds.push(...members.map((mem) => mem.member_id));
+    }
 
     const friends = await prisma.friend.findMany({
       include: { user: true, friend: true },
@@ -30,14 +43,14 @@ export async function GET(
                 ? { friend: { full_name: { contains: searchKey } } }
                 : {},
             ],
-            NOT: exceptId ? [{ friend_id: exceptId! }] : [],
+            friend_id: { notIn: exceptionIds },
           },
           {
             AND: [
               { friend_id: params.userId },
               searchKey ? { user: { full_name: { contains: searchKey } } } : {},
             ],
-            NOT: exceptId ? [{ user_id: exceptId! }] : [],
+            user_id: { notIn: exceptionIds },
           },
         ],
       },

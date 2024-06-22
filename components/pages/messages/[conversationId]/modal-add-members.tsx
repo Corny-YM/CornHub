@@ -1,8 +1,11 @@
 "use client";
 
+import toast from "react-hot-toast";
 import { User } from "@prisma/client";
-import { useCallback, useEffect, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { useCallback, useMemo, useState } from "react";
 
+import { addMembers } from "@/actions/conversation";
 import { useConversationContext } from "@/providers/conversation-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,40 +18,48 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import SelectFriends from "../select-friends";
-import { useQuery } from "@tanstack/react-query";
-import { getMembers } from "@/actions/conversation";
 
 interface Props {
   open: boolean;
   onOpenChange: (val?: boolean) => void;
 }
 
-const ModalMembers = ({ open, onOpenChange }: Props) => {
+const ModalAddMembers = ({ open, onOpenChange }: Props) => {
   const { conversationData, isGroupChat } = useConversationContext();
 
   const [selectedIds, setSelectedIds] = useState<Record<string, User>>({});
 
-  const { data, isLoading } = useQuery({
-    enabled:
-      !!conversationData && isGroupChat && !Object.keys(selectedIds).length,
-    queryKey: ["conversation", "members", conversationData.id],
-    queryFn: () => getMembers(conversationData.id),
+  const { mutate, isPending } = useMutation({
+    mutationKey: ["conversation", "add", "members", conversationData.id],
+    mutationFn: addMembers,
+    onSuccess() {
+      toast.success("Mời người dùng thành công");
+      onOpenChange(false);
+      setSelectedIds({});
+    },
+    onError() {
+      toast.error("Mời người dùng thất bại. Vui lòng thử lại sau");
+    },
   });
 
-  useEffect(() => {
-    if (!data) return;
-    const result = data.reduce((obj, item) => {
-      return { ...obj, [item.member_id]: item.member };
-    }, {});
-    setSelectedIds(result);
-  }, [data]);
+  const disabled = useMemo(
+    () => !Object.keys(selectedIds).length || isPending,
+    [selectedIds, isPending]
+  );
 
-  const handleAdd = useCallback(() => {}, []);
+  const handleAdd = useCallback(() => {
+    const ids = Object.keys(selectedIds);
+    if (!conversationData || !ids.length || !isGroupChat) return;
+    mutate({
+      conversationId: conversationData.id,
+      ids,
+    });
+  }, [conversationData, isGroupChat, selectedIds]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogOverlay className="z-[9999]" />
-      <DialogContent className="z-[9999] w-screen md:max-w-[784px]">
+      <DialogOverlay className="z-[99999]" />
+      <DialogContent className="z-[99999] w-screen md:max-w-[784px]">
         <DialogHeader>
           <DialogTitle>Thành viên</DialogTitle>
           <DialogDescription className="text-xs">
@@ -58,6 +69,7 @@ const ModalMembers = ({ open, onOpenChange }: Props) => {
 
         <SelectFriends
           open={open}
+          params={{ conversationId: conversationData.id }}
           selectedIds={selectedIds}
           setSelectedIds={setSelectedIds}
         />
@@ -66,7 +78,7 @@ const ModalMembers = ({ open, onOpenChange }: Props) => {
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Hủy bỏ
           </Button>
-          <Button size="sm" disabled={false} onClick={handleAdd}>
+          <Button size="sm" disabled={disabled} onClick={handleAdd}>
             Mời vào nhóm
           </Button>
         </DialogFooter>
@@ -75,4 +87,4 @@ const ModalMembers = ({ open, onOpenChange }: Props) => {
   );
 };
 
-export default ModalMembers;
+export default ModalAddMembers;

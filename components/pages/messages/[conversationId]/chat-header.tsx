@@ -16,7 +16,7 @@ import ModalMembers from "./modal-members";
 const ChatHeader = () => {
   const { userId } = useAuth();
 
-  const [modalAdd, toggleModalAdd] = useToggle(false);
+  const [modalMembers, toggleModalMembers] = useToggle(false);
 
   const {
     conversationData,
@@ -63,7 +63,7 @@ const ChatHeader = () => {
 
   const handleClick = useCallback(() => {
     if (!isGroupChat) return;
-    toggleModalAdd(true);
+    toggleModalMembers(true);
   }, [isGroupChat]);
 
   return (
@@ -88,7 +88,7 @@ const ChatHeader = () => {
         <ChatInfo />
       </div>
 
-      <ModalMembers open={modalAdd} onOpenChange={toggleModalAdd} />
+      <ModalMembers open={modalMembers} onOpenChange={toggleModalMembers} />
     </div>
   );
 };
