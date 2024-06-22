@@ -1,11 +1,18 @@
 "use client";
 
+import toast from "react-hot-toast";
 import { z } from "zod";
-import { useCallback, useMemo } from "react";
-import { FieldErrors, SubmitErrorHandler, useForm } from "react-hook-form";
+import { useUser } from "@clerk/nextjs";
+import { RotateCcw } from "lucide-react";
+import { useForm } from "react-hook-form";
 import { UserDetail } from "@prisma/client";
+import { useRouter } from "next/navigation";
+import { useCallback, useMemo } from "react";
+
+import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { update } from "@/actions/user";
 import { genderOptions, relationOptions } from "@/lib/const";
 import { useAccountContext } from "@/providers/account-provider";
 import { Input } from "@/components/ui/input";
@@ -26,12 +33,6 @@ import {
 } from "@/components/ui/form";
 import DatePicker from "@/components/date-picker";
 import InputSelect from "@/components/input-select";
-import { RotateCcw } from "lucide-react";
-import { useUser } from "@clerk/nextjs";
-import toast from "react-hot-toast";
-import { useMutation } from "@tanstack/react-query";
-import { update } from "@/actions/user";
-import { useRouter } from "next/navigation";
 
 interface Props {
   open: boolean;
@@ -95,7 +96,7 @@ const ModalInfoDetails = ({ open, onOpenChange }: Props) => {
   const disabled = useMemo(() => {
     const name = form.getValues("full_name");
     return !name || isPending;
-  }, [form, isPending]);
+  }, [form.getValues("full_name"), isPending]);
 
   const onSubmit = useCallback(
     (values: z.infer<typeof formSchema>) => {
@@ -122,22 +123,28 @@ const ModalInfoDetails = ({ open, onOpenChange }: Props) => {
     [clerkUser]
   );
 
+  const handleCancel = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onOpenChange(false);
+  }, []);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogOverlay className="z-[9999]" />
-      <DialogContent className="z-[9999] sm:w-[600px] sm:max-w-none h-[80vh] flex flex-col !ring-0 !ring-offset-0 !outline-none">
+      <DialogContent className="z-[9999] sm:w-[600px] sm:max-w-none flex flex-col !ring-0 !ring-offset-0 !outline-none">
         <DialogHeader>
           <DialogTitle>Chỉnh sửa trang cá nhân</DialogTitle>
         </DialogHeader>
 
         {/* content */}
-        <div className="flex-1 h-full flex flex-col">
+        <div className="h-[80vh] flex flex-col">
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit, onInValid)}
-              className="h-full flex flex-col items-stretch space-y-4"
+              className="h-full flex flex-col space-y-4"
             >
-              <div className="flex-1 h-full flex flex-col gap-2">
+              <div className="h-full space-y-2 -mx-4 px-4 overflow-hidden overflow-y-auto">
                 {/* Input Name */}
                 <div className="w-full flex items-end space-x-2">
                   <FormField
@@ -325,7 +332,7 @@ const ModalInfoDetails = ({ open, onOpenChange }: Props) => {
                 />
               </div>
               <div className="w-full flex items-center justify-end gap-x-2">
-                <Button variant="outline" onClick={() => onOpenChange(false)}>
+                <Button variant="outline" onClick={handleCancel}>
                   Đóng
                 </Button>
                 <Button disabled={disabled}>Lưu thay đổi</Button>

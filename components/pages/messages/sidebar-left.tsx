@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Search } from "lucide-react";
+import { MessageSquareDiff, Search } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
 import { Conversation, User, File as IFile } from "@prisma/client";
 
@@ -28,7 +28,17 @@ const SidebarLeft = ({ conversations }: Props) => {
   return (
     <div className="side-bar basis-[360px]">
       <div className="w-full h-full flex flex-col px-2 border-r border-r-stone-600/30">
-        <div className="text-2xl font-bold mb-4">Đoạn chat</div>
+        <div className="text-2xl font-bold mb-4 flex items-center justify-between">
+          <div>Đoạn chat</div>
+          <Button
+            className="rounded-full"
+            size="icon"
+            variant="outline"
+            onClick={() => toggleModalAdd(true)}
+          >
+            <MessageSquareDiff size={20} />
+          </Button>
+        </div>
         <div className="relative w-full">
           <Input
             className="!ring-0 !ring-offset-0 rounded-full overflow-hidden pl-10"

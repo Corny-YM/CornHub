@@ -57,44 +57,44 @@ export async function GET(req: Request) {
   }
 }
 
-export async function PUT(req: Request) {
-  try {
-    const formData = await req.formData();
-    const file = formData.get("file") as File | null;
-    const content = formData.get("content") as string;
-    const conversationId = formData.get("conversationId") as string;
+// export async function PUT(req: Request) {
+//   try {
+//     const formData = await req.formData();
+//     const file = formData.get("file") as File | null;
+//     const content = formData.get("content") as string;
+//     const conversationId = formData.get("conversationId") as string;
 
-    const { userId } = auth();
-    if (!userId) return new NextResponse("Unauthenticated", { status: 401 });
+//     const { userId } = auth();
+//     if (!userId) return new NextResponse("Unauthenticated", { status: 401 });
 
-    if (!conversationId)
-      return new NextResponse("Conversation ID is required", { status: 404 });
+//     if (!conversationId)
+//       return new NextResponse("Conversation ID is required", { status: 404 });
 
-    const conversation = await prisma.conversation.findFirst({
-      where: { id: conversationId },
-    });
-    if (!conversation)
-      return new NextResponse("Conversation does not exist", { status: 404 });
+//     const conversation = await prisma.conversation.findFirst({
+//       where: { id: conversationId },
+//     });
+//     if (!conversation)
+//       return new NextResponse("Conversation does not exist", { status: 404 });
 
-    const fileDB: IFile | null = await uploadFile({
-      file,
-      userId,
-      used_for: UsedForEnum.message,
-    });
+//     const fileDB: IFile | null = await uploadFile({
+//       file,
+//       userId,
+//       used_for: UsedForEnum.message,
+//     });
 
-    const comment = await prisma.message.create({
-      data: {
-        conversation_id: conversation.id,
-        sender_id: userId,
-        file_id: fileDB?.id,
-        content: content,
-        type: fileDB?.id ? TypeMessageEnum.file : TypeMessageEnum.message,
-      },
-    });
+//     const comment = await prisma.message.create({
+//       data: {
+//         conversation_id: conversation.id,
+//         sender_id: userId,
+//         file_id: fileDB?.id,
+//         content: content,
+//         type: fileDB?.id ? TypeMessageEnum.file : TypeMessageEnum.message,
+//       },
+//     });
 
-    return NextResponse.json(comment);
-  } catch (err) {
-    console.log("[MESSAGE_PUT]", err);
-    return new NextResponse("Internal error", { status: 500 });
-  }
-}
+//     return NextResponse.json(comment);
+//   } catch (err) {
+//     console.log("[MESSAGE_PUT]", err);
+//     return new NextResponse("Internal error", { status: 500 });
+//   }
+// }

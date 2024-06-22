@@ -31,7 +31,7 @@ export const emotions = [
 ];
 
 export const emotionIcons: Record<
-  "like" | "heart" | "love" | "smile" | "wow" | "sad" | "angry",
+  "like" | "heart" | "love" | "smile" | "wow" | "sad" | "angry" | string,
   ({ className }: { className?: string }) => JSX.Element
 > = {
   like: Like,

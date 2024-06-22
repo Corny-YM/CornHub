@@ -27,5 +27,5 @@ export const store = async (data: IStoreData): Promise<Message> => {
     const value = data?.[key];
     formData.append(key, value);
   });
-  return await defHttp.put(indexApi, formData);
+  return await defHttp.put(`socket/${indexApi}/`, formData);
 };

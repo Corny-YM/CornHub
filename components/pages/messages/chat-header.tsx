@@ -1,18 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useAuth } from "@clerk/nextjs";
 import { Phone, Video } from "lucide-react";
+import { useCallback, useMemo } from "react";
 
+import { useToggle } from "@/hooks/useToggle";
 import { useConversationContext } from "@/providers/conversation-provider";
 import { Button } from "@/components/ui/button";
+import SocketIndicator from "@/components/socket-indicator";
 import AvatarImg from "@/components/avatar-img";
 import ChatInfo from "./chat-info";
-import SocketIndicator from "@/components/socket-indicator";
+import ModalMembers from "./modal-members";
 
 const ChatHeader = () => {
-  const { conversationAvatar, conversationName, isGroupChat } =
-    useConversationContext();
+  const { userId } = useAuth();
+
+  const [modalAdd, toggleModalAdd] = useToggle(false);
+
+  const {
+    conversationData,
+    conversationAvatar,
+    conversationName,
+    isGroupChat,
+  } = useConversationContext();
 
   const content = useMemo(() => {
     const defaultContent = (
@@ -29,16 +40,40 @@ const ChatHeader = () => {
       return (
         <div className="flex items-center space-x-2">{defaultContent}</div>
       );
+
+    const personId =
+      conversationData.created_by === userId
+        ? conversationData.user_id
+        : conversationData.created_by;
     return (
-      <Link className="flex items-center space-x-2" href="#">
+      <Link
+        className="flex items-center space-x-2"
+        href={`/account/${personId}`}
+      >
         {defaultContent}
       </Link>
     );
-  }, [isGroupChat, conversationAvatar, conversationName]);
+  }, [
+    userId,
+    isGroupChat,
+    conversationData,
+    conversationName,
+    conversationAvatar,
+  ]);
+
+  const handleClick = useCallback(() => {
+    if (!isGroupChat) return;
+    toggleModalAdd(true);
+  }, [isGroupChat]);
 
   return (
     <div className="w-full flex items-center justify-between">
-      <Button className="h-fit px-2" variant="ghost" asChild={!isGroupChat}>
+      <Button
+        className="h-fit px-2"
+        variant="ghost"
+        asChild={!isGroupChat}
+        onClick={handleClick}
+      >
         {content}
       </Button>
 
@@ -52,6 +87,8 @@ const ChatHeader = () => {
         </Button>
         <ChatInfo />
       </div>
+
+      <ModalMembers open={modalAdd} onOpenChange={toggleModalAdd} />
     </div>
   );
 };
