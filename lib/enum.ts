@@ -20,9 +20,15 @@ export enum UsedForEnum {
   cover = "cover",
   comment = "comment",
   reply = "reply",
+  message = "message",
 }
 
 export enum TypeConversationEnum {
   group = "group",
   private = "private",
+}
+
+export enum TypeMessageEnum {
+  message = "message",
+  file = "file",
 }

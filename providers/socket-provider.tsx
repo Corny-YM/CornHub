@@ -17,27 +17,23 @@ const SocketContext = createContext<SocketContextType>({
   isConnected: false,
 });
 
-export const useSocket = () => {
-  return useContext(SocketContext);
-};
-
 export const SocketProvider = ({ children }: Props) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    const socketInstance = ClientIO(process.env.NEXT_PUBLIC_SITE_URL!, {
-      path: "/api/socket/io",
-      addTrailingSlash: false,
-    });
+    // const socketInstance = ClientIO(process.env.NEXT_PUBLIC_SITE_URL!, {
+    //   path: "/api/socket/io",
+    //   addTrailingSlash: false,
+    // });
 
-    // const socketInstance = new (ClientIO as any)(
-    //   process.env.NEXT_PUBLIC_SITE_URL!,
-    //   {
-    //     path: "/api/socket/io",
-    //     addTrailingSlash: false,
-    //   }
-    // );
+    const socketInstance = new (ClientIO as any)(
+      process.env.NEXT_PUBLIC_SITE_URL!,
+      {
+        path: "/api/socket/io",
+        addTrailingSlash: false,
+      }
+    );
 
     socketInstance.on("connect", () => {
       console.log("Socket connected");
@@ -61,4 +57,8 @@ export const SocketProvider = ({ children }: Props) => {
       {children}
     </SocketContext.Provider>
   );
+};
+
+export const useSocket = () => {
+  return useContext(SocketContext);
 };

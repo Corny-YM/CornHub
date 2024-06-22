@@ -63,6 +63,24 @@ export const formatDate = (
   return `${formattedDate} ${formattedHour}`;
 };
 
+export const formatToLocaleDate = (str: string | Date) => {
+  const date = new Date(str);
+
+  const datePart = date.toLocaleDateString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+  });
+
+  const timePart = date.toLocaleTimeString("vi-VN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+
+  return `${datePart}, ${timePart}`;
+};
+
 export const formatAmounts = (viewCount: number, fixed: number = 1) => {
   let result = "";
   if (viewCount <= 0) return 0;

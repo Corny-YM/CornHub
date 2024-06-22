@@ -15,7 +15,6 @@ export default function handler(
   res: NextApiResponseServerIo
 ) {
   try {
-    console.log("hello123123");
     if (!res?.socket?.server?.io) {
       const path = "/api/socket/io";
       const httpServer: NetServer = res.socket.server as any;
@@ -29,5 +28,6 @@ export default function handler(
     res.end();
   } catch (err) {
     console.log("[SOCKET.IO handler]", err);
+    res.status(500).json({ error: "failed to socket" });
   }
 }
