@@ -1,22 +1,23 @@
 "use client";
 
 import { User } from "@prisma/client";
-import { useCallback, useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { getMembers } from "@/actions/conversation";
 import { useConversationContext } from "@/providers/conversation-provider";
-import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogOverlay,
   DialogTitle,
 } from "@/components/ui/dialog";
-import SelectFriends from "./select-friends";
-import { useQuery } from "@tanstack/react-query";
-import { getMembers } from "@/actions/conversation";
+import Loading from "@/components/icons/loading";
+import EmptyData from "@/components/empty-data";
+import CardMember from "./card-member";
 
 interface Props {
   open: boolean;
@@ -45,31 +46,31 @@ const ModalMembers = ({ open, onOpenChange }: Props) => {
 
   const handleAdd = useCallback(() => {}, []);
 
+  const content = useMemo(() => {
+    if (isLoading)
+      return (
+        <div className="w-full h-full flex items-center justify-center">
+          <Loading />
+        </div>
+      );
+    if (!data || !data.length) return <EmptyData />;
+    return data.map((item) => <CardMember key={item.id} data={item.member} />);
+  }, [data, isLoading]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogOverlay className="z-[9999]" />
-      <DialogContent className="z-[9999] w-screen md:max-w-[784px]">
+      <DialogContent className="z-[9999] w-screen md:max-w-[784px] sm:w-[600px] sm:max-w-none flex flex-col !ring-0 !ring-offset-0 !outline-none">
         <DialogHeader>
           <DialogTitle>Thành viên</DialogTitle>
           <DialogDescription className="text-xs">
-            Thiết lập danh sách thành viên ở đây. Nhấp vào lưu khi bạn hoàn tất.
+            Danh sách thành viên ở đây.
           </DialogDescription>
         </DialogHeader>
 
-        <SelectFriends
-          open={open}
-          selectedIds={selectedIds}
-          setSelectedIds={setSelectedIds}
-        />
-
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Hủy bỏ
-          </Button>
-          <Button size="sm" disabled={false} onClick={handleAdd}>
-            Mời vào nhóm
-          </Button>
-        </DialogFooter>
+        <div className="flex-1 h-ful flex flex-col">
+          <ScrollArea className="h-[600px] -mx-6 px-6">{content}</ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   );

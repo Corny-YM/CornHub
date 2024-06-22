@@ -3,8 +3,8 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { ConversationProvider } from "@/providers/conversation-provider";
 import { Separator } from "@/components/ui/separator";
-import ChatHeader from "@/components/pages/messages/chat-header";
-import ChatInput from "@/components/pages/messages/chat-input";
+import ChatHeader from "@/components/pages/messages/[conversationId]/chat-header";
+import ChatInput from "@/components/pages/messages/[conversationId]/chat-input";
 
 interface Props {
   children: React.ReactNode;

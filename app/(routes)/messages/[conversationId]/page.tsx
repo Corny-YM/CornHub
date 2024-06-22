@@ -7,7 +7,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { index } from "@/actions/message";
 import { useSocket } from "@/providers/socket-provider";
 import { useConversationContext } from "@/providers/conversation-provider";
-import ChatItem from "@/components/pages/messages/chat-item";
+import ChatItem from "@/components/pages/messages/[conversationId]/chat-item";
 
 const ConversationIdPage = () => {
   const { userId } = useAuth();

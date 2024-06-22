@@ -17,6 +17,7 @@ interface Props {
 }
 
 export type ConversationContext = {
+  isOwner: boolean;
   isGroupChat: boolean;
   userUrl?: string | null;
   conversationAvatar?: string | null;
@@ -26,6 +27,7 @@ export type ConversationContext = {
 };
 
 const ConversationContext = createContext<ConversationContext>({
+  isOwner: false,
   isGroupChat: false,
   conversationData: {} as Props["data"],
   setConversationData: () => {},
@@ -35,7 +37,9 @@ export const ConversationProvider = ({ children, data }: Props) => {
   const { userId } = useAuth();
   const [conversationData, setConversationData] = useState(data);
 
-  const { name, file, user, createdBy, type } = conversationData;
+  const { name, file, user, createdBy, created_by, type } = conversationData;
+
+  const isOwner = useMemo(() => created_by === userId, [created_by, userId]);
 
   const isGroupChat = useMemo(
     () => type === TypeConversationEnum.group,
@@ -61,6 +65,7 @@ export const ConversationProvider = ({ children, data }: Props) => {
     <ConversationContext.Provider
       value={{
         userUrl,
+        isOwner,
         isGroupChat,
         conversationAvatar,
         conversationName,
