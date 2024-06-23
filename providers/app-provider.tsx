@@ -27,7 +27,7 @@ type Context = {
 };
 
 const queryClient = new QueryClient({
-  defaultOptions: { queries: { retry: false } },
+  defaultOptions: { queries: { retry: false, refetchInterval: false } },
 });
 
 const AppContext = createContext<Context>({

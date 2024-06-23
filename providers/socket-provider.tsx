@@ -22,18 +22,18 @@ export const SocketProvider = ({ children }: Props) => {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    // const socketInstance = ClientIO(process.env.NEXT_PUBLIC_SITE_URL!, {
-    //   path: "/api/socket/io",
-    //   addTrailingSlash: false,
-    // });
+    const socketInstance = ClientIO(process.env.NEXT_PUBLIC_SITE_URL!, {
+      path: "/api/socket/io",
+      addTrailingSlash: false,
+    });
 
-    const socketInstance = new (ClientIO as any)(
-      process.env.NEXT_PUBLIC_SITE_URL!,
-      {
-        path: "/api/socket/io",
-        addTrailingSlash: false,
-      }
-    );
+    // const socketInstance = new (ClientIO as any)(
+    //   process.env.NEXT_PUBLIC_SITE_URL!,
+    //   {
+    //     path: "/api/socket/io",
+    //     addTrailingSlash: false,
+    //   }
+    // );
 
     socketInstance.on("connect", () => {
       console.log("Socket connected");

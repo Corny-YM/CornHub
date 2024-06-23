@@ -43,6 +43,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponseServerIo) => {
     });
 
     const message = await prisma.message.create({
+      include: { sender: true, file: true },
       data: {
         conversation_id: conversation.id,
         sender_id: userId,
