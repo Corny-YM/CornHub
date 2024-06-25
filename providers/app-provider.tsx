@@ -6,15 +6,16 @@ import { User } from "@prisma/client";
 import { useSession, useUser } from "@clerk/nextjs";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
-  useContext,
-  createContext,
-  useEffect,
   useState,
+  useEffect,
+  useContext,
   useCallback,
+  createContext,
 } from "react";
 
 import { store } from "@/actions/user";
 import { IDispatchState } from "@/types";
+import { SocketProvider } from "@/providers/socket-provider";
 
 interface Props {
   children: React.ReactNode;
@@ -27,7 +28,13 @@ type Context = {
 };
 
 const queryClient = new QueryClient({
-  defaultOptions: { queries: { retry: false, refetchInterval: false } },
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchInterval: false,
+      refetchOnWindowFocus: false,
+    },
+  },
 });
 
 const AppContext = createContext<Context>({
@@ -82,8 +89,10 @@ export const AppProvider = ({ children }: Props) => {
       value={{ currentUser, setCurrentUser, toastFeatureUpdating }}
     >
       <QueryClientProvider client={queryClient}>
-        <Toaster containerStyle={{ zIndex: 9999999999 }} />
-        {children}
+        <SocketProvider>
+          <Toaster containerStyle={{ zIndex: 9999999999 }} />
+          {children}
+        </SocketProvider>
       </QueryClientProvider>
     </AppContext.Provider>
   );

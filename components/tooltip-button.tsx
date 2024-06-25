@@ -13,6 +13,7 @@ interface Props {
   delayDuration?: number;
   button: React.ReactNode;
   children: React.ReactNode;
+  disableHoverableContent?: boolean;
   side?: "top" | "right" | "bottom" | "left";
 }
 
@@ -22,11 +23,15 @@ export const TooltipButton = ({
   className,
   side = "top",
   delayDuration = 250,
+  disableHoverableContent,
 }: Props) => {
   return (
     <TooltipProvider>
       {/* ms */}
-      <Tooltip delayDuration={delayDuration}>
+      <Tooltip
+        delayDuration={delayDuration}
+        disableHoverableContent={disableHoverableContent}
+      >
         <TooltipTrigger asChild>{button}</TooltipTrigger>
         <TooltipContent side={side} className={cn(className)}>
           {children}

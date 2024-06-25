@@ -7,6 +7,20 @@ import { Member, Profile, Server } from "@prisma/client";
 // types.d.ts
 import { Server as HttpServer } from "http";
 
+import { Server as SocketIOServer } from "socket.io";
+
+declare global {
+  namespace NodeJS {
+    interface Global {
+      io: SocketIOServer;
+    }
+  }
+
+  var io: SocketIOServer; // Ensures global variable is recognized
+}
+
+export {};
+
 declare module "http" {
   interface IncomingMessage {
     socket: {

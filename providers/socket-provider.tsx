@@ -2,6 +2,7 @@
 
 import { io as ClientIO, Socket } from "socket.io-client";
 import { createContext, useContext, useEffect, useState } from "react";
+import { socket } from "@/app/socket";
 
 interface Props {
   children: React.ReactNode;
@@ -18,42 +19,74 @@ const SocketContext = createContext<SocketContextType>({
 });
 
 export const SocketProvider = ({ children }: Props) => {
-  const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [transport, setTransport] = useState("N/A");
 
   useEffect(() => {
-    const socketInstance = ClientIO(process.env.NEXT_PUBLIC_SITE_URL!, {
-      path: "/api/socket/io",
-      addTrailingSlash: false,
-    });
+    if (socket.connected) {
+      onConnect();
+    }
 
-    // const socketInstance = new (ClientIO as any)(
-    //   process.env.NEXT_PUBLIC_SITE_URL!,
-    //   {
-    //     path: "/api/socket/io",
-    //     addTrailingSlash: false,
-    //   }
-    // );
-
-    socketInstance.on("connect", () => {
+    function onConnect() {
       console.log("Socket connected");
       setIsConnected(true);
-    });
+      setTransport(socket.io.engine.transport.name);
 
-    socketInstance.on("disconnect", () => {
+      socket.io.engine.on("upgrade", (transport) => {
+        setTransport(transport.name);
+      });
+    }
+
+    function onDisconnect() {
       console.log("Socket disconnected");
       setIsConnected(false);
-    });
+      setTransport("N/A");
+    }
 
-    setSocket(socketInstance);
+    socket.on("connect", onConnect);
+    socket.on("disconnect", onDisconnect);
 
     return () => {
-      socketInstance.disconnect();
+      socket.off("connect", onConnect);
+      socket.off("disconnect", onDisconnect);
     };
   }, []);
 
+  //   const url = process.env.NEXT_PUBLIC_APP_URL!;
+  //   console.log(url);
+
+  //   const socketInstance = ClientIO(url, {
+  //     path: "/api/socket/app-io",
+  //     addTrailingSlash: false,
+  //   });
+
+  //   // const socketInstance = new (ClientIO as any)(
+  //   //   process.env.NEXT_PUBLIC_APP_URL!,
+  //   //   {
+  //   //     path: "/api/socket/io",
+  //   //     addTrailingSlash: false,
+  //   //   }
+  //   // );
+
+  //   socketInstance.on("connect", () => {
+  //     console.log("Socket connected");
+  //     setIsConnected(true);
+  //   });
+
+  //   socketInstance.on("disconnect", () => {
+  //     console.log("Socket disconnected");
+  //     setIsConnected(false);
+  //   });
+
+  //   setSocket(socketInstance);
+
+  //   return () => {
+  //     socketInstance.disconnect();
+  //   };
+  // }, []);
+
   return (
-    <SocketContext.Provider value={{ socket, isConnected }}>
+    <SocketContext.Provider value={{ socket: socket, isConnected }}>
       {children}
     </SocketContext.Provider>
   );

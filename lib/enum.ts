@@ -32,3 +32,8 @@ export enum TypeMessageEnum {
   message = "message",
   file = "file",
 }
+
+export enum OptionDeleteMessageEnum {
+  recall = "recall",
+  terminate = "terminate",
+}

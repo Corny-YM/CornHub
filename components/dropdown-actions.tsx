@@ -25,6 +25,7 @@ interface Props {
   actions: IDropdownAction[];
   align?: "end" | "center" | "start" | undefined;
   size?: "icon" | "default" | "sm" | "lg" | null;
+  onOpenChange?: (val?: boolean) => void;
 }
 
 export const DropdownActions = ({
@@ -34,9 +35,10 @@ export const DropdownActions = ({
   actions,
   disabled,
   className,
+  onOpenChange,
 }: Props) => {
   return (
-    <DropdownMenu>
+    <DropdownMenu onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
         <Button
           className={cn(

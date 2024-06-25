@@ -24,5 +24,7 @@ export const config = {
     "/((?!.+\\.[\\w]+$|_next).*)",
     "/((?!.*\\..*|_next|api/ws).*?)",
     "/(api(?!/ws)|trpc)(.*)",
+    "/((?!proxy|favicon.ico).*)",
+    "/pages(.*)",
   ],
 };

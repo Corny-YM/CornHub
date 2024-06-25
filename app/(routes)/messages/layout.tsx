@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 
-import { SocketProvider } from "@/providers/socket-provider";
 import { MessageProvider } from "@/providers/message-provider";
 import prisma from "@/lib/prisma";
 import Header from "@/components/header";
@@ -27,20 +26,18 @@ const MessagesLayout = async ({ children }: Props) => {
   });
 
   return (
-    <SocketProvider>
-      <div className="relative w-full h-full max-h-full flex items-center">
-        <Header />
+    <div className="relative w-full h-full max-h-full flex items-center">
+      <Header />
 
-        <MessageProvider>
-          <div className="flex-1 w-full h-full max-h-full flex relative pt-14">
-            <SidebarLeft conversations={conversations} />
+      <MessageProvider>
+        <div className="flex-1 w-full h-full max-h-full flex relative pt-14">
+          <SidebarLeft conversations={conversations} />
 
-            {/* Content */}
-            {children}
-          </div>
-        </MessageProvider>
-      </div>
-    </SocketProvider>
+          {/* Content */}
+          {children}
+        </div>
+      </MessageProvider>
+    </div>
   );
 };
 

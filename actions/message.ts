@@ -29,3 +29,10 @@ export const store = async (data: IStoreData): Promise<Message> => {
   });
   return await defHttp.put(`socket/${indexApi}/`, formData);
 };
+
+export const destroyMessage = async (data: {
+  id: number;
+  type: string;
+  conversationId: string;
+}): Promise<Message> =>
+  defHttp.post(`socket/${indexApi}/${data.id}/delete`, data);

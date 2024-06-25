@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSocket } from "@/providers/socket-provider";
 import { File as IFile, Message, User } from "@prisma/client";
+import { OptionDeleteMessageEnum } from "@/lib/enum";
 
 type ChatSocketProps = {
   addKey: string;
@@ -9,10 +10,11 @@ type ChatSocketProps = {
   queryKey: string;
 };
 
-type MessageWithSenderWithFile = Message & {
-  sender: User;
-  file?: IFile;
-};
+type MessageWithSenderWithFile = Record<string, any> &
+  Message & {
+    sender: User;
+    file?: IFile;
+  };
 
 export const useChatSocket = ({
   addKey,
@@ -34,7 +36,11 @@ export const useChatSocket = ({
           return {
             ...page,
             items: page.items.map((item: MessageWithSenderWithFile) => {
-              if (item.id === message.id) return message;
+              if (item?.id === message?.id) {
+                if (message?.option === OptionDeleteMessageEnum.terminate)
+                  return null;
+                return message;
+              }
               return item;
             }),
           };

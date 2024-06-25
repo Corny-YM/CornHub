@@ -47,8 +47,6 @@ export const useChatScroll = ({
       return distanceFromBottom <= 100;
     };
 
-    console.log(shouldAutoScroll());
-
     if (shouldAutoScroll()) {
       setTimeout(() => {
         bottomRef.current?.scrollIntoView({
