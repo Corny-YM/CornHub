@@ -58,6 +58,7 @@ model User {
   conversations         Conversation[]       @relation("UserToConversation")
   messages              Message[]            @relation("UserToMessage")
   conversationMembers   ConversationMember[] @relation("UserToConversationMember")
+  messageReactions      MessageReaction[]    @relation("UserToMessageReaction")
 
   @@map("users")
 }
@@ -497,8 +498,29 @@ model Message {
   sender_id String
   sender    User   @relation("UserToMessage", fields: [sender_id], references: [id])
 
+  messageReactions MessageReaction[] @relation("MessageToMessageReaction")
+
   @@index([file_id])
   @@index([sender_id])
   @@index([conversation_id])
   @@map("messages")
+}
+
+model MessageReaction {
+  id         Int      @id @default(autoincrement())
+  type       String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // relation
+  message_id Int
+  message    Message @relation("MessageToMessageReaction", fields: [message_id], references: [id])
+
+  user_id String
+  user    User   @relation("UserToMessageReaction", fields: [user_id], references: [id])
+
+  @@unique([message_id, user_id])
+  @@index([user_id])
+  @@index([message_id])
+  @@map("message_reactions")
 }

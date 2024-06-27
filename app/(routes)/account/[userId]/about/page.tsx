@@ -28,7 +28,7 @@ const UserAboutPage = () => {
 
   const { userDetails } = accountData;
 
-  const infoDetails = useMemo(() => userDetails?.[0], []);
+  const infoDetails = useMemo(() => userDetails?.[0], [userDetails]);
 
   // Gender
   const iconGender = useMemo(() => {

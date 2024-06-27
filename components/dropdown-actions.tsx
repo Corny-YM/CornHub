@@ -23,6 +23,7 @@ interface Props {
   disabled?: boolean;
   icon: React.ReactNode;
   actions: IDropdownAction[];
+  menuSide?: "top" | "right" | "bottom" | "left";
   align?: "end" | "center" | "start" | undefined;
   size?: "icon" | "default" | "sm" | "lg" | null;
   onOpenChange?: (val?: boolean) => void;
@@ -30,11 +31,12 @@ interface Props {
 
 export const DropdownActions = ({
   icon,
-  align = "end",
-  size = "icon",
   actions,
   disabled,
   className,
+  size = "icon",
+  align = "end",
+  menuSide = "bottom",
   onOpenChange,
 }: Props) => {
   return (
@@ -56,6 +58,7 @@ export const DropdownActions = ({
       <DropdownMenuContent
         className="z-[999999] flex flex-col gap-y-2 p-2"
         align={align}
+        side={menuSide}
       >
         {actions.map(
           (

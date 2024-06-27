@@ -15,6 +15,8 @@ interface Props {
   children: React.ReactNode;
   disableHoverableContent?: boolean;
   side?: "top" | "right" | "bottom" | "left";
+  open?: boolean;
+  onOpenChange?: (val?: boolean) => void;
 }
 
 export const TooltipButton = ({
@@ -24,13 +26,17 @@ export const TooltipButton = ({
   side = "top",
   delayDuration = 250,
   disableHoverableContent,
+  open,
+  onOpenChange,
 }: Props) => {
   return (
     <TooltipProvider>
       {/* ms */}
       <Tooltip
+        open={open}
         delayDuration={delayDuration}
         disableHoverableContent={disableHoverableContent}
+        onOpenChange={onOpenChange}
       >
         <TooltipTrigger asChild>{button}</TooltipTrigger>
         <TooltipContent side={side} className={cn(className)}>

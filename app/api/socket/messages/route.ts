@@ -32,7 +32,12 @@ export async function PUT(req: Request, res: NextApiResponseServerIo) {
     });
 
     const message = await prisma.message.create({
-      include: { sender: true, file: true },
+      include: {
+        sender: true,
+        file: true,
+        messageReactions: true,
+        _count: { select: { messageReactions: true } },
+      },
       data: {
         conversation_id: conversation.id,
         sender_id: userId,

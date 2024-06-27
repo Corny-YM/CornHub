@@ -2,31 +2,37 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useCallback, useMemo } from "react";
 import { User } from "@prisma/client";
-import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import { useCallback, useMemo } from "react";
 import { CircleUserRound, Ellipsis, UserRoundX } from "lucide-react";
 
+import { useConversationContext } from "@/providers/conversation-provider";
 import DropdownActions, {
   IDropdownAction,
 } from "@/components/dropdown-actions";
 import NoAvatar from "@/public/no-avatar.jpg";
-import { useConversationContext } from "@/providers/conversation-provider";
+import { emotionIcons } from "@/lib/const";
 
 interface Props {
   data: User;
+  type?: string;
+  isReaction?: boolean;
 }
 
-const CardMember = ({ data }: Props) => {
+const CardMember = ({ data, type, isReaction }: Props) => {
   const router = useRouter();
-  const { userId } = useAuth();
 
   const { isOwner } = useConversationContext();
 
   const handleUserProfile = useCallback(() => {
     router.push(`/account/${data.id}`);
   }, [data]);
+
+  const Icon = useMemo(() => {
+    if (!type || !isReaction || !emotionIcons[type]) return;
+    return emotionIcons[type];
+  }, [type, isReaction]);
 
   const actions = useMemo(() => {
     const arr: IDropdownAction[] = [
@@ -65,11 +71,21 @@ const CardMember = ({ data }: Props) => {
         {data.full_name}
       </Link>
       <div className="flex justify-center items-center h-full">
-        <DropdownActions
-          className="hover:bg-primary/50"
-          actions={actions}
-          icon={<Ellipsis />}
-        />
+        {!!Icon && (
+          <div
+            data-type={type}
+            className="w-10 h-10 flex justify-center items-center rounded-full overflow-hidden border border-solid cursor-pointer transition-all hover:scale-110"
+          >
+            <Icon />
+          </div>
+        )}
+        {!isReaction && (
+          <DropdownActions
+            className="hover:bg-primary/50"
+            actions={actions}
+            icon={<Ellipsis />}
+          />
+        )}
       </div>
     </div>
   );

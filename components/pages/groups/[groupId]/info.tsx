@@ -70,7 +70,7 @@ const Info = () => {
       <div
         key={item.id}
         className="friends-icon"
-        style={{ zIndex: length - index }}
+        style={{ zIndex: length - index + 5 }}
       >
         <Image
           className="w-full h-full"

@@ -39,11 +39,10 @@ const Info = () => {
       <Link
         key={id}
         className="friends-icon"
-        target="_blank"
         href={`/account/${id}`}
-        style={{ zIndex: length - index }}
+        style={{ zIndex: length - index + 5 }}
       >
-        <AvatarImg src={avatar} alt={full_name} />
+        <AvatarImg className="w-full h-full" src={avatar} alt={full_name} />
       </Link>
     ));
   }, [dataFriends, isLoadingFriends, accountFriends]);

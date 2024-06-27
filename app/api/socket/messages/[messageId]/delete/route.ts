@@ -43,14 +43,21 @@ export async function POST(
       }
     }
 
+    const include = {
+      sender: true,
+      file: true,
+      messageReactions: true,
+      _count: { select: { messageReactions: true } },
+    };
+
     if (type === "terminate") {
       message = await prisma.message.delete({
-        include: { file: true },
+        include: include,
         where: { id: message.id },
       });
     } else {
       message = await prisma.message.update({
-        include: { file: true },
+        include: include,
         where: { id: message.id },
         data: {
           content: "Tin nhắn đã bị thu hồi",

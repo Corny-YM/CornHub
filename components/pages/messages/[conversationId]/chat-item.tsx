@@ -1,40 +1,45 @@
 "use client";
 
 import toast from "react-hot-toast";
-import {
-  Smile,
-  Trash,
-  Pencil,
-  ClipboardCopy,
-  EllipsisVertical,
-} from "lucide-react";
 import { useCallback, useMemo } from "react";
-import { Message, User, File as IFile } from "@prisma/client";
+import { Trash, ClipboardCopy, EllipsisVertical } from "lucide-react";
 
+import { IMessage } from "@/actions/message";
 import { useToggle } from "@/hooks/useToggle";
 import { TypeFileEnum } from "@/lib/enum";
-import { cn, formatToLocaleDate } from "@/lib/utils";
-import { emotionIcons, emotions } from "@/lib/const";
+import { cn, formatAmounts, formatToLocaleDate } from "@/lib/utils";
+import { emotionIcons } from "@/lib/const";
 import DropdownActions, {
   IDropdownAction,
 } from "@/components/dropdown-actions";
-import { Button } from "@/components/ui/button";
 import AvatarImg from "@/components/avatar-img";
 import TooltipButton from "@/components/tooltip-button";
 import ModalDelete from "./modal-delete";
+import PopoverReactions from "./popover-reactions";
+import ModalReacted from "./modal-reacted";
 
 interface Props {
-  data?: Message & { sender: User; file?: IFile };
+  data?: IMessage;
   isOwner?: boolean;
 }
 
 const ChatItem = ({ data, isOwner }: Props) => {
   if (!data) return null;
-  const Icon = emotionIcons.smile;
 
-  const { sender, file, file_id, content, deleted, updated_at } = data;
-  const [actionPopup, toggleActionPopup] = useToggle(false);
-  const [modalDelete, toggleModalDelete] = useToggle(false);
+  const {
+    file,
+    sender,
+    _count,
+    file_id,
+    content,
+    deleted,
+    updated_at,
+    messageReactions,
+  } = data;
+
+  const [actionPopup, toggleActionPopup] = useToggle();
+  const [modalDelete, toggleModalDelete] = useToggle();
+  const [modalReacted, toggleModalReacted] = useToggle();
 
   const handleCopy = useCallback(() => {
     if (!content || file_id) return;
@@ -50,6 +55,17 @@ const ChatItem = ({ data, isOwner }: Props) => {
     return file?.type === TypeFileEnum.video;
   }, [file]);
 
+  const arrEmoted = useMemo(
+    () =>
+      messageReactions.reduce((obj, item) => {
+        const tmp = obj[item.type] || 0;
+        const total = tmp + 1;
+        return { ...obj, [item.type]: total };
+      }, {} as Record<string, number>),
+    [messageReactions]
+  );
+  const emotionKeys = useMemo(() => Object.keys(arrEmoted), [arrEmoted]);
+
   const actions = useMemo(() => {
     const arr: IDropdownAction[] = [];
 
@@ -62,12 +78,6 @@ const ChatItem = ({ data, isOwner }: Props) => {
     }
 
     if (isOwner) {
-      if (!deleted) {
-        arr.push({
-          label: "Chỉnh sửa",
-          icon: <Pencil className="mr-2" size={16} />,
-        });
-      }
       arr.push({
         label: "Xóa",
         destructive: true,
@@ -95,7 +105,7 @@ const ChatItem = ({ data, isOwner }: Props) => {
     return (
       <div
         className={cn(
-          "max-w-96 break-words rounded-lg bg-primary-foreground px-3 py-2 leading-normal",
+          "max-w-96 break-words rounded-lg bg-zinc-400/50 dark:bg-primary-foreground px-3 py-2 leading-normal",
           deleted && "rounded-full italic text-zinc-500 dark:text-zinc-400"
         )}
       >
@@ -140,16 +150,34 @@ const ChatItem = ({ data, isOwner }: Props) => {
           <div className="text-xs">{formatToLocaleDate(updated_at)}</div>
         </TooltipButton>
         {/* Reactions */}
-        <div className="absolute right-0 bottom-0 translate-y-1/2">
-          <div className="flex items-center px-1 py-[2px] rounded-full bg-primary-foreground/50">
-            <div className="flex justify-center items-center w-4 h-4">
-              <Icon />
-            </div>
-            <div className="flex justify-center items-center w-4 h-4">
-              <Icon />
+        {!!emotionKeys.length && (
+          <div className="absolute right-0 -bottom-2 translate-y-1/2">
+            <div
+              className="flex items-center px-2 py-[2px] rounded-full bg-primary/50 cursor-pointer"
+              onClick={() => toggleModalReacted(true)}
+            >
+              <div className="flex items-center">
+                {emotionKeys.map((key) => {
+                  const Icon = emotionIcons[key];
+                  if (!Icon) return null;
+                  return (
+                    <div
+                      key={key}
+                      className="flex justify-center items-center w-4 h-4"
+                    >
+                      <Icon />
+                    </div>
+                  );
+                })}
+              </div>
+              {!!_count.messageReactions && (
+                <div className="leading-normal ml-1">
+                  {formatAmounts(_count.messageReactions)}
+                </div>
+              )}
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Actions */}
@@ -159,30 +187,7 @@ const ChatItem = ({ data, isOwner }: Props) => {
           actionPopup && "opacity-100"
         )}
       >
-        {!deleted && (
-          <TooltipButton
-            delayDuration={100}
-            className="rounded-full"
-            button={
-              <Button className="rounded-full" variant="ghost" size="icon">
-                <Smile size={16} />
-              </Button>
-            }
-          >
-            <div className="flex items-center justify-center gap-1">
-              {emotions.map(({ label, type, icon: Icon }) => (
-                <div
-                  key={label}
-                  data-type={type}
-                  className="w-10 h-10 flex justify-center items-center rounded-full overflow-hidden border border-solid cursor-pointer transition-all hover:scale-110"
-                  // onClick={() => {}}
-                >
-                  <Icon />
-                </div>
-              ))}
-            </div>
-          </TooltipButton>
-        )}
+        {!deleted && <PopoverReactions message={data} />}
 
         {/* <Button className="rounded-full" variant="ghost" size="icon">
           <CornerUpLeft size={16} />
@@ -190,8 +195,9 @@ const ChatItem = ({ data, isOwner }: Props) => {
 
         <DropdownActions
           className="!ring-0 !ring-offset-0"
-          icon={<EllipsisVertical size={16} />}
+          menuSide="top"
           actions={actions}
+          icon={<EllipsisVertical size={16} />}
           onOpenChange={toggleActionPopup}
         />
 
@@ -199,6 +205,13 @@ const ChatItem = ({ data, isOwner }: Props) => {
           message={data}
           open={modalDelete}
           onOpenChange={toggleModalDelete}
+        />
+
+        <ModalReacted
+          message={data}
+          reactionTypes={arrEmoted}
+          open={modalReacted}
+          onOpenChange={toggleModalReacted}
         />
       </div>
     </div>

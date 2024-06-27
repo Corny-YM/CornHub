@@ -74,7 +74,6 @@ const ReactionsModal = ({
     const target = e.currentTarget as HTMLButtonElement;
     const type = target.dataset.type;
     if (!type) return;
-    console.log(type);
     setCurrentType(type);
   }, []);
 
@@ -100,7 +99,7 @@ const ReactionsModal = ({
           key={type}
           className={cn(
             currentType === type &&
-              "bg-primary-foreground hover:bg-primary-foreground/90"
+              "bg-primary hover:bg-primary dark:bg-primary-foreground dark:hover:bg-primary-foreground/90"
           )}
           data-type={type}
           variant="outline"
@@ -160,7 +159,7 @@ const ReactionsModal = ({
                 <Button
                   className={cn(
                     currentType === defaultType &&
-                      "bg-primary-foreground hover:bg-primary-foreground/90"
+                      "bg-primary hover:bg-primary dark:bg-primary-foreground dark:hover:bg-primary-foreground/90"
                   )}
                   data-type={defaultType}
                   variant="outline"

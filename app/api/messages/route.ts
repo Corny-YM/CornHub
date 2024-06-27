@@ -23,20 +23,27 @@ export async function GET(req: Request) {
 
     let messages: Message[] = [];
 
+    const include = {
+      sender: true,
+      file: true,
+      messageReactions: true,
+      _count: { select: { messageReactions: true } },
+    };
+
     if (cursor) {
       messages = await prisma.message.findMany({
         take: MESSAGE_BATCH,
         skip: 1,
         cursor: { id: +cursor },
         where: { conversation_id: conversationId },
-        include: { sender: true, file: true },
+        include: include,
         orderBy: { created_at: "desc" },
       });
     } else {
       messages = await prisma.message.findMany({
         take: MESSAGE_BATCH,
         where: { conversation_id: conversationId },
-        include: { sender: true, file: true },
+        include: include,
         orderBy: { created_at: "desc" },
       });
     }
