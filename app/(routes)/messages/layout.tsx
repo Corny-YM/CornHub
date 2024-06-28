@@ -14,6 +14,7 @@ const MessagesLayout = async ({ children }: Props) => {
   const { userId } = auth();
   if (!userId) redirect("/sign-in");
 
+  // TODO: get conversations using tanstack
   const conversations = await prisma.conversation.findMany({
     include: { file: true, user: true, createdBy: true },
     where: {

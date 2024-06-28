@@ -440,6 +440,7 @@ model Conversation {
   emoji_id         String? // for GROUP chat
   emoji_skin       String? // for GROUP chat
   type             String   @default("group")
+  active           Int      @default(1) @db.TinyInt
   last_message     String   @default("")
   last_time_online DateTime @default(now())
   created_at       DateTime @default(now())

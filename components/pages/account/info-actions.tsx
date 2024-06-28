@@ -174,6 +174,10 @@ const InfoActions = () => {
     mutateUnFollow({ userId, followerId: accountData.id });
   }, [userId, accountData, mutateUnFollow]);
 
+  const handleClickMessage = useCallback(() => {
+    window.open(`/messages/${accountData.id}`, "_blank");
+  }, [accountData]);
+
   // useMemo
   const btnActions = useMemo(() => {
     const actions: IAction[] = [];
@@ -254,6 +258,7 @@ const InfoActions = () => {
           label: "Nhắn tin",
           icon: MessageCircle,
           primary: !!dataFriendStatus.friend,
+          onClick: handleClickMessage,
         }
       );
     } else {
@@ -279,6 +284,7 @@ const InfoActions = () => {
     handleUnfollow,
     handleUnfriend,
     handleFollowing,
+    handleClickMessage,
     handleSendFriendRequest,
     handleRemoveFriendRequest,
     handleAcceptFriendRequest,
