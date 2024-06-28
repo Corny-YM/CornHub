@@ -2,11 +2,20 @@ import toast from "react-hot-toast";
 import { useCallback } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { Conversation, Message } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
+import { Conversation, Message } from "@prisma/client";
 
-import { destroyMessage } from "@/actions/message";
-import { IStoreData, store } from "@/actions/conversation";
+import {
+  store as storeConversation,
+  IStoreData as IStoreDataConversation,
+} from "@/actions/conversation";
+import {
+  destroyMessage,
+  reactionMessage,
+  store as storeMessage,
+  destroyReactionMessage,
+  IStoreData as IStoreDataMessage,
+} from "@/actions/message";
 
 export const useMutates = () => {
   const router = useRouter();
@@ -17,13 +26,25 @@ export const useMutates = () => {
     isPending: isPendingStoreConversation,
   } = useMutation({
     mutationKey: ["conversation", "store", userId],
-    mutationFn: store,
+    mutationFn: storeConversation,
     onSuccess() {
       toast.success("Tạo cuộc hội thoại thành công");
       router.refresh();
     },
     onError() {
       toast.error("Tạo cuộc hội thoại thất bại. Vui lòng thử lại sau");
+    },
+  });
+
+  const {
+    mutateAsync: mutateAsyncStoreMessage,
+    isPending: isPendingStoreMessage,
+  } = useMutation({
+    mutationKey: ["send", "message", "store"],
+    mutationFn: storeMessage,
+    onSuccess() {},
+    onError() {
+      toast.error("Gửi tin nhắn thất bại. Vui lòng thử lại sau");
     },
   });
 
@@ -42,13 +63,50 @@ export const useMutates = () => {
     },
   });
 
+  const {
+    mutateAsync: mutateAsyncStoreReaction,
+    isPending: isPendingStoreReaction,
+  } = useMutation({
+    mutationKey: ["message", "reaction", "store"],
+    mutationFn: reactionMessage,
+    onError() {
+      toast.error("Thả tương tác tin nhắn thất bại. Vui lòng thử lại sau");
+    },
+  });
+
+  const {
+    mutateAsync: mutateAsyncDeleteReaction,
+    isPending: isPendingDeleteReaction,
+  } = useMutation({
+    mutationKey: ["message", "reaction", "delete"],
+    mutationFn: destroyReactionMessage,
+    onError() {
+      toast.error("Gỡ bỏ tương tác tin nhắn thất bại. Vui lòng thử lại sau");
+    },
+  });
+
   const onStoreConversation = useCallback(
-    async (data: IStoreData, callback?: (val: Conversation) => void | null) => {
+    async (
+      data: IStoreDataConversation,
+      callback?: (val: Conversation) => void | null
+    ) => {
       const { name, ids } = data;
       if (!name) return;
       await mutateAsyncStoreConversation({ name, ids: ids || [] }).then((res) =>
         callback?.(res)
       );
+    },
+    []
+  );
+
+  const onStoreMessage = useCallback(
+    async (
+      data: IStoreDataMessage,
+      callback?: (val: Message) => void | null
+    ) => {
+      const { conversationId, content, file } = data;
+      if (!conversationId || (!content && !file)) return;
+      await mutateAsyncStoreMessage(data).then((res) => callback?.(res));
     },
     []
   );
@@ -65,10 +123,40 @@ export const useMutates = () => {
     []
   );
 
+  const onStoreReaction = useCallback(
+    async (
+      data: { id: number; type: string; conversationId: string },
+      callback?: (val: Message) => void | null
+    ) => {
+      const { conversationId, id, type } = data;
+      if (!id || !type || !conversationId) return;
+      await mutateAsyncStoreReaction(data).then((res) => callback?.(res));
+    },
+    []
+  );
+
+  const onDeleteReaction = useCallback(
+    async (
+      data: { reactionId: number; messageId: number; conversationId: string },
+      callback?: (val: Message) => void | null
+    ) => {
+      const { conversationId, messageId, reactionId } = data;
+      if (!messageId || !reactionId || !conversationId) return;
+      await mutateAsyncDeleteReaction(data).then((res) => callback?.(res));
+    },
+    []
+  );
+
   return {
     isPendingStoreConversation,
+    isPendingDeleteReaction,
     isPendingDeleteMessage,
+    isPendingStoreReaction,
+    isPendingStoreMessage,
     onStoreConversation,
+    onDeleteReaction,
     onDeleteMessage,
+    onStoreReaction,
+    onStoreMessage,
   } as const;
 };

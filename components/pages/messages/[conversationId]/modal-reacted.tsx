@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useCallback, useMemo, useState } from "react";
 
+import { emotions } from "@/lib/const";
 import { cn, formatAmounts } from "@/lib/utils";
 import { IMessage, getReactions } from "@/actions/message";
 import {
@@ -13,12 +14,10 @@ import {
   DialogOverlay,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import Loading from "@/components/icons/loading";
 import EmptyData from "@/components/empty-data";
 import CardMember from "./card-member";
-import { emotionIcons, emotions } from "@/lib/const";
 
 interface Props {
   open: boolean;
@@ -37,8 +36,8 @@ const ModalReacted = ({
 }: Props) => {
   const [currentType, setCurrentType] = useState(defaultType);
 
-  const { data, isLoading } = useQuery({
-    enabled: !!message.id,
+  const { data, isLoading, refetch } = useQuery({
+    enabled: !!message.id && open,
     queryKey: ["mesage", "reactions", message.id, currentType],
     queryFn: () => getReactions(message.id, { type: currentType }),
   });
@@ -87,7 +86,13 @@ const ModalReacted = ({
       );
     if (!data || !data.length) return <EmptyData />;
     return data.map((item) => (
-      <CardMember key={item.id} isReaction type={item.type} data={item.user} />
+      <CardMember
+        key={item.id}
+        data={item.user}
+        type={item.type}
+        messageReaction={item}
+        refetch={refetch}
+      />
     ));
   }, [data, isLoading]);
 

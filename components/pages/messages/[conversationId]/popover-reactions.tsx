@@ -2,16 +2,15 @@ import { Smile } from "lucide-react";
 import React, { useCallback } from "react";
 
 import { emotions } from "@/lib/const";
+import { IMessage } from "@/actions/message";
 import { useToggle } from "@/hooks/useToggle";
+import { useMutates } from "@/hooks/mutations/message/useMutates";
+import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { useMutation } from "@tanstack/react-query";
-import { IMessage, reactionMessage } from "@/actions/message";
-import toast from "react-hot-toast";
 
 interface Props {
   message: IMessage;
@@ -20,25 +19,22 @@ interface Props {
 const PopoverReactions = ({ message }: Props) => {
   const [open, toggleOpen] = useToggle(false);
 
-  const { mutate, isPending } = useMutation({
-    mutationKey: ["message", "reaction", message.id],
-    mutationFn: reactionMessage,
-    onError() {
-      toast.error("Thả tương tác tin nhắn thất bại. Vui lòng thử lại sau");
-    },
-  });
+  const { onStoreReaction, isPendingStoreReaction } = useMutates();
 
   const handleClickReact = useCallback(
-    (e: React.MouseEvent) => {
+    async (e: React.MouseEvent) => {
       const target = e.currentTarget as HTMLDivElement;
       const type = target.dataset.type;
       if (!type) return;
       toggleOpen(false);
-      mutate({
-        type,
-        id: message.id,
-        conversationId: message.conversation_id,
-      });
+      await onStoreReaction(
+        {
+          type,
+          id: message.id,
+          conversationId: message.conversation_id,
+        },
+        () => {}
+      );
     },
     [message]
   );
@@ -50,7 +46,7 @@ const PopoverReactions = ({ message }: Props) => {
           className="rounded-full"
           variant="ghost"
           size="icon"
-          disabled={isPending}
+          disabled={isPendingStoreReaction}
           onClick={() => toggleOpen(true)}
         >
           <Smile size={16} />

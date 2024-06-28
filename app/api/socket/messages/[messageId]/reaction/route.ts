@@ -1,5 +1,3 @@
-import path from "path";
-import fs from "node:fs/promises";
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 
@@ -22,6 +20,7 @@ export async function GET(
         message_id: +params.messageId,
         ...(type && type !== "all" && { type: type }),
       },
+      orderBy: { updated_at: "desc" },
     });
 
     return NextResponse.json(messageReactions);
@@ -85,6 +84,62 @@ export async function POST(
     const conversationKey = `conversation:${conversationId}:messages:update`;
 
     global.io.emit(conversationKey, { ...message, option: type });
+
+    return NextResponse.json(message);
+  } catch (err) {
+    console.error("[MESSAGE_REACTION_POST]", err);
+    return new NextResponse("Internal error", { status: 500 });
+  }
+}
+
+export async function DELETE(
+  req: Request,
+  { params }: { params: { messageId: string } }
+) {
+  try {
+    const { userId } = auth();
+    if (!userId) return new NextResponse("Unauthorized", { status: 401 });
+
+    const body: { conversationId: string; reactionId: number } =
+      await req.json();
+    const { conversationId, reactionId } = body;
+
+    if (!reactionId)
+      return new NextResponse("Reaction ID is required", { status: 404 });
+
+    if (!conversationId)
+      return new NextResponse("Conversation ID is required", { status: 404 });
+
+    const conversation = await prisma.conversation.findFirst({
+      where: { id: conversationId },
+    });
+    if (!conversation)
+      return new NextResponse("Conversation does not exist", { status: 404 });
+
+    let message = await prisma.message.findFirst({
+      where: { id: +params.messageId },
+    });
+
+    if (!message)
+      return new NextResponse("Message does not exist", { status: 404 });
+
+    await prisma.messageReaction.delete({
+      where: { id: +reactionId },
+    });
+
+    message = await prisma.message.findFirst({
+      include: {
+        sender: true,
+        file: true,
+        messageReactions: true,
+        _count: { select: { messageReactions: true } },
+      },
+      where: { id: +params.messageId },
+    });
+
+    const conversationKey = `conversation:${conversationId}:messages:update`;
+
+    global.io.emit(conversationKey, message);
 
     return NextResponse.json(message);
   } catch (err) {

@@ -37,6 +37,13 @@ export const store = async (data: IStoreData): Promise<Message> => {
   return await defHttp.put(`socket/${indexApi}/`, formData);
 };
 
+export const destroyMessage = async (data: {
+  id: number;
+  type: string;
+  conversationId: string;
+}): Promise<Message> =>
+  defHttp.post(`socket/${indexApi}/${data.id}/delete`, data);
+
 export const getReactions = async (
   id: number,
   params?: any
@@ -50,9 +57,14 @@ export const reactionMessage = async (data: {
 }): Promise<Message> =>
   defHttp.post(`socket/${indexApi}/${data.id}/reaction`, data);
 
-export const destroyMessage = async (data: {
-  id: number;
-  type: string;
+export const destroyReactionMessage = async (data: {
+  reactionId: number;
+  messageId: number;
   conversationId: string;
 }): Promise<Message> =>
-  defHttp.post(`socket/${indexApi}/${data.id}/delete`, data);
+  defHttp.delete(`socket/${indexApi}/${data.messageId}/reaction`, {
+    data: {
+      reactionId: data.reactionId,
+      conversationId: data.conversationId,
+    },
+  });
