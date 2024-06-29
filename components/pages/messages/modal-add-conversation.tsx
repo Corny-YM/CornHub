@@ -37,7 +37,7 @@ const ModalAddConversation = ({ open, onOpenChange }: Props) => {
       isPendingStoreConversation ||
       !name.trim() ||
       !Object.keys(selectedIds).length,
-    [isPendingStoreConversation, name]
+    [isPendingStoreConversation, name, selectedIds]
   );
 
   const handleChange = useCallback((e: React.ChangeEvent) => {

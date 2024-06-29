@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 
 import prisma from "@/lib/prisma";
+import { TypeConversationEnum } from "@/lib/enum";
 
 export async function GET(
   req: Request,
@@ -46,7 +47,13 @@ export async function POST(
     if (!conversationId)
       return new NextResponse("Conversation ID is required", { status: 404 });
 
-    const conversation = await prisma.conversation.findFirst({
+    let conversation = await prisma.conversation.findFirst({
+      include: {
+        file: true,
+        user: true,
+        createdBy: true,
+        conversationMembers: true,
+      },
       where: { id: conversationId },
     });
     if (!conversation)
@@ -59,7 +66,8 @@ export async function POST(
     if (!message)
       return new NextResponse("Message does not exist", { status: 404 });
 
-    await prisma.messageReaction.upsert({
+    const messageReaction = await prisma.messageReaction.upsert({
+      include: { user: true },
       where: {
         message_id_user_id: { message_id: message.id, user_id: userId },
       },
@@ -81,8 +89,36 @@ export async function POST(
       where: { id: +params.messageId },
     });
 
-    const conversationKey = `conversation:${conversationId}:messages:update`;
+    const lastMessage =
+      conversation.type === TypeConversationEnum.group
+        ? `${messageReaction.user.full_name}: đã bày tỏ cảm xúc`
+        : "Đã bày tỏ cảm xúc";
 
+    conversation = await prisma.conversation.update({
+      include: {
+        file: true,
+        user: true,
+        createdBy: true,
+        conversationMembers: true,
+      },
+      where: { id: conversation.id },
+      data: {
+        last_message: lastMessage,
+        last_time_online: new Date(),
+      },
+    });
+
+    // Emit for conversation
+    const memberIds =
+      conversation.type === TypeConversationEnum.group
+        ? conversation.conversationMembers.map((item) => item.member_id)
+        : [conversation.user_id, conversation.created_by];
+    memberIds.forEach((id) => {
+      global.io.emit(`${id}:conversation:list:update`, conversation);
+    });
+
+    // Emit for message
+    const conversationKey = `conversation:${conversationId}:messages:update`;
     global.io.emit(conversationKey, { ...message, option: type });
 
     return NextResponse.json(message);

@@ -1,18 +1,16 @@
 import { NextResponse } from "next/server";
-import { currentUser } from "@clerk/nextjs/server";
 
 import prisma from "@/lib/prisma";
+import { auth } from "@clerk/nextjs/server";
 
 export async function GET(
   req: Request,
   { params }: { params: { userId: string } }
 ) {
   try {
-    const clerkUser = await currentUser();
+    const { userId } = auth();
 
-    if (!clerkUser) {
-      return new NextResponse("Unauthenticated", { status: 401 });
-    }
+    if (!userId) return new NextResponse("Unauthenticated", { status: 401 });
 
     const posts = await prisma.post.findMany({
       include: {
@@ -20,7 +18,7 @@ export async function GET(
         group: true,
         file: true,
         reactions: {
-          where: { user_id: clerkUser.id, comment_id: null, reply_id: null },
+          where: { user_id: userId, comment_id: null, reply_id: null },
           take: 1,
         },
         _count: {

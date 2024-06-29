@@ -55,6 +55,10 @@ export async function POST(
       })),
     });
 
+    ids.forEach((id) => {
+      global.io.emit(`${id}:conversation:list`, conversation);
+    });
+
     return NextResponse.json(res);
   } catch (err) {
     console.log("[CONVERSATION_ID_MEMBERS_POST]", err);

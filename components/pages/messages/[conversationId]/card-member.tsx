@@ -6,7 +6,7 @@ import { MessageReaction, User } from "@prisma/client";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
-import { CircleUserRound, Ellipsis, UserRoundX } from "lucide-react";
+import { CircleUserRound, DoorOpen, Ellipsis, UserRoundX } from "lucide-react";
 
 import { emotionIcons } from "@/lib/const";
 import { useMutates } from "@/hooks/mutations/message/useMutates";
@@ -15,6 +15,7 @@ import DropdownActions, {
   IDropdownAction,
 } from "@/components/dropdown-actions";
 import NoAvatar from "@/public/no-avatar.jpg";
+import AvatarImg from "@/components/avatar-img";
 
 interface Props {
   data: User;
@@ -59,7 +60,7 @@ const CardMember = ({ data, type, messageReaction, refetch }: Props) => {
 
   const handleUserProfile = useCallback(() => {
     router.push(`/account/${data.id}`);
-  }, [data]);
+  }, [data, router]);
 
   const Icon = useMemo(() => {
     if (!type || !messageReaction || !emotionIcons[type]) return;
@@ -75,26 +76,27 @@ const CardMember = ({ data, type, messageReaction, refetch }: Props) => {
       },
     ];
 
-    if (isOwner)
+    if (isOwner && userId !== data.id)
       arr.push({
         destructive: true,
         label: "Xóa thành viên",
         icon: <UserRoundX className="mr-2" size={20} />,
       });
+    if (userId === data.id) {
+      arr.push({
+        destructive: true,
+        label: "Rời nhóm",
+        icon: <DoorOpen className="mr-2" size={20} />,
+      });
+    }
 
     return arr;
-  }, [isOwner, handleUserProfile]);
+  }, [isOwner, userId, data, handleUserProfile]);
 
   return (
     <div className="w-full min-h-11 flex items-center p-2 rounded-lg overflow-hidden shadow-lg dark:bg-neutral-800/50 bg-[#f0f2f5]">
       <div className="relative flex justify-center items-center w-14 h-14 rounded-full overflow-hidden">
-        <Image
-          className="absolute w-full h-full"
-          src={data.avatar || NoAvatar}
-          alt={data.full_name || "member-avatar"}
-          fill
-          sizes="w-14"
-        />
+        <AvatarImg className="w-full h-full" src={data.avatar} />
       </div>
       <div className="flex-1 px-3 leading-normal">
         <Link
@@ -105,6 +107,9 @@ const CardMember = ({ data, type, messageReaction, refetch }: Props) => {
         </Link>
         {!!messageReaction && userId === data.id && (
           <div className="italic text-xs">Nhấn biểu tượng để gỡ</div>
+        )}
+        {!messageReaction && conversationData.created_by === data.id && (
+          <div className="italic text-xs">Quản trị viên</div>
         )}
       </div>
       <div className="flex justify-center items-center h-full">

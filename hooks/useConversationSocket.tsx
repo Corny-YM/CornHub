@@ -1,34 +1,33 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { File as IFile, Message, User } from "@prisma/client";
+import { Conversation, File as IFile, User } from "@prisma/client";
 
-import { OptionDeleteMessageEnum } from "@/lib/enum";
 import { useSocket } from "@/providers/socket-provider";
 
-type ChatSocketProps = {
+type Props = {
   addKey: string;
   updateKey: string;
   queryKey: string;
 };
 
-type MessageWithSenderWithFile = Record<string, any> &
-  Message & {
-    sender: User;
-    file?: IFile;
-  };
+type ConversationType = Conversation & {
+  file?: IFile;
+  user?: User;
+  createdBy: User;
+};
 
-export const useChatSocket = ({
+export const useConversationSocket = ({
   addKey,
   updateKey,
   queryKey,
-}: ChatSocketProps) => {
-  const { socket } = useSocket();
+}: Props) => {
   const queryClient = useQueryClient();
+  const { socket } = useSocket();
 
   useEffect(() => {
     if (!socket) return;
 
-    socket.on(updateKey, (message: MessageWithSenderWithFile) => {
+    socket.on(updateKey, (conversation: ConversationType) => {
       queryClient.setQueryData([queryKey], (oldData: any) => {
         if (!oldData || !oldData.pages || oldData.pages.length === 0)
           return oldData;
@@ -36,14 +35,13 @@ export const useChatSocket = ({
         const newData = oldData.pages.map((page: any) => {
           return {
             ...page,
-            items: page.items.map((item: MessageWithSenderWithFile) => {
-              if (item?.id === message?.id) {
-                if (message?.option === OptionDeleteMessageEnum.terminate)
-                  return null;
-                return message;
-              }
-              return item;
-            }),
+            items: [
+              conversation,
+              ...page.items.map((item: ConversationType) => {
+                if (item?.id === conversation?.id) return null;
+                return item;
+              }),
+            ],
           };
         });
 
@@ -51,13 +49,13 @@ export const useChatSocket = ({
       });
     });
 
-    socket.on(addKey, (message: MessageWithSenderWithFile) => {
+    socket.on(addKey, (conversation: ConversationType) => {
       queryClient.setQueryData([queryKey], (oldData: any) => {
         if (!oldData || !oldData.pages || oldData.pages.length === 0)
           return {
             pages: [
               {
-                items: [message],
+                items: [conversation],
               },
             ],
           };
@@ -65,7 +63,7 @@ export const useChatSocket = ({
         const newData = [...oldData.pages];
         newData[0] = {
           ...newData[0],
-          items: [message, ...newData[0].items],
+          items: [conversation, ...newData[0].items],
         };
 
         return {

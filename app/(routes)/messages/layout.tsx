@@ -32,7 +32,7 @@ const MessagesLayout = async ({ children }: Props) => {
 
       <MessageProvider>
         <div className="flex-1 w-full h-full max-h-full flex relative pt-14">
-          <SidebarLeft conversations={conversations} />
+          <SidebarLeft />
 
           {/* Content */}
           {children}

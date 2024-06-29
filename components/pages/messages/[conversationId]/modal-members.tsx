@@ -74,8 +74,8 @@ const ModalMembers = ({ open, onOpenChange }: Props) => {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 h-ful flex flex-col">
-          <ScrollArea className="h-[600px] -mx-6 px-6">
+        <div className="flex-1 h-full flex flex-col">
+          <ScrollArea className="max-h-[500px] -mx-6 px-6">
             <div className="space-y-2">{content}</div>
           </ScrollArea>
         </div>
