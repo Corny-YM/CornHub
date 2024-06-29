@@ -18,6 +18,10 @@ export interface IStoreData {
   name: string;
   ids?: string[];
 }
+export interface IUpdateData extends Record<string, any> {
+  name?: string;
+  file?: File;
+}
 
 export const index = async (data: {
   cursor: any;
@@ -27,6 +31,20 @@ export const index = async (data: {
 export const store = async (data: IStoreData): Promise<IConversation> =>
   await defHttp.post(`${indexApi}`, data);
 
+export const update = async ({
+  id,
+  data,
+}: {
+  id: string;
+  data: IUpdateData;
+}): Promise<IConversation> => {
+  const formData = new FormData();
+  Object.keys(data).forEach((key) => {
+    const value = data?.[key];
+    formData.append(key, value);
+  });
+  return await defHttp.put(`${indexApi}/${id}`, formData);
+};
 export const getMembers = async (
   id: string
 ): Promise<(ConversationMember & { member: User })[]> =>

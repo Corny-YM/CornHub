@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import AvatarImg from "@/components/avatar-img";
 import SheetButton from "@/components/sheet-button";
 import CollapsibleButton from "@/components/collapsible-button";
+import ModalUpdate from "./modal-update";
 import ModalAddMembers from "./modal-add-members";
 
 const ChatInfo = () => {
@@ -34,6 +35,7 @@ const ChatInfo = () => {
   } = useConversationContext();
 
   const [modalAdd, toggleModalAdd] = useToggle(false);
+  const [modalUpdate, toggleModalUpdate] = useToggle(false);
 
   const content = useMemo(() => {
     if (isGroupChat) return conversationName;
@@ -110,14 +112,25 @@ const ChatInfo = () => {
             }
           >
             {isGroupChat && (
-              <Button
-                className="w-full flex items-center justify-start"
-                variant="outline"
-                size="sm"
-              >
-                <Pencil size={20} className="mr-2" />
-                Đổi tên đoạn chat
-              </Button>
+              <>
+                <Button
+                  className="w-full flex items-center justify-start"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => toggleModalUpdate(true)}
+                >
+                  <Pencil size={20} className="mr-2" />
+                  Đổi tên đoạn chat
+                </Button>
+                <Button
+                  className="w-full flex items-center justify-start"
+                  variant="outline"
+                  size="sm"
+                >
+                  <Images size={20} className="mr-2" />
+                  Thay đổi ảnh
+                </Button>
+              </>
             )}
 
             <Button
@@ -191,6 +204,7 @@ const ChatInfo = () => {
       </div>
 
       <ModalAddMembers open={modalAdd} onOpenChange={toggleModalAdd} />
+      <ModalUpdate open={modalUpdate} onOpenChange={toggleModalUpdate} />
     </SheetButton>
   );
 };

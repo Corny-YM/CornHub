@@ -6,8 +6,10 @@ import { useMutation } from "@tanstack/react-query";
 import { Conversation, Message } from "@prisma/client";
 
 import {
+  update as updateConversation,
   store as storeConversation,
   IStoreData as IStoreDataConversation,
+  IUpdateData as IUpdateDataConversation,
 } from "@/actions/conversation";
 import {
   destroyMessage,
@@ -20,6 +22,21 @@ import {
 export const useMutates = () => {
   const router = useRouter();
   const { userId } = useAuth();
+
+  const {
+    mutateAsync: mutateAsyncUpdateConversation,
+    isPending: isPendingUpdateConversation,
+  } = useMutation({
+    mutationKey: ["conversation", "update", userId],
+    mutationFn: updateConversation,
+    onSuccess() {
+      toast.success("Cập nhật cuộc hội thoại thành công");
+      router.refresh();
+    },
+    onError() {
+      toast.error("Cập nhật cuộc hội thoại thất bại. Vui lòng thử lại sau");
+    },
+  });
 
   const {
     mutateAsync: mutateAsyncStoreConversation,
@@ -99,6 +116,19 @@ export const useMutates = () => {
     []
   );
 
+  const onUpdateConversation = useCallback(
+    async (
+      { id, data }: { id: string; data: IUpdateDataConversation },
+      callback?: (val: Conversation) => void | null
+    ) => {
+      if (!id || !data) return;
+      await mutateAsyncUpdateConversation({ id, data }).then((res) =>
+        callback?.(res)
+      );
+    },
+    []
+  );
+
   const onStoreMessage = useCallback(
     async (
       data: IStoreDataMessage,
@@ -148,11 +178,13 @@ export const useMutates = () => {
   );
 
   return {
+    isPendingUpdateConversation,
     isPendingStoreConversation,
     isPendingDeleteReaction,
     isPendingDeleteMessage,
     isPendingStoreReaction,
     isPendingStoreMessage,
+    onUpdateConversation,
     onStoreConversation,
     onDeleteReaction,
     onDeleteMessage,

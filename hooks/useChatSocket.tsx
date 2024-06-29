@@ -4,6 +4,8 @@ import { File as IFile, Message, User } from "@prisma/client";
 
 import { OptionDeleteMessageEnum } from "@/lib/enum";
 import { useSocket } from "@/providers/socket-provider";
+import { useConversationContext } from "@/providers/conversation-provider";
+import { IConversation } from "@/actions/conversation";
 
 type ChatSocketProps = {
   addKey: string;
@@ -22,11 +24,20 @@ export const useChatSocket = ({
   updateKey,
   queryKey,
 }: ChatSocketProps) => {
-  const { socket } = useSocket();
   const queryClient = useQueryClient();
+
+  const { socket } = useSocket();
+  const { setConversationData } = useConversationContext();
 
   useEffect(() => {
     if (!socket) return;
+
+    socket.on(queryKey, (conversation: IConversation) => {
+      setConversationData((prev) => ({
+        ...prev,
+        name: conversation.name,
+      }));
+    });
 
     socket.on(updateKey, (message: MessageWithSenderWithFile) => {
       queryClient.setQueryData([queryKey], (oldData: any) => {
