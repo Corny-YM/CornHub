@@ -13,7 +13,7 @@ app.prepare().then(() => {
   const httpServer = createServer(handler);
 
   const io = new Server(httpServer);
-  global.io = io;
+  if (!global.io) global.io = io;
 
   io.on("connection", (socket) => {
     console.log("Server Socket connected");

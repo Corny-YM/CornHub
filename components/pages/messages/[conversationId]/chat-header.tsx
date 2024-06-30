@@ -33,12 +33,16 @@ const ChatHeader = () => {
           src={conversationAvatar}
           alt={conversationName}
         />
-        <div className="font-semibold">{conversationName || "---"}</div>
+        <div className="font-semibold line-clamp-1">
+          {conversationName || "---"}
+        </div>
       </>
     );
     if (isGroupChat)
       return (
-        <div className="flex items-center space-x-2">{defaultContent}</div>
+        <div className="flex items-center space-x-2 line-clamp-1">
+          {defaultContent}
+        </div>
       );
 
     const personId =
@@ -47,7 +51,7 @@ const ChatHeader = () => {
         : conversationData.created_by;
     return (
       <Link
-        className="flex items-center space-x-2"
+        className="flex items-center space-x-2 line-clamp-1"
         href={`/account/${personId}`}
       >
         {defaultContent}
@@ -69,7 +73,7 @@ const ChatHeader = () => {
   return (
     <div className="w-full flex items-center justify-between">
       <Button
-        className="h-fit px-2"
+        className="h-fit px-2 max-w-96"
         variant="ghost"
         asChild={!isGroupChat}
         onClick={handleClick}

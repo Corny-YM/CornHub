@@ -12,6 +12,7 @@ export enum StatusGenderEnum {
 export enum TypeFileEnum {
   image = "image",
   video = "video",
+  application = "application",
 }
 
 export enum UsedForEnum {

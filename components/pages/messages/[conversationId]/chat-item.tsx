@@ -2,7 +2,12 @@
 
 import toast from "react-hot-toast";
 import { useCallback, useMemo } from "react";
-import { Trash, ClipboardCopy, EllipsisVertical } from "lucide-react";
+import {
+  Trash,
+  ClipboardCopy,
+  EllipsisVertical,
+  CloudDownload,
+} from "lucide-react";
 
 import { IMessage } from "@/actions/message";
 import { useToggle } from "@/hooks/useToggle";
@@ -17,6 +22,7 @@ import TooltipButton from "@/components/tooltip-button";
 import ModalDelete from "./modal-delete";
 import PopoverReactions from "./popover-reactions";
 import ModalReacted from "./modal-reacted";
+import Link from "next/link";
 
 interface Props {
   data?: IMessage;
@@ -100,6 +106,28 @@ const ChatItem = ({ data, isOwner }: Props) => {
       return (
         <div className="w-full max-w-96 flex justify-center items-center rounded-xl overflow-hidden">
           <img className="w-full h-auto object-cover" src={file.path} />
+        </div>
+      );
+    if (file && !isImage && !isVideo)
+      return (
+        <div
+          className={cn(
+            "max-w-96 break-words rounded-lg bg-zinc-400/50 dark:bg-primary-foreground px-3 py-2 leading-normal",
+            deleted && "rounded-full italic text-zinc-500 dark:text-zinc-400"
+          )}
+        >
+          <Link
+            className="flex-center underline"
+            target="_blank"
+            href={file.path}
+          >
+            <span className="flex items-center line-clamp-1">
+              {file.actual_name}
+              <div className="w-10 h-10 flex items-center justify-center">
+                <CloudDownload className="ml-2" />
+              </div>
+            </span>
+          </Link>
         </div>
       );
     return (

@@ -77,8 +77,12 @@ const ConversationIdPage = () => {
       className="flex-1 flex-grow flex flex-col -mx-2 px-2 overflow-hidden overflow-y-auto"
       ref={chatRef}
     >
-      <div className="flex flex-col items-center">
-        {!hasNextPage && <ChatWelcome />}
+      <div className="flex-1 flex flex-col items-center">
+        {!hasNextPage && (
+          <div className="flex-1">
+            <ChatWelcome />
+          </div>
+        )}
 
         {hasNextPage && (
           <div className="flex justify-center">

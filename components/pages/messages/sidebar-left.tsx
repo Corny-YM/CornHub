@@ -141,7 +141,7 @@ const SidebarLeft = ({}: Props) => {
                   >
                     <AvatarImg isChat src={conversationAvatar} />
                     <div className="flex-1 leading-normal">
-                      <div className="font-semibold text-sm">
+                      <div className="line-clamp-2 font-semibold text-sm">
                         {conversationName}
                       </div>
                       <div className="flex w-full text-xs opacity-75 space-x-1">
