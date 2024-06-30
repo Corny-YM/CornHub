@@ -36,6 +36,8 @@ export const useChatSocket = ({
       setConversationData((prev) => ({
         ...prev,
         name: conversation.name,
+        file_id: conversation.file_id,
+        file: conversation.file,
       }));
     });
 

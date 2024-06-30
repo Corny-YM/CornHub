@@ -1,21 +1,19 @@
 "use client";
 
-import toast from "react-hot-toast";
 import { User } from "@prisma/client";
-import { useMutation } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
 
-import { addMembers } from "@/actions/conversation";
+import { useMutates } from "@/hooks/mutations/message/useMutates";
 import { useConversationContext } from "@/providers/conversation-provider";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
-  DialogDescription,
+  DialogTitle,
   DialogFooter,
   DialogHeader,
+  DialogContent,
   DialogOverlay,
-  DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import SelectFriends from "../select-friends";
 
@@ -26,35 +24,23 @@ interface Props {
 
 const ModalAddMembers = ({ open, onOpenChange }: Props) => {
   const { conversationData, isGroupChat } = useConversationContext();
+  const { isPendingAddMembers, onAddMembers } = useMutates();
 
   const [selectedIds, setSelectedIds] = useState<Record<string, User>>({});
 
-  const { mutate, isPending } = useMutation({
-    mutationKey: ["conversation", "add", "members", conversationData.id],
-    mutationFn: addMembers,
-    onSuccess() {
-      toast.success("Mời người dùng thành công");
-      onOpenChange(false);
-      setSelectedIds({});
-    },
-    onError() {
-      toast.error("Mời người dùng thất bại. Vui lòng thử lại sau");
-    },
-  });
-
   const disabled = useMemo(
-    () => !Object.keys(selectedIds).length || isPending,
-    [selectedIds, isPending]
+    () => !Object.keys(selectedIds).length || isPendingAddMembers,
+    [selectedIds, isPendingAddMembers]
   );
 
-  const handleAdd = useCallback(() => {
+  const handleAdd = useCallback(async () => {
     const ids = Object.keys(selectedIds);
     if (!conversationData || !ids.length || !isGroupChat) return;
-    mutate({
-      conversationId: conversationData.id,
-      ids,
+    await onAddMembers({ ids, conversationId: conversationData.id }, () => {
+      onOpenChange(false);
+      setSelectedIds({});
     });
-  }, [conversationData, isGroupChat, selectedIds]);
+  }, [conversationData, isGroupChat, selectedIds, onAddMembers]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

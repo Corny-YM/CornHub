@@ -38,11 +38,16 @@ const ModalMembers = ({ open, onOpenChange }: Props) => {
     [selectedIds, isGroupChat, conversationData, open]
   );
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     enabled,
     queryKey: ["conversation", "members", conversationData.id],
     queryFn: () => getMembers(conversationData.id),
   });
+
+  useEffect(() => {
+    if (!open) return;
+    refetch();
+  }, [open]);
 
   useEffect(() => {
     if (!data) return;
@@ -60,7 +65,9 @@ const ModalMembers = ({ open, onOpenChange }: Props) => {
         </div>
       );
     if (!data || !data.length) return <EmptyData />;
-    return data.map((item) => <CardMember key={item.id} data={item.member} />);
+    return data.map((item) => (
+      <CardMember key={item.id} data={item.member} refetch={refetch} />
+    ));
   }, [data, isLoading]);
 
   return (

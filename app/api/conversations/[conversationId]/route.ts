@@ -18,12 +18,28 @@ export async function PUT(
     const { userId } = auth();
     if (!userId) return new NextResponse("Unauthenticated", { status: 400 });
 
+    const sender = await prisma.user.findFirstOrThrow({
+      where: { id: userId },
+    });
+
     const fileDB: IFile | null = await uploadFile({ file, userId: userId });
+
+    let lastMessage = `${sender.full_name} đã thay đổi tên đoạn chat`;
+
+    if (fileDB) {
+      lastMessage = `${sender.full_name} đã thay đổi ảnh nhóm`;
+    }
 
     const conversation = await prisma.conversation.update({
       include: { file: true, createdBy: true, user: true },
       where: { id: params.conversationId },
-      data: { name, file_id: fileDB?.id, active: 1 },
+      data: {
+        name,
+        file_id: fileDB?.id,
+        active: 1,
+        last_message: lastMessage,
+        last_time_online: new Date(),
+      },
     });
 
     const members = await prisma.conversationMember.findMany({

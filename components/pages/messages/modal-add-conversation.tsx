@@ -18,6 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import SelectFriends from "./select-friends";
+import { useRouter } from "next/navigation";
 
 interface Props {
   open: boolean;
@@ -25,6 +26,7 @@ interface Props {
 }
 
 const ModalAddConversation = ({ open, onOpenChange }: Props) => {
+  const router = useRouter();
   const { userId } = useAuth();
 
   const [name, setName] = useState("");
@@ -56,10 +58,11 @@ const ModalAddConversation = ({ open, onOpenChange }: Props) => {
   const handleSendGroupRequest = useCallback(async () => {
     const ids = Object.keys(selectedIds);
     if (!userId || !name.trim() || !ids.length) return;
-    await onStoreConversation({ name, ids }, () => {
+    await onStoreConversation({ name, ids }, (res) => {
       handleReset();
+      if (res) router.push(`/messages/${res.id}`);
     });
-  }, [userId, name, selectedIds, onStoreConversation]);
+  }, [userId, name, selectedIds, router, onStoreConversation]);
 
   const handleCancel = useCallback(() => {
     handleReset();

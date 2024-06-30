@@ -1,15 +1,22 @@
 import toast from "react-hot-toast";
+import {
+  User,
+  Message,
+  Conversation,
+  ConversationMember,
+} from "@prisma/client";
 import { useCallback } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
-import { Conversation, Message } from "@prisma/client";
 
 import {
-  update as updateConversation,
+  addMembers,
   store as storeConversation,
+  update as updateConversation,
   IStoreData as IStoreDataConversation,
   IUpdateData as IUpdateDataConversation,
+  removeMembers,
 } from "@/actions/conversation";
 import {
   destroyMessage,
@@ -23,6 +30,7 @@ export const useMutates = () => {
   const router = useRouter();
   const { userId } = useAuth();
 
+  // CONVERSATION
   const {
     mutateAsync: mutateAsyncUpdateConversation,
     isPending: isPendingUpdateConversation,
@@ -53,6 +61,36 @@ export const useMutates = () => {
     },
   });
 
+  // MEMBERS
+  const { mutateAsync: mutateAsyncAddMembers, isPending: isPendingAddMembers } =
+    useMutation({
+      mutationKey: ["conversation", "add", "members"],
+      mutationFn: addMembers,
+      onSuccess() {
+        toast.success("Mời người dùng thành công");
+        router.refresh();
+      },
+      onError() {
+        toast.error("Mời người dùng thất bại. Vui lòng thử lại sau");
+      },
+    });
+
+  const {
+    mutateAsync: mutateAsyncRemoveMembers,
+    isPending: isPendingRemoveMembers,
+  } = useMutation({
+    mutationKey: ["conversation", "remove", "members"],
+    mutationFn: removeMembers,
+    onSuccess() {
+      toast.success("Loại bỏ thành viên thành công");
+      router.refresh();
+    },
+    onError() {
+      toast.error("Loại bỏ thành viên thất bại. Vui lòng thử lại sau");
+    },
+  });
+
+  // MESSAGE
   const {
     mutateAsync: mutateAsyncStoreMessage,
     isPending: isPendingStoreMessage,
@@ -80,6 +118,7 @@ export const useMutates = () => {
     },
   });
 
+  // REACTION
   const {
     mutateAsync: mutateAsyncStoreReaction,
     isPending: isPendingStoreReaction,
@@ -102,6 +141,7 @@ export const useMutates = () => {
     },
   });
 
+  // Conversation
   const onStoreConversation = useCallback(
     async (
       data: IStoreDataConversation,
@@ -129,6 +169,32 @@ export const useMutates = () => {
     []
   );
 
+  // Members
+  const onAddMembers = useCallback(
+    async (
+      data: { conversationId: string; ids: string[] },
+      callback?: (val: (ConversationMember & { member: User })[]) => void | null
+    ) => {
+      const { conversationId, ids } = data;
+      if (!conversationId || !ids || !ids.length) return;
+      await mutateAsyncAddMembers(data).then((res) => callback?.(res));
+    },
+    []
+  );
+
+  const onRemoveMembers = useCallback(
+    async (
+      data: { conversationId: string; memberId: string },
+      callback?: (val: (ConversationMember & { member: User })[]) => void | null
+    ) => {
+      const { conversationId, memberId } = data;
+      if (!conversationId || !memberId) return;
+      await mutateAsyncRemoveMembers(data).then((res) => callback?.(res));
+    },
+    []
+  );
+
+  // Message
   const onStoreMessage = useCallback(
     async (
       data: IStoreDataMessage,
@@ -153,6 +219,7 @@ export const useMutates = () => {
     []
   );
 
+  // Reaction
   const onStoreReaction = useCallback(
     async (
       data: { id: number; type: string; conversationId: string },
@@ -183,12 +250,16 @@ export const useMutates = () => {
     isPendingDeleteReaction,
     isPendingDeleteMessage,
     isPendingStoreReaction,
+    isPendingRemoveMembers,
     isPendingStoreMessage,
+    isPendingAddMembers,
     onUpdateConversation,
     onStoreConversation,
     onDeleteReaction,
     onDeleteMessage,
     onStoreReaction,
+    onRemoveMembers,
     onStoreMessage,
+    onAddMembers,
   } as const;
 };

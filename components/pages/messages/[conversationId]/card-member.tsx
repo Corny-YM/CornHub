@@ -14,7 +14,6 @@ import { useConversationContext } from "@/providers/conversation-provider";
 import DropdownActions, {
   IDropdownAction,
 } from "@/components/dropdown-actions";
-import NoAvatar from "@/public/no-avatar.jpg";
 import AvatarImg from "@/components/avatar-img";
 
 interface Props {
@@ -30,7 +29,16 @@ const CardMember = ({ data, type, messageReaction, refetch }: Props) => {
 
   const { isOwner, conversationData } = useConversationContext();
 
-  const { onDeleteReaction, isPendingDeleteReaction } = useMutates();
+  const {
+    isPendingRemoveMembers,
+    isPendingDeleteReaction,
+    onRemoveMembers,
+    onDeleteReaction,
+  } = useMutates();
+
+  const handleUserProfile = useCallback(() => {
+    router.push(`/account/${data.id}`);
+  }, [data, router]);
 
   const handleRemoveReaction = useCallback(async () => {
     if (
@@ -58,9 +66,14 @@ const CardMember = ({ data, type, messageReaction, refetch }: Props) => {
     isPendingDeleteReaction,
   ]);
 
-  const handleUserProfile = useCallback(() => {
-    router.push(`/account/${data.id}`);
-  }, [data, router]);
+  const handleRemoveMember = useCallback(async () => {
+    await onRemoveMembers(
+      { conversationId: conversationData.id, memberId: data.id },
+      () => {
+        refetch?.();
+      }
+    );
+  }, [conversationData, data, onRemoveMembers]);
 
   const Icon = useMemo(() => {
     if (!type || !messageReaction || !emotionIcons[type]) return;
@@ -80,7 +93,9 @@ const CardMember = ({ data, type, messageReaction, refetch }: Props) => {
       arr.push({
         destructive: true,
         label: "Xóa thành viên",
+        disabled: isPendingRemoveMembers,
         icon: <UserRoundX className="mr-2" size={20} />,
+        onClick: handleRemoveMember,
       });
     if (userId === data.id) {
       arr.push({
@@ -91,7 +106,14 @@ const CardMember = ({ data, type, messageReaction, refetch }: Props) => {
     }
 
     return arr;
-  }, [isOwner, userId, data, handleUserProfile]);
+  }, [
+    data,
+    userId,
+    isOwner,
+    isPendingRemoveMembers,
+    handleUserProfile,
+    handleRemoveMember,
+  ]);
 
   return (
     <div className="w-full min-h-11 flex items-center p-2 rounded-lg overflow-hidden shadow-lg dark:bg-neutral-800/50 bg-[#f0f2f5]">

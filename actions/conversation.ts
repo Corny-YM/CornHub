@@ -58,3 +58,14 @@ export const addMembers = async ({
   ids: string[];
 }): Promise<(ConversationMember & { member: User })[]> =>
   await defHttp.post(`${indexApi}/${conversationId}/members`, { ids });
+
+export const removeMembers = async ({
+  conversationId,
+  memberId,
+}: {
+  conversationId: string;
+  memberId: string;
+}): Promise<(ConversationMember & { member: User })[]> =>
+  await defHttp.delete(`${indexApi}/${conversationId}/members`, {
+    data: { memberId },
+  });

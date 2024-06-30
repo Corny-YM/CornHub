@@ -1,12 +1,12 @@
 import { redirect } from "next/navigation";
+import { auth } from "@clerk/nextjs/server";
 
 import prisma from "@/lib/prisma";
+import { TypeConversationEnum } from "@/lib/enum";
 import { ConversationProvider } from "@/providers/conversation-provider";
 import { Separator } from "@/components/ui/separator";
 import ChatHeader from "@/components/pages/messages/[conversationId]/chat-header";
 import ChatInput from "@/components/pages/messages/[conversationId]/chat-input";
-import { auth } from "@clerk/nextjs/server";
-import { TypeConversationEnum } from "@/lib/enum";
 
 interface Props {
   children: React.ReactNode;
@@ -46,6 +46,14 @@ const ConversationIdLayout = async ({ children, params }: Props) => {
   }
 
   if (!conversation) redirect("/messages");
+
+  // Check user is a member of that conversation
+  if (conversation.type === TypeConversationEnum.group) {
+    const members = await prisma.conversationMember.findFirst({
+      where: { member_id: userId, conversation_id: conversation.id },
+    });
+    if (!members) redirect("/messages");
+  }
 
   return (
     <div className="flex-grow h-full max-h-full flex flex-col px-2 pt-4 pb-4">

@@ -14,9 +14,10 @@ import {
   CircleUserRound,
   UserRoundPlus,
 } from "lucide-react";
-import { useMemo } from "react";
+import { useCallback, useMemo, useRef } from "react";
 
 import { useToggle } from "@/hooks/useToggle";
+import { useMutates } from "@/hooks/mutations/message/useMutates";
 import { useConversationContext } from "@/providers/conversation-provider";
 import { Button } from "@/components/ui/button";
 import AvatarImg from "@/components/avatar-img";
@@ -33,9 +34,12 @@ const ChatInfo = () => {
     conversationName,
     conversationAvatar,
   } = useConversationContext();
+  const { isPendingUpdateConversation, onUpdateConversation } = useMutates();
 
   const [modalAdd, toggleModalAdd] = useToggle(false);
   const [modalUpdate, toggleModalUpdate] = useToggle(false);
+
+  const inputFileRef = useRef<HTMLInputElement | null>(null);
 
   const content = useMemo(() => {
     if (isGroupChat) return conversationName;
@@ -45,6 +49,20 @@ const ChatInfo = () => {
       </Link>
     );
   }, [userUrl, isGroupChat, conversationName, conversationData]);
+
+  const handleChangeFile = useCallback(
+    async (e: React.ChangeEvent) => {
+      const target = e.target as HTMLInputElement;
+      const file = target.files?.[0];
+      if (!file || !target) return;
+      await onUpdateConversation({
+        id: conversationData.id,
+        data: { file: file, name: conversationData.name! },
+      });
+      target.value = "";
+    },
+    [conversationData, onUpdateConversation]
+  );
 
   return (
     <SheetButton
@@ -126,6 +144,8 @@ const ChatInfo = () => {
                   className="w-full flex items-center justify-start"
                   variant="outline"
                   size="sm"
+                  disabled={isPendingUpdateConversation}
+                  onClick={() => inputFileRef.current?.click()}
                 >
                   <Images size={20} className="mr-2" />
                   Thay đổi ảnh
@@ -203,6 +223,15 @@ const ChatInfo = () => {
         </div>
       </div>
 
+      <input
+        ref={inputFileRef}
+        hidden
+        multiple={false}
+        style={{ display: "none" }}
+        accept="image/*"
+        type="file"
+        onChange={handleChangeFile}
+      />
       <ModalAddMembers open={modalAdd} onOpenChange={toggleModalAdd} />
       <ModalUpdate open={modalUpdate} onOpenChange={toggleModalUpdate} />
     </SheetButton>
