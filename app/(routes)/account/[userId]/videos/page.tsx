@@ -1,18 +1,14 @@
-import Image from "next/image";
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-
 import prisma from "@/lib/prisma";
 import Video from "@/components/video";
 import EmptyData from "@/components/empty-data";
 
-const UserVideosPage = async () => {
-  const { userId } = auth();
+interface Props {
+  params: { userId: string };
+}
 
-  if (!userId) redirect("/sign-in");
-
+const UserVideosPage = async ({ params }: Props) => {
   const videos = await prisma.file.findMany({
-    where: { user_id: userId, type: "video" },
+    where: { user_id: params.userId, type: "video" },
   });
 
   return (

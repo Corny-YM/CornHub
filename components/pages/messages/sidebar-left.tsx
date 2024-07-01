@@ -118,26 +118,32 @@ const SidebarLeft = ({}: Props) => {
                   file,
                   type,
                   user_id,
+                  created_by,
                   createdBy,
                   last_message,
                   last_time_online,
                 } = conversation;
                 const isGroupChat = type === TypeConversationEnum.group;
+                const conversationId = isGroupChat
+                  ? id
+                  : user_id === userId
+                  ? created_by
+                  : user_id;
                 const conversationAvatar = isGroupChat
                   ? file?.path
                   : user_id === userId
-                  ? user?.avatar
-                  : createdBy.avatar;
+                  ? createdBy.avatar
+                  : user?.avatar;
                 const conversationName = isGroupChat
                   ? name
                   : user_id === userId
-                  ? user?.full_name
-                  : createdBy.full_name;
+                  ? createdBy.full_name
+                  : user?.full_name;
                 return (
                   <Link
                     key={id}
                     className="p-2 flex items-center space-x-2 rounded-lg select-none cursor-pointer transition hover:bg-primary-foreground"
-                    href={`/messages/${id}`}
+                    href={`/messages/${conversationId}`}
                   >
                     <AvatarImg isChat src={conversationAvatar} />
                     <div className="flex-1 leading-normal">

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import toast from "react-hot-toast";
 import { useCallback, useMemo } from "react";
 import {
@@ -20,9 +21,8 @@ import DropdownActions, {
 import AvatarImg from "@/components/avatar-img";
 import TooltipButton from "@/components/tooltip-button";
 import ModalDelete from "./modal-delete";
-import PopoverReactions from "./popover-reactions";
 import ModalReacted from "./modal-reacted";
-import Link from "next/link";
+import PopoverReactions from "./popover-reactions";
 
 interface Props {
   data?: IMessage;
@@ -211,8 +211,9 @@ const ChatItem = ({ data, isOwner }: Props) => {
       {/* Actions */}
       <div
         className={cn(
-          "flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition",
-          actionPopup && "opacity-100"
+          "flex items-center gap-1 opacity-0 group-hover:opacity-100 transition",
+          actionPopup && "opacity-100",
+          isOwner && "flex-row-reverse"
         )}
       >
         {!deleted && <PopoverReactions message={data} />}
@@ -221,27 +222,28 @@ const ChatItem = ({ data, isOwner }: Props) => {
           <CornerUpLeft size={16} />
         </Button> */}
 
-        <DropdownActions
-          className="!ring-0 !ring-offset-0"
-          menuSide="top"
-          actions={actions}
-          icon={<EllipsisVertical size={16} />}
-          onOpenChange={toggleActionPopup}
-        />
-
-        <ModalDelete
-          message={data}
-          open={modalDelete}
-          onOpenChange={toggleModalDelete}
-        />
-
-        <ModalReacted
-          message={data}
-          reactionTypes={arrEmoted}
-          open={modalReacted}
-          onOpenChange={toggleModalReacted}
-        />
+        {!deleted && !!actions.length && (
+          <DropdownActions
+            className="!ring-0 !ring-offset-0"
+            menuSide="top"
+            actions={actions}
+            icon={<EllipsisVertical size={16} />}
+            onOpenChange={toggleActionPopup}
+          />
+        )}
       </div>
+      <ModalDelete
+        message={data}
+        open={modalDelete}
+        onOpenChange={toggleModalDelete}
+      />
+
+      <ModalReacted
+        message={data}
+        reactionTypes={arrEmoted}
+        open={modalReacted}
+        onOpenChange={toggleModalReacted}
+      />
     </div>
   );
 };

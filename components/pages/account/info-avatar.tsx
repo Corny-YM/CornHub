@@ -77,11 +77,10 @@ const InfoAvatar = () => {
   );
 
   const isShowEdit = useMemo(() => {
-    if (!isOwner) return false;
-    else if (file) return false;
+    if (file) return false;
     else if (avatar && isSelecting) return false;
     return true;
-  }, [isOwner, file, avatar, isSelecting]);
+  }, [file, avatar, isSelecting]);
 
   const actions = useMemo(() => {
     const result: IDropdownAction[] = [
@@ -149,35 +148,36 @@ const InfoAvatar = () => {
         />
       </div>
       <div className="absolute bottom-1 right-1">
-        {isShowEdit ? (
-          <DropdownActions
-            align="start"
-            disabled={disabled}
-            actions={actions}
-            icon={<Camera size={20} />}
-          />
-        ) : (
-          <>
+        {isOwner &&
+          (isShowEdit ? (
             <DropdownActions
               align="start"
               disabled={disabled}
-              actions={[
-                {
-                  label: "Lưu",
-                  icon: <CircleCheck className="mr-2" size={20} />,
-                  onClick: handleUpdateAvatar,
-                },
-                {
-                  label: "Bỏ",
-                  destructive: true,
-                  icon: <Trash2 className="mr-2" size={20} />,
-                  onClick: handleRemovePreviewAvatar,
-                },
-              ]}
-              icon={<Settings2 size={20} />}
+              actions={actions}
+              icon={<Camera size={20} />}
             />
-          </>
-        )}
+          ) : (
+            <>
+              <DropdownActions
+                align="start"
+                disabled={disabled}
+                actions={[
+                  {
+                    label: "Lưu",
+                    icon: <CircleCheck className="mr-2" size={20} />,
+                    onClick: handleUpdateAvatar,
+                  },
+                  {
+                    label: "Bỏ",
+                    destructive: true,
+                    icon: <Trash2 className="mr-2" size={20} />,
+                    onClick: handleRemovePreviewAvatar,
+                  },
+                ]}
+                icon={<Settings2 size={20} />}
+              />
+            </>
+          ))}
 
         <input
           ref={inputFileRef}

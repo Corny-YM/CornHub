@@ -1,16 +1,14 @@
 import Image from "next/image";
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
 
 import prisma from "@/lib/prisma";
 
-const UserImagesPage = async () => {
-  const { userId } = auth();
+interface Props {
+  params: { userId: string };
+}
 
-  if (!userId) redirect("/sign-in");
-
+const UserImagesPage = async ({ params }: Props) => {
   const images = await prisma.file.findMany({
-    where: { user_id: userId, type: "image" },
+    where: { user_id: params.userId, type: "image" },
   });
 
   return (

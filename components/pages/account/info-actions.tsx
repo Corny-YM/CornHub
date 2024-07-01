@@ -175,7 +175,7 @@ const InfoActions = () => {
   }, [userId, accountData, mutateUnFollow]);
 
   const handleClickMessage = useCallback(() => {
-    window.open(`/messages/${accountData.id}`, "_blank");
+    window.open(`/messages/${accountData.id}`);
   }, [accountData]);
 
   // useMemo
