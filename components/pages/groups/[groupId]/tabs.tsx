@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { useGroupContext } from "@/providers/group-provider";
 interface Props {}
 
 const Tabs = ({}: Props) => {
-  const { tabs, pathname, groupData } = useGroupContext();
+  const { tabs, pathname, groupData, isGroupOwner } = useGroupContext();
 
   const hasSelected = useCallback(
     (url: string) => {
@@ -21,9 +21,20 @@ const Tabs = ({}: Props) => {
     [pathname]
   );
 
+  const btnTabs = useMemo(() => {
+    if (!isGroupOwner || !groupData.approve_posts) return tabs;
+    return [
+      ...tabs,
+      {
+        url: `/pending/posts`,
+        label: "Kiểm duyệt bài viết",
+      },
+    ];
+  }, [isGroupOwner, groupData]);
+
   return (
     <div className="w-full flex items-center gap-x-2">
-      {tabs.map(({ url, label }) => (
+      {btnTabs.map(({ url, label }) => (
         <Button
           key={url}
           className={cn(

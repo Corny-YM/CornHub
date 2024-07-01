@@ -10,9 +10,10 @@ export async function GET(
   try {
     const { userId } = auth();
 
-    if (!userId) {
-      return new NextResponse("Unauthenticated", { status: 400 });
-    }
+    if (!userId) return new NextResponse("Unauthenticated", { status: 400 });
+
+    const url = new URL(req.url);
+    const approve = url.searchParams.get("approve");
 
     const group = await prisma.group.findFirst({
       where: { id: +params.groupId },
@@ -20,8 +21,6 @@ export async function GET(
 
     if (!group)
       return new NextResponse("Group does not exist", { status: 404 });
-
-    const clause = group.approve_posts ? { approve: true } : {};
 
     const posts = await prisma.post.findMany({
       include: {
@@ -39,7 +38,10 @@ export async function GET(
           },
         },
       },
-      where: { group_id: +params.groupId, ...clause },
+      where: {
+        group_id: +params.groupId,
+        approve: !approve ? true : !!+approve,
+      },
       orderBy: { created_at: "desc" },
     });
 

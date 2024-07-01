@@ -13,6 +13,7 @@ interface IPostData extends Record<string, any> {
   status: string;
   userId: string;
   content: string;
+  approve?: number;
   file?: File | null;
   groupId?: number | null;
 }

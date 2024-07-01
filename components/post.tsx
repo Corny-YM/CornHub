@@ -15,6 +15,7 @@ import ReactionsModal from "./reactions-modal";
 interface Props {
   className?: string;
   isModal?: boolean;
+  isApproving?: boolean;
   isGroupOwner?: boolean;
   isGroupOwnerPost?: boolean;
   data: Post & {
@@ -31,6 +32,7 @@ const PostItem = ({
   data,
   className,
   isModal,
+  isApproving,
   isGroupOwner,
   isGroupOwnerPost,
   onSuccessDelete,
@@ -55,6 +57,7 @@ const PostItem = ({
       <PostHeader
         data={dataPost}
         isModal={isModal}
+        isApproving={isApproving}
         isGroupOwner={isGroupOwner}
         isGroupOwnerPost={isGroupOwnerPost}
         onSuccessDelete={onSuccessDelete}

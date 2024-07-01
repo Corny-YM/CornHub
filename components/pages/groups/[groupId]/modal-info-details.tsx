@@ -54,7 +54,7 @@ const formSchema = z.object({
 const ModalInfoDetails = ({ open, onOpenChange }: Props) => {
   const router = useRouter();
   const { user: clerkUser } = useUser();
-  const { groupData } = useGroupContext();
+  const { groupData, setGroupData } = useGroupContext();
 
   const { mutate, isPending } = useMutation({
     mutationKey: ["group", "update", groupData.id],
@@ -63,6 +63,7 @@ const ModalInfoDetails = ({ open, onOpenChange }: Props) => {
       toast.success("Cập nhật thông tin nhóm thành công");
       router.refresh();
       onOpenChange(false);
+      setGroupData(res);
     },
     onError() {
       toast.error("Cập nhật thất bại. Vui lòng thử lại sau");

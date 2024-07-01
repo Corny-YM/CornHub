@@ -46,6 +46,7 @@ const WatchPage = async () => {
               },
             ],
           },
+          group_id: null,
         },
         // Get all group posts that user joined
         {

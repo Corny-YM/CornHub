@@ -1,11 +1,10 @@
 import fs from "node:fs/promises";
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { File as IFile } from "@prisma/client";
+import { Group, File as IFile } from "@prisma/client";
 
 import prisma from "@/lib/prisma";
 import uploadFile from "@/services/uploadFile";
-import { UsedForEnum } from "@/lib/enum";
 
 interface IBody {
   groupId?: number;
@@ -36,12 +35,23 @@ export async function PUT(req: Request) {
       group_id: groupId && !isNaN(+groupId) ? +groupId : undefined,
     });
 
+    let group: Group | null = null;
+    if (groupId) {
+      group = await prisma.group.findFirst({
+        where: { id: +groupId },
+      });
+    }
+
+    const isOwner = group?.owner_id === userId;
+    const approve = isOwner || !group?.approve_posts;
+
     const post = await prisma.post.create({
       include: { user: true, group: true, file: true },
       data: {
         status,
         content,
         user_id: userServerId,
+        approve: approve,
         group_id: groupId && !isNaN(+groupId) ? +groupId : null,
         file_id: fileDB ? fileDB.id : null,
       },
@@ -49,7 +59,7 @@ export async function PUT(req: Request) {
 
     return NextResponse.json(post);
   } catch (err) {
-    console.log("[USERS_PUT]", err);
+    console.log("[POST_PUT]", err);
     return new NextResponse("Internal error", { status: 500 });
   }
 }

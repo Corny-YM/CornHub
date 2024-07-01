@@ -18,9 +18,10 @@ export async function PUT(
     const status = formData.get("status") as string;
     const content = formData.get("content") as string;
     const groupId = formData.get("groupId") as string;
+    const approve = formData.get("approve") as string;
 
     const { userId: userServerId } = auth();
-    if (!userServerId || !userId || userServerId !== userId) {
+    if (!userServerId) {
       return new NextResponse("Unauthenticated", { status: 400 });
     }
 
@@ -31,6 +32,9 @@ export async function PUT(
 
     if (!post) return new NextResponse("Post does not exist", { status: 404 });
 
+    if (post.user_id !== userId && post.group && post.group.owner_id !== userId)
+      return new NextResponse("You does not have permission", { status: 404 });
+
     const fileDB: IFile | null = await uploadFile({
       file,
       userId: userServerId,
@@ -39,12 +43,13 @@ export async function PUT(
 
     post = await prisma.post.update({
       include: { user: true, group: true, file: true },
-      where: { id: post.id, user_id: userServerId },
+      where: { id: post.id },
       data: {
         status,
         content,
         group_id: groupId && !isNaN(+groupId) ? +groupId : post.group_id,
         file_id: fileDB ? fileDB.id : post.file_id,
+        ...(approve ? { approve: !!+approve } : {}),
       },
     });
 
@@ -69,10 +74,7 @@ export async function DELETE(
     });
 
     if (!post) return new NextResponse("Post does not exist", { status: 404 });
-    if (
-      post.user_id !== userId ||
-      (post.group && post.group.owner_id !== userId)
-    )
+    if (post.user_id !== userId && post.group && post.group.owner_id !== userId)
       return new NextResponse("You does not have permission", { status: 404 });
 
     // Delete post => delete reactions, reports, comments, reply, files

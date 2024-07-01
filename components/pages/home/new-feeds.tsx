@@ -44,6 +44,7 @@ const NewFeeds = async ({ userId }: Props) => {
               },
             ],
           },
+          group_id: null,
         },
         // Get all group posts that user joined
         {

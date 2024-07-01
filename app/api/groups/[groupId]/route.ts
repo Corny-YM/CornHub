@@ -52,6 +52,7 @@ export async function PUT(
     if (description) data.description = description;
 
     group = await prisma.group.update({
+      include: { owner: true, _count: { select: { groupMembers: true } } },
       where: { id: group.id },
       data: { ...data },
     });

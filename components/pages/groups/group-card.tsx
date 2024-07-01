@@ -132,7 +132,7 @@ const GroupCard = ({ data, member, request, following }: Props) => {
       <div className="w-full flex items-center justify-start">
         <div className="relative flex justify-center items-center w-20 h-20 aspect-square rounded-lg overflow-hidden">
           <Image
-            className="absolute w-full h-full"
+            className="absolute w-full h-full object-cover"
             src={cover || NoCover}
             alt="avatar_group"
             fill

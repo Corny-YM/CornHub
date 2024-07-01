@@ -3,7 +3,9 @@ import {
   Pencil,
   Trash2,
   BellOff,
+  TicketX,
   Ellipsis,
+  TicketCheck,
   ShieldAlert,
   MessageSquareWarning,
 } from "lucide-react";
@@ -15,8 +17,8 @@ import { useCallback, useMemo } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Group, Post, User, File as IFile } from "@prisma/client";
 
-import { destroy } from "@/actions/post";
 import { useToggle } from "@/hooks/useToggle";
+import { destroy, update } from "@/actions/post";
 import { cn, getRelativeTime } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import DropdownActions, {
@@ -28,6 +30,7 @@ import PostingModal from "@/components/posting-modal";
 
 interface Props {
   isModal?: boolean;
+  isApproving?: boolean;
   isGroupOwner?: boolean;
   isGroupOwnerPost?: boolean;
   data: Post & { user: User; group: Group | null; file: IFile | null };
@@ -40,6 +43,7 @@ interface Props {
 const PostHeader = ({
   data,
   isModal,
+  isApproving,
   isGroupOwner,
   isGroupOwnerPost,
   onSuccessDelete,
@@ -51,6 +55,19 @@ const PostHeader = ({
 
   const [confirmDelete, toggleConfirmDelete] = useToggle(false);
   const [modalUpdate, toggleModalUpdate] = useToggle(false);
+
+  const { mutate: mutateUpdate, isPending: isPendingUpdate } = useMutation({
+    mutationKey: ["store", "post", userId, id],
+    mutationFn: update,
+    onSuccess(res) {
+      toast.success("Kiểm duyệt bài viết thành công");
+      router.refresh();
+      onSuccessDelete?.();
+    },
+    onError() {
+      toast.error("Kiểm duyệt bài viết thất bại. Vui lòng thử lại sau");
+    },
+  });
 
   const { mutate, isPending } = useMutation({
     mutationKey: ["post", "destroy", data.id],
@@ -82,9 +99,38 @@ const PostHeader = ({
     return user.full_name;
   }, [group_id, group, user, isGroupOwnerPost]);
 
+  const handleApprovePost = useCallback(() => {
+    mutateUpdate({
+      postId: data.id,
+      data: {
+        status: data.status,
+        userId: data.user_id,
+        content: data.content || "",
+        approve: 1,
+      },
+    });
+  }, [data]);
+
   const actions = useMemo(() => {
     const groupActions: IDropdownAction[] = [];
     if (group_id && group) {
+      if (isApproving) {
+        groupActions.push(
+          {
+            label: `Kiểm duyệt`,
+            icon: <TicketCheck className="mr-2" size={20} />,
+            onClick: handleApprovePost,
+          },
+          {
+            label: `Hủy bỏ`,
+            destructive: true,
+            icon: <TicketX className="mr-2" size={20} />,
+            onClick: () => toggleConfirmDelete(true),
+          }
+        );
+        return groupActions;
+      }
+
       if (!isGroupOwner) {
         groupActions.push({
           label: `Bỏ theo dõi nhóm ${group.group_name}`,
@@ -130,7 +176,17 @@ const PostHeader = ({
     }
 
     return [...groupActions, ...userActions] as IDropdownAction[];
-  }, [group_id, group, user, isPostOwner, isGroupOwner, isPending]);
+  }, [
+    user,
+    group,
+    group_id,
+    isPending,
+    isPostOwner,
+    isApproving,
+    isGroupOwner,
+    isPendingUpdate,
+    handleApprovePost,
+  ]);
 
   const handleDeletePost = useCallback(() => {
     if (!data) return;
