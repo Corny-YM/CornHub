@@ -1,7 +1,7 @@
 "use client";
 
 import { SendHorizontal } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 
 import { cn } from "@/lib/utils";
 import { useAppContext } from "@/providers/app-provider";
@@ -51,14 +51,16 @@ const UserInputSending = ({
   const handleKeyDown = useCallback(
     async (e: React.KeyboardEvent) => {
       if (e.key.toLowerCase() !== "enter" || !currentUser) return;
-      await onSend?.({ value: inputValue })?.then(() => handleClearData());
+      onSend?.({ value: inputValue })?.then(() => {});
+      handleClearData();
     },
     [inputValue, currentUser, onSend]
   );
 
   const handleClickSend = useCallback(async () => {
     if (!inputValue.trim() || !currentUser) return;
-    await onSend?.({ value: inputValue })?.then(() => handleClearData());
+    onSend?.({ value: inputValue })?.then(() => {});
+    handleClearData();
   }, [inputValue, currentUser, onSend]);
 
   if (!currentUser) return null;
@@ -70,7 +72,6 @@ const UserInputSending = ({
         className="flex-1 !ring-0 !ring-offset-0 rounded-full outline-none"
         placeholder="Viết bình luận"
         value={inputValue}
-        disabled={disabled}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
       />

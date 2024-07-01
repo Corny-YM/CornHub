@@ -42,7 +42,8 @@ const ChatInfo = () => {
   const inputFileRef = useRef<HTMLInputElement | null>(null);
 
   const content = useMemo(() => {
-    if (isGroupChat) return conversationName;
+    if (isGroupChat)
+      return <div className="text-justify">{conversationName}</div>;
     return (
       <Link href={userUrl || ""} className="font-semibold hover:underline">
         {conversationName}

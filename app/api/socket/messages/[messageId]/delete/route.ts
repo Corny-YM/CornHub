@@ -51,6 +51,9 @@ export async function POST(
     };
 
     if (type === "terminate") {
+      await prisma.messageReaction.deleteMany({
+        where: { message_id: message.id },
+      });
       message = await prisma.message.delete({
         include: include,
         where: { id: message.id },
