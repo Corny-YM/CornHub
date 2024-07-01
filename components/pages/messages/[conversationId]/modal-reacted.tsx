@@ -122,7 +122,7 @@ const ModalReacted = ({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex-1 h-ful flex flex-col">
+        <div className="flex-1 h-full flex flex-col">
           <ScrollArea className="h-[600px] -mx-6 px-6">
             <div className="space-y-2">{content}</div>
           </ScrollArea>

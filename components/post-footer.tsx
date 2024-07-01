@@ -52,12 +52,21 @@ const PostFooter = ({
       const target = e.currentTarget as HTMLDivElement;
       const type = target.dataset.type;
       if (!type || !userId) return;
-      await onStore({ type, post_id: id, user_id: userId }, (res) => {
-        setCurrentUserReaction(res);
-        setTotalReactions((prev) => prev + 1);
-      });
+      await onStore(
+        {
+          type,
+          post_id: id,
+          user_id: userId,
+          reply_id: undefined,
+          comment_id: undefined,
+        },
+        (res) => {
+          setCurrentUserReaction(res);
+          if (!currentUserReaction) setTotalReactions((prev) => prev + 1);
+        }
+      );
     },
-    [id, userId, onStore]
+    [id, userId, currentUserReaction, onStore]
   );
 
   const handleClickReaction = useCallback(async () => {

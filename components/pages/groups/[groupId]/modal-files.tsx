@@ -92,7 +92,7 @@ const ModalFiles = ({ open, onSelect, onOpenChange }: Props) => {
         </DialogHeader>
 
         {/* content */}
-        <div className="flex-1 h-ful flex flex-col">
+        <div className="flex-1 h-full flex flex-col">
           <ScrollArea className="flex-1 max-h-[600px] -mx-6 px-6">
             {content}
           </ScrollArea>

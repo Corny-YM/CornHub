@@ -2,11 +2,17 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import {
+  Bell,
+  BellOff,
+  DoorOpen,
+  Ellipsis,
+  UserRoundMinus,
+} from "lucide-react";
 import { User } from "@prisma/client";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
-import { Bell, BellOff, DoorOpen, Ellipsis } from "lucide-react";
 
 import { useToggle } from "@/hooks/useToggle";
 import { useMutates } from "@/hooks/mutations/group/useMutates";
@@ -27,6 +33,7 @@ const CardMember = ({ groupId, data }: Props) => {
   const { userId } = useAuth();
 
   const [modalConfirm, toggleModalConfirm] = useToggle(false);
+  const [modalKick, toggleModalKick] = useToggle(false);
 
   const { isFollowing, setIsFollowing, isMember, setIsMember, isGroupOwner } =
     useGroupContext();
@@ -45,7 +52,7 @@ const CardMember = ({ groupId, data }: Props) => {
   const actions = useMemo(() => {
     const arr: IDropdownAction[] = [];
 
-    if (!isGroupOwner)
+    if (!isGroupOwner && !isOwner)
       arr.push(
         isFollowing
           ? {
@@ -64,7 +71,16 @@ const CardMember = ({ groupId, data }: Props) => {
             }
       );
 
-    if (isMember) {
+    if (isGroupOwner && !isOwner) {
+      arr.push({
+        label: "Kick khỏi nhóm",
+        icon: <UserRoundMinus className="mr-2" size={20} />,
+        destructive: true,
+        onClick: () => toggleModalKick(true),
+      });
+    }
+
+    if (isMember && isOwner) {
       arr.push({
         label: "Rời nhóm",
         icon: <DoorOpen className="mr-2" size={20} />,
@@ -87,10 +103,13 @@ const CardMember = ({ groupId, data }: Props) => {
   const handleLeave = useCallback(async () => {
     await onLeave(() => {
       setIsMember(false);
+      if (isGroupOwner) return router.push("/groups/joins");
       router.refresh();
       router.push(`/groups/${groupId}`);
     });
-  }, [groupId, onLeave]);
+  }, [groupId, isGroupOwner, onLeave]);
+
+  const handleKick = useCallback(() => {}, []);
 
   return (
     <div className="w-full min-h-11 flex items-center p-2 rounded-lg overflow-hidden shadow-lg dark:bg-neutral-800/50 bg-[#f0f2f5]">
@@ -103,10 +122,15 @@ const CardMember = ({ groupId, data }: Props) => {
           sizes="w-14"
         />
       </div>
-      <Link className="flex-1 px-3 line-clamp-2" href={`/account/${data.id}`}>
-        {data.full_name}
-      </Link>
-      {(isGroupOwner || isOwner) && (
+      <div className="flex-1">
+        <Link
+          className="w-fit px-3 line-clamp-2 hover:underline"
+          href={`/account/${data.id}`}
+        >
+          {data.full_name}
+        </Link>
+      </div>
+      {!!actions.length && (
         <div className="flex justify-center items-center h-full">
           <DropdownActions
             className="hover:bg-primary/50"
@@ -122,6 +146,14 @@ const CardMember = ({ groupId, data }: Props) => {
         disabled={isPendingLeave}
         onOpenChange={toggleModalConfirm}
         onClick={handleLeave}
+      />
+
+      <AlertModal
+        destructive
+        open={modalKick}
+        disabled={isPendingLeave}
+        onOpenChange={toggleModalKick}
+        onClick={handleKick}
       />
     </div>
   );

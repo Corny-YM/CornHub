@@ -66,7 +66,7 @@ export const AppProvider = ({ children }: Props) => {
         id,
         email,
         avatar: imageUrl,
-        full_name: fullName,
+        full_name: fullName || id,
         last_name: lastName,
         first_name: firstName,
         last_sign_in: lastSignInAt,

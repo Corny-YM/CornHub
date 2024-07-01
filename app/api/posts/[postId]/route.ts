@@ -79,9 +79,9 @@ export async function DELETE(
 
     // Delete post => delete reactions, reports, comments, reply, files
     await prisma.report.deleteMany({ where: { post_id: post.id } });
-    await prisma.comment.deleteMany({ where: { post_id: post.id } });
-    await prisma.commentReply.deleteMany({ where: { post_id: post.id } });
     await prisma.reaction.deleteMany({ where: { post_id: post.id } });
+    await prisma.commentReply.deleteMany({ where: { post_id: post.id } });
+    await prisma.comment.deleteMany({ where: { post_id: post.id } });
 
     if (post.file_id && post.file) {
       try {

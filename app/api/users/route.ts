@@ -18,15 +18,29 @@ export async function POST(req: Request) {
 
     const { last_sign_in } = user;
 
-    const data = await prisma.user.upsert({
+    let userAccount = await prisma.user.findFirst({
       where: { email: user.email },
-      // Update the user if it exists
-      update: { last_sign_in },
-      // Create a new user if it doesn't exist
-      create: user,
     });
 
-    return NextResponse.json(data);
+    if (userAccount) {
+      userAccount = await prisma.user.update({
+        where: { email: userAccount.email },
+        data: { last_sign_in: last_sign_in },
+      });
+    } else {
+      userAccount = await prisma.user.create({ data: user });
+    }
+
+    // Somehow this is working but still this error
+    // const data = await prisma.user.upsert({
+    //   where: { email: user.email },
+    //   // Update the user if it exists
+    //   update: { last_sign_in },
+    //   // Create a new user if it doesn't exist
+    //   create: user,
+    // });
+
+    return NextResponse.json(userAccount);
   } catch (err) {
     console.log("[USERS_POST]", err);
     return new NextResponse("Internal error", { status: 500 });

@@ -79,7 +79,7 @@ const CommentsModal = ({ data, open, children, onOpenChange }: Props) => {
     <Dialog open={open} onOpenChange={onOpenChange}>
       {children && <DialogTrigger asChild>{children}</DialogTrigger>}
       <DialogOverlay className="z-[9999]" />
-      <DialogContent className="z-[9999] sm:w-[600px] sm:max-w-none h-[80vh] flex flex-col !ring-0 !ring-offset-0 !outline-none">
+      <DialogContent className="z-[9999] sm:w-[600px] sm:max-w-none h-[80vh] !ring-0 !ring-offset-0 !outline-none">
         <DialogHeader>
           <DialogTitle>
             <div className="flex items-center gap-x-2 select-none">
@@ -89,8 +89,8 @@ const CommentsModal = ({ data, open, children, onOpenChange }: Props) => {
         </DialogHeader>
 
         {/* content */}
-        <div className="flex-1 h-ful flex flex-col">
-          <ScrollArea className="flex-1 max-h-[600px] -mx-6 px-6">
+        <div className="h-full flex flex-col overflow-hidden overflow-y-auto">
+          <ScrollArea className="max-h-full -mx-6 px-6">
             {/* Content */}
             <PostItem data={data} isModal />
 

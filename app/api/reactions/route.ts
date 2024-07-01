@@ -67,7 +67,12 @@ export async function POST(req: Request) {
     if (!post) return new NextResponse("Post does not exist", { status: 400 });
 
     const existed = await prisma.reaction.findFirst({
-      where: { user_id, post_id, comment_id, reply_id },
+      where: {
+        user_id,
+        post_id,
+        reply_id: reply_id || null,
+        comment_id: comment_id || null,
+      },
     });
 
     let result: Reaction | null = null;
