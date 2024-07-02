@@ -19,10 +19,12 @@ const ChatHeader = () => {
   const [modalMembers, toggleModalMembers] = useToggle(false);
 
   const {
+    isGroupChat,
+    conversationName,
     conversationData,
     conversationAvatar,
-    conversationName,
-    isGroupChat,
+    toggleCall,
+    toggleCallVideo,
   } = useConversationContext();
 
   const content = useMemo(() => {
@@ -83,10 +85,20 @@ const ChatHeader = () => {
 
       <div className="h-full flex items-center space-x-2">
         <SocketIndicator />
-        <Button className="rounded-full" variant="ghost" size="icon">
+        <Button
+          className="rounded-full"
+          variant="ghost"
+          size="icon"
+          onClick={() => toggleCall(true)}
+        >
           <Phone size={20} />
         </Button>
-        <Button className="rounded-full" variant="ghost" size="icon">
+        <Button
+          className="rounded-full"
+          variant="ghost"
+          size="icon"
+          onClick={() => toggleCallVideo(true)}
+        >
           <Video size={20} />
         </Button>
         <ChatInfo />

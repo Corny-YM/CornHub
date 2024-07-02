@@ -6,6 +6,7 @@ import { createContext, useContext, useMemo, useState } from "react";
 
 import { IDispatchState } from "@/types";
 import { TypeConversationEnum } from "@/lib/enum";
+import { useToggle } from "@/hooks/useToggle";
 
 interface Props {
   children: React.ReactNode;
@@ -17,25 +18,36 @@ interface Props {
 }
 
 export type ConversationContext = {
+  call: boolean;
+  callVideo: boolean;
   isOwner: boolean;
   isGroupChat: boolean;
   userUrl?: string | null;
   conversationAvatar?: string | null;
   conversationName?: string | null;
   conversationData: Props["data"];
+  toggleCall: (val?: boolean) => void;
+  toggleCallVideo: (val?: boolean) => void;
   setConversationData: IDispatchState<Props["data"]>;
 };
 
 const ConversationContext = createContext<ConversationContext>({
+  call: false,
+  callVideo: false,
   isOwner: false,
   isGroupChat: false,
   conversationData: {} as Props["data"],
+  toggleCall: () => {},
+  toggleCallVideo: () => {},
   setConversationData: () => {},
 });
 
 export const ConversationProvider = ({ children, data }: Props) => {
   const { userId } = useAuth();
   const [conversationData, setConversationData] = useState(data);
+
+  const [call, toggleCall] = useToggle();
+  const [callVideo, toggleCallVideo] = useToggle();
 
   const { name, file, user, createdBy, created_by, type } = conversationData;
 
@@ -64,12 +76,16 @@ export const ConversationProvider = ({ children, data }: Props) => {
   return (
     <ConversationContext.Provider
       value={{
+        call,
+        callVideo,
         userUrl,
         isOwner,
         isGroupChat,
         conversationAvatar,
         conversationName,
         conversationData,
+        toggleCall,
+        toggleCallVideo,
         setConversationData,
       }}
     >
