@@ -4,7 +4,6 @@ import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 import { TypeConversationEnum } from "@/lib/enum";
 import { ConversationProvider } from "@/providers/conversation-provider";
-import { Separator } from "@/components/ui/separator";
 import ChatHeader from "@/components/pages/messages/[conversationId]/chat-header";
 import ChatInput from "@/components/pages/messages/[conversationId]/chat-input";
 
@@ -56,12 +55,10 @@ const ConversationIdLayout = async ({ children, params }: Props) => {
   }
 
   return (
-    <div className="flex-grow h-full max-h-full flex flex-col px-2 pt-4 pb-4">
+    <div className="flex-grow flex-1 h-full max-h-full flex flex-col px-2 pt-4 pb-4">
       <ConversationProvider data={conversation}>
         {/* Header */}
         <ChatHeader />
-
-        <Separator className="my-2" />
 
         {/* Content */}
         {children}

@@ -17,6 +17,8 @@ interface Props {
   onDisconnected?: () => void;
 }
 
+const serverUrl = process.env.NEXT_PUBLIC_LK_SERVER_URL;
+
 export const MediaRoom = ({ chatId, video, audio, onDisconnected }: Props) => {
   const { user } = useUser();
   const [token, setToken] = useState("");
@@ -47,17 +49,18 @@ export const MediaRoom = ({ chatId, video, audio, onDisconnected }: Props) => {
   }
 
   return (
-    <LiveKitRoom
-      className="!flex-1"
-      data-lk-theme="default"
-      serverUrl={process.env.NEXT_PUBLIC_LK_SERVER_URL}
-      token={token}
-      connect={true}
-      video={video}
-      audio={audio}
-      onDisconnected={onDisconnected}
-    >
-      <VideoConference />
-    </LiveKitRoom>
+    <div className="flex-1 h-full overflow-hidden overflow-y-auto">
+      <LiveKitRoom
+        data-lk-theme="default"
+        serverUrl={serverUrl}
+        token={token}
+        connect={true}
+        video={video}
+        audio={audio}
+        onDisconnected={onDisconnected}
+      >
+        <VideoConference />
+      </LiveKitRoom>
+    </div>
   );
 };

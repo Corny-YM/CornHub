@@ -10,7 +10,9 @@ import { Button } from "@/components/ui/button";
 import UserInputSending from "@/components/user-input-sending";
 
 const ChatInput = () => {
-  const { conversationData } = useConversationContext();
+  const { conversationData, call, callVideo } = useConversationContext();
+  if (call || callVideo) return null;
+
   const { isPendingStoreMessage, onStoreMessage } = useMutates();
 
   const imgRef = useRef<HTMLInputElement | null>(null);

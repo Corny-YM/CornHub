@@ -1,8 +1,9 @@
 "use client";
 
+import { useConversationContext } from "@/providers/conversation-provider";
+import { Separator } from "@/components/ui/separator";
 import { MediaRoom } from "@/components/media-room";
 import ChatContent from "@/components/pages/messages/[conversationId]/chat-content";
-import { useConversationContext } from "@/providers/conversation-provider";
 
 interface Props {}
 
@@ -30,7 +31,12 @@ const ConversationIdPage = ({}: Props) => {
       />
     );
 
-  return <ChatContent />;
+  return (
+    <>
+      <Separator className="my-2" />
+      <ChatContent />
+    </>
+  );
 };
 
 export default ConversationIdPage;

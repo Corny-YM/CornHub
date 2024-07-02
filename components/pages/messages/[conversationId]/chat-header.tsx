@@ -15,10 +15,9 @@ import ModalMembers from "./modal-members";
 
 const ChatHeader = () => {
   const { userId } = useAuth();
-
-  const [modalMembers, toggleModalMembers] = useToggle(false);
-
   const {
+    call,
+    callVideo,
     isGroupChat,
     conversationName,
     conversationData,
@@ -26,6 +25,8 @@ const ChatHeader = () => {
     toggleCall,
     toggleCallVideo,
   } = useConversationContext();
+
+  const [modalMembers, toggleModalMembers] = useToggle(false);
 
   const content = useMemo(() => {
     const defaultContent = (
@@ -72,6 +73,7 @@ const ChatHeader = () => {
     toggleModalMembers(true);
   }, [isGroupChat]);
 
+  if (call || callVideo) return null;
   return (
     <div className="w-full flex items-center justify-between">
       <Button
