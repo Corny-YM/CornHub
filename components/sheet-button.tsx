@@ -11,16 +11,23 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
+import { Button, ButtonProps } from "@/components/ui/button";
 
 interface Props {
-  activator: React.ReactNode;
-  children: React.ReactNode;
   title?: string;
   description?: string;
+  children: React.ReactNode;
+  activator: React.ReactNode;
+  footerActions?: ButtonProps[];
 }
 
-const SheetButton = ({ activator, children, title, description }: Props) => {
+const SheetButton = ({
+  title,
+  children,
+  activator,
+  description,
+  footerActions,
+}: Props) => {
   return (
     <Sheet>
       <SheetTrigger asChild>{activator}</SheetTrigger>
@@ -35,6 +42,9 @@ const SheetButton = ({ activator, children, title, description }: Props) => {
           <SheetClose asChild>
             <Button variant="outline">Đóng</Button>
           </SheetClose>
+          {footerActions?.map((action) => (
+            <Button {...action} />
+          ))}
         </SheetFooter>
       </SheetContent>
     </Sheet>

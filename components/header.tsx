@@ -1,8 +1,8 @@
 "use client";
 
-import * as ClerkNextJs from "@clerk/nextjs";
 import Link from "next/link";
 import { Search } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import { useToggle } from "@/hooks/useToggle";
@@ -16,6 +16,7 @@ import SearchModal from "@/components/search-modal";
 import Notification from "@/components/icons/notification";
 
 const Header = () => {
+  const pathname = usePathname();
   const [modalSearch, toggleModalSearch] = useToggle(false);
   return (
     <div
@@ -48,16 +49,18 @@ const Header = () => {
       {/* More */}
       <div className="flex items-center gap-2 h-full">
         <ToggleMode className="hover:bg-primary/50" />
-        <Button
-          className="z-50 flex justify-center items-center w-10 h-10 p-2 rounded-full outline-none hover:bg-primary/50"
-          variant="outline"
-          size="icon"
-          asChild
-        >
-          <Link href="/messages">
-            <Message />
-          </Link>
-        </Button>
+        {!pathname.includes("messages") && (
+          <Button
+            className="z-50 flex justify-center items-center w-10 h-10 p-2 rounded-full outline-none hover:bg-primary/50"
+            variant="outline"
+            size="icon"
+            asChild
+          >
+            <Link href="/messages">
+              <Message />
+            </Link>
+          </Button>
+        )}
         <Button
           className="z-50 flex justify-center items-center w-10 h-10 p-2 rounded-full outline-none hover:bg-primary/50"
           variant="outline"

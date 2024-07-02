@@ -15,6 +15,7 @@ import {
   store as storeConversation,
   leave as leaveConversation,
   update as updateConversation,
+  destroy as destroyConversation,
   IStoreData as IStoreDataConversation,
   IUpdateData as IUpdateDataConversation,
   removeMembers,
@@ -59,6 +60,21 @@ export const useMutates = () => {
     },
     onError() {
       toast.error("Tạo cuộc hội thoại thất bại. Vui lòng thử lại sau");
+    },
+  });
+
+  const {
+    mutateAsync: mutateAsyncDeleteConversation,
+    isPending: isPendingDeleteConversation,
+  } = useMutation({
+    mutationKey: ["conversation", "destroy", userId],
+    mutationFn: destroyConversation,
+    onSuccess() {
+      toast.success("Xóa cuộc hội thoại thành công");
+      router.refresh();
+    },
+    onError() {
+      toast.error("Xóa cuộc hội thoại thất bại. Vui lòng thử lại sau");
     },
   });
 
@@ -185,6 +201,19 @@ export const useMutates = () => {
     []
   );
 
+  const onDeleteConversation = useCallback(
+    async (
+      conversationId: string,
+      callback?: (val: Conversation) => void | null
+    ) => {
+      if (!conversationId) return;
+      await mutateAsyncDeleteConversation(conversationId).then((res) =>
+        callback?.(res)
+      );
+    },
+    []
+  );
+
   const onLeaveConversation = useCallback(
     async (
       data: { conversationId: string; memberId: string },
@@ -273,6 +302,7 @@ export const useMutates = () => {
 
   return {
     isPendingUpdateConversation,
+    isPendingDeleteConversation,
     isPendingStoreConversation,
     isPendingLeaveConversation,
     isPendingDeleteReaction,
@@ -282,6 +312,7 @@ export const useMutates = () => {
     isPendingStoreMessage,
     isPendingAddMembers,
     onUpdateConversation,
+    onDeleteConversation,
     onStoreConversation,
     onLeaveConversation,
     onDeleteReaction,

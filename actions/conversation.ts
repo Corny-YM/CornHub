@@ -46,6 +46,9 @@ export const update = async ({
   return await defHttp.put(`${indexApi}/${id}`, formData);
 };
 
+export const destroy = async (conversationId: string): Promise<IConversation> =>
+  await defHttp.delete(`${indexApi}/${conversationId}`);
+
 export const leave = async (data: {
   conversationId: string;
   memberId: string;

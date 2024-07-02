@@ -19,7 +19,7 @@ import { useCallback, useMemo, useRef } from "react";
 import { useToggle } from "@/hooks/useToggle";
 import { useMutates } from "@/hooks/mutations/message/useMutates";
 import { useConversationContext } from "@/providers/conversation-provider";
-import { Button } from "@/components/ui/button";
+import { Button, ButtonProps } from "@/components/ui/button";
 import AvatarImg from "@/components/avatar-img";
 import SheetButton from "@/components/sheet-button";
 import CollapsibleButton from "@/components/collapsible-button";
@@ -29,12 +29,18 @@ import ModalAddMembers from "./modal-add-members";
 const ChatInfo = () => {
   const {
     userUrl,
+    isOwner,
     isGroupChat,
     conversationData,
     conversationName,
     conversationAvatar,
   } = useConversationContext();
-  const { isPendingUpdateConversation, onUpdateConversation } = useMutates();
+  const {
+    isPendingUpdateConversation,
+    isPendingDeleteConversation,
+    onUpdateConversation,
+    onDeleteConversation,
+  } = useMutates();
 
   const [modalAdd, toggleModalAdd] = useToggle(false);
   const [modalUpdate, toggleModalUpdate] = useToggle(false);
@@ -65,6 +71,25 @@ const ChatInfo = () => {
     [conversationData, onUpdateConversation]
   );
 
+  const handleDeleteChat = useCallback(async () => {
+    if (isPendingDeleteConversation) return;
+    await onDeleteConversation(conversationData.id, () => {});
+  }, [conversationData, isPendingDeleteConversation]);
+
+  const footerActions = useMemo(() => {
+    const arr = [] as ButtonProps[];
+
+    if (isOwner && isGroupChat)
+      arr.push({
+        variant: "destructive",
+        children: "Xóa cuộc hội thoại",
+        disabled: isPendingDeleteConversation,
+        onClick: handleDeleteChat,
+      });
+
+    return arr;
+  }, [isOwner, isGroupChat, isPendingDeleteConversation, handleDeleteChat]);
+
   return (
     <SheetButton
       title="Thông tin về cuộc trò chuyện"
@@ -73,6 +98,7 @@ const ChatInfo = () => {
           <Info size={20} />
         </Button>
       }
+      footerActions={footerActions}
     >
       <div className="w-full h-full">
         {/* User Info */}

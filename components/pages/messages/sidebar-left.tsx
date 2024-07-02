@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { ElementRef, Fragment, useMemo, useRef } from "react";
 import { useAuth } from "@clerk/nextjs";
+import { usePathname } from "next/navigation";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { ElementRef, Fragment, useMemo, useRef } from "react";
 import { Loader2, MessageSquareDiff, Search, ServerCrash } from "lucide-react";
 
-import { getRelativeTime } from "@/lib/utils";
+import { cn, getRelativeTime } from "@/lib/utils";
 import { index } from "@/actions/conversation";
 import { TypeConversationEnum } from "@/lib/enum";
 import { useSocket } from "@/providers/socket-provider";
@@ -19,6 +20,7 @@ import AvatarImg from "@/components/avatar-img";
 interface Props {}
 
 const SidebarLeft = ({}: Props) => {
+  const pathname = usePathname();
   const { userId } = useAuth();
   const { isConnected } = useSocket();
   const { toggleModalAdd } = useMessageContext();
@@ -89,7 +91,7 @@ const SidebarLeft = ({}: Props) => {
           </div>
         )}
         <div
-          className="flex-1 w-full flex flex-col mt-2 space-y-2 h-full overflow-hidden overflow-y-auto"
+          className="flex-1 w-full flex flex-col mt-2 space-y-1 h-full overflow-hidden overflow-y-auto"
           ref={conversationRef}
         >
           {data?.pages?.map((page, index) => (
@@ -139,10 +141,15 @@ const SidebarLeft = ({}: Props) => {
                   : user_id === userId
                   ? createdBy.full_name
                   : user?.full_name;
+                const selected =
+                  conversationId && pathname.includes(conversationId);
                 return (
                   <Link
                     key={id}
-                    className="p-2 flex items-center space-x-2 rounded-lg select-none cursor-pointer transition hover:bg-primary-foreground"
+                    className={cn(
+                      "p-2 flex items-center space-x-2 rounded-lg select-none cursor-pointer transition hover:bg-primary dark:hover:bg-primary-foreground",
+                      selected && "bg-primary dark:bg-primary-foreground"
+                    )}
                     href={`/messages/${conversationId}`}
                   >
                     <AvatarImg isChat src={conversationAvatar} />
