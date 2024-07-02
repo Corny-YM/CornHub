@@ -13,6 +13,7 @@ import { useMutation } from "@tanstack/react-query";
 import {
   addMembers,
   store as storeConversation,
+  leave as leaveConversation,
   update as updateConversation,
   IStoreData as IStoreDataConversation,
   IUpdateData as IUpdateDataConversation,
@@ -58,6 +59,21 @@ export const useMutates = () => {
     },
     onError() {
       toast.error("Tạo cuộc hội thoại thất bại. Vui lòng thử lại sau");
+    },
+  });
+
+  const {
+    mutateAsync: mutateAsyncLeaveConversation,
+    isPending: isPendingLeaveConversation,
+  } = useMutation({
+    mutationKey: ["conversation", "leave", userId],
+    mutationFn: leaveConversation,
+    onSuccess() {
+      toast.success("Rời nhóm thành công");
+      router.refresh();
+    },
+    onError() {
+      toast.error("Rời nhóm thất bại. Vui lòng thử lại sau");
     },
   });
 
@@ -169,6 +185,17 @@ export const useMutates = () => {
     []
   );
 
+  const onLeaveConversation = useCallback(
+    async (
+      data: { conversationId: string; memberId: string },
+      callback?: (val: Conversation) => void | null
+    ) => {
+      if (!data.conversationId || !data.memberId) return;
+      await mutateAsyncLeaveConversation(data).then((res) => callback?.(res));
+    },
+    []
+  );
+
   // Members
   const onAddMembers = useCallback(
     async (
@@ -247,6 +274,7 @@ export const useMutates = () => {
   return {
     isPendingUpdateConversation,
     isPendingStoreConversation,
+    isPendingLeaveConversation,
     isPendingDeleteReaction,
     isPendingDeleteMessage,
     isPendingStoreReaction,
@@ -255,6 +283,7 @@ export const useMutates = () => {
     isPendingAddMembers,
     onUpdateConversation,
     onStoreConversation,
+    onLeaveConversation,
     onDeleteReaction,
     onDeleteMessage,
     onStoreReaction,

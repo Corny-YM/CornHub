@@ -1,11 +1,11 @@
+import toast from "react-hot-toast";
 import { useEffect } from "react";
+import { useAuth } from "@clerk/nextjs";
 import { useQueryClient } from "@tanstack/react-query";
+import { usePathname, useRouter } from "next/navigation";
 import { Conversation, File as IFile, User } from "@prisma/client";
 
 import { useSocket } from "@/providers/socket-provider";
-import toast from "react-hot-toast";
-import { useAuth } from "@clerk/nextjs";
-import { usePathname, useRouter } from "next/navigation";
 
 type Props = {
   addKey: string;
@@ -34,9 +34,9 @@ export const useConversationSocket = ({
   useEffect(() => {
     if (!socket) return;
 
-    // TODO: socket remove member
     socket.on(updateKey, (conversation: ConversationType) => {
       const memberDeleted = conversation.member_deleted;
+      const memberLeaved = conversation.member_leaved;
       if (
         memberDeleted &&
         userId === memberDeleted &&
@@ -46,6 +46,8 @@ export const useConversationSocket = ({
         window.location.reload();
         // router.push("/messages");
         // router.refresh();
+      } else {
+        router.refresh();
       }
 
       queryClient.setQueryData([queryKey], (oldData: any) => {
@@ -56,7 +58,9 @@ export const useConversationSocket = ({
           return {
             ...page,
             items: [
-              !memberDeleted && userId !== memberDeleted ? conversation : null,
+              !memberDeleted && userId !== memberDeleted && !memberLeaved
+                ? conversation
+                : null,
               ...page.items.map((item: ConversationType) => {
                 if (item?.id === conversation?.id) return null;
                 return item;
@@ -70,6 +74,7 @@ export const useConversationSocket = ({
     });
 
     socket.on(addKey, (conversation: ConversationType) => {
+      router.refresh();
       queryClient.setQueryData([queryKey], (oldData: any) => {
         if (!oldData || !oldData.pages || oldData.pages.length === 0)
           return {

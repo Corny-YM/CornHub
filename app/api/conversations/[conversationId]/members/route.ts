@@ -84,6 +84,7 @@ export async function DELETE(
     const { memberId } = body;
 
     const conversation = await prisma.conversation.findFirstOrThrow({
+      include: { file: true, createdBy: true, user: true },
       where: { id: params.conversationId },
     });
 

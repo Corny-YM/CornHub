@@ -4,6 +4,7 @@ import Image from "next/image";
 import toast from "react-hot-toast";
 import { User } from "@prisma/client";
 import { useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 
@@ -16,6 +17,7 @@ interface Props {
 }
 
 const RequestSenderCard = ({ data }: Props) => {
+  const router = useRouter();
   const { userId } = useAuth();
   const [senderData, setSenderData] = useState<User>(data);
   const [status, setStatus] = useState<"accept" | "denied" | null>(null);
@@ -31,6 +33,7 @@ const RequestSenderCard = ({ data }: Props) => {
       toast.success(
         `Đã chấp nhận lời mời kết bạn của "${senderData.full_name}"`
       );
+      router.refresh();
     },
     onError() {
       toast.error("Chấp nhận lời mời thất bại. Vui lòng thử lại sau");

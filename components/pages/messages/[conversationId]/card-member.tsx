@@ -15,6 +15,8 @@ import DropdownActions, {
   IDropdownAction,
 } from "@/components/dropdown-actions";
 import AvatarImg from "@/components/avatar-img";
+import { useToggle } from "@/hooks/useToggle";
+import AlertModal from "@/components/alert-modal";
 
 interface Props {
   data: User;
@@ -24,17 +26,19 @@ interface Props {
 }
 
 const CardMember = ({ data, type, messageReaction, refetch }: Props) => {
-  const { userId } = useAuth();
   const router = useRouter();
-
+  const { userId } = useAuth();
   const { isOwner, conversationData } = useConversationContext();
-
   const {
     isPendingRemoveMembers,
     isPendingDeleteReaction,
+    isPendingLeaveConversation,
     onRemoveMembers,
     onDeleteReaction,
+    onLeaveConversation,
   } = useMutates();
+
+  const [modalConfirmLeave, toggleModalConfirmLeave] = useToggle();
 
   const handleUserProfile = useCallback(() => {
     router.push(`/account/${data.id}`);
@@ -75,6 +79,17 @@ const CardMember = ({ data, type, messageReaction, refetch }: Props) => {
     );
   }, [conversationData, data, onRemoveMembers]);
 
+  const handleLeave = useCallback(async () => {
+    if (!userId) return;
+    await onLeaveConversation(
+      { memberId: userId, conversationId: conversationData.id },
+      () => {
+        router.push("/messages");
+        router.refresh();
+      }
+    );
+  }, [userId, conversationData]);
+
   const Icon = useMemo(() => {
     if (!type || !messageReaction || !emotionIcons[type]) return;
     return emotionIcons[type];
@@ -102,6 +117,7 @@ const CardMember = ({ data, type, messageReaction, refetch }: Props) => {
         destructive: true,
         label: "Rời nhóm",
         icon: <DoorOpen className="mr-2" size={20} />,
+        onClick: () => toggleModalConfirmLeave(true),
       });
     }
 
@@ -152,6 +168,14 @@ const CardMember = ({ data, type, messageReaction, refetch }: Props) => {
           />
         )}
       </div>
+
+      <AlertModal
+        destructive
+        disabled={isPendingLeaveConversation}
+        open={modalConfirmLeave}
+        onOpenChange={toggleModalConfirmLeave}
+        onClick={handleLeave}
+      />
     </div>
   );
 };

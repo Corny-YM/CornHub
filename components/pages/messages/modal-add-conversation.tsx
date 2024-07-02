@@ -45,7 +45,6 @@ const ModalAddConversation = ({ open, onOpenChange }: Props) => {
   const handleChange = useCallback((e: React.ChangeEvent) => {
     const target = e.target as HTMLInputElement;
     const value = target.value;
-    if (!value) return;
     setName(value);
   }, []);
 

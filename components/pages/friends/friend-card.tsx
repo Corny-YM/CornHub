@@ -11,6 +11,7 @@ import { following, unfollow, unfriend } from "@/actions/user";
 import { Button } from "@/components/ui/button";
 import AlertModal from "@/components/alert-modal";
 import NoAvatar from "@/public/no-avatar.jpg";
+import Link from "next/link";
 
 type IUserWithFollowers = User & { followerUserInfo: Follower[] };
 
@@ -143,7 +144,12 @@ const FriendCard = ({ data }: Props) => {
         />
       </div>
       <div className="w-full flex flex-col p-3 gap-y-1">
-        <div className="font-medium">{friendData.full_name}</div>
+        <Link
+          className="font-medium hover:underline"
+          href={`/account/${friendData.id}`}
+        >
+          {friendData.full_name}
+        </Link>
         {contentActions}
       </div>
     </div>
