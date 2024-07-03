@@ -26,6 +26,7 @@ import {
   sendFriendRequest,
   deniedFriendRequest,
   acceptFriendRequest,
+  removeFriendRequest,
 } from "@/actions/user";
 import { useAccountContext } from "@/providers/account-provider";
 import { Button } from "@/components/ui/button";
@@ -78,7 +79,7 @@ const InfoActions = () => {
     mutate: mutateAcceptFriendRequest,
     isPending: isPendingAcceptFriendRequest,
   } = useMutation({
-    mutationKey: ["account", "unfriend", userId, accountData.id],
+    mutationKey: ["account", "accept", "request", userId, accountData.id],
     mutationFn: acceptFriendRequest,
     onSuccess() {
       refetchFriendStatus();
@@ -88,6 +89,20 @@ const InfoActions = () => {
     },
     onError() {
       toast.error("Chấp nhận lời mời thất bại. Vui lòng thử lại sau");
+    },
+  });
+  const {
+    mutate: mutateRemoveFriendRequest,
+    isPending: isPendingRemoveFriendRequest,
+  } = useMutation({
+    mutationKey: ["account", "remove", userId, accountData.id],
+    mutationFn: removeFriendRequest,
+    onSuccess() {
+      refetchFriendStatus();
+      toast.success(`Xóa lời mời kết bạn thành công`);
+    },
+    onError() {
+      toast.error("Xóa lời mời kết bạn thất bại. Vui lòng thử lại sau");
     },
   });
   const { mutate: mutateFollowing, isPending: isPendingFollowing } =
@@ -147,6 +162,11 @@ const InfoActions = () => {
     mutateSendFriendRequest({ userId, friendId: accountData.id });
   }, [userId, accountData, mutateSendFriendRequest]);
 
+  const handleRemoveFriendRequest = useCallback(() => {
+    if (!userId || !accountData) return;
+    mutateRemoveFriendRequest({ userId, friendId: accountData.id });
+  }, [userId, accountData, mutateRemoveFriendRequest]);
+
   const handleAcceptFriendRequest = useCallback(() => {
     if (!userId || !accountData) return;
     mutateAcceptFriendRequest({ userId, friendId: accountData.id });
@@ -156,8 +176,6 @@ const InfoActions = () => {
     if (!userId || !accountData) return;
     mutateDeniedFriendRequest({ userId, friendId: accountData.id });
   }, [userId, accountData, mutateDeniedFriendRequest]);
-
-  const handleRemoveFriendRequest = useCallback(() => {}, []);
 
   const handleUnfriend = useCallback(() => {
     if (!dataFriendStatus?.friend || !userId || !accountData) return;
@@ -199,6 +217,7 @@ const InfoActions = () => {
             {
               label: "Hủy bỏ lời mời kết bạn",
               destructive: true,
+              disabled: isPendingRemoveFriendRequest,
               icon: <SquareX className="mr-2" size={20} />,
               onClick: handleRemoveFriendRequest,
             },
@@ -279,6 +298,7 @@ const InfoActions = () => {
     isPendingFollowing,
     isLoadingFriendStatus,
     isPendingSendFriendRequest,
+    isPendingRemoveFriendRequest,
     isPendingAcceptFriendRequest,
     isPendingDeniedFriendRequest,
     handleUnfollow,

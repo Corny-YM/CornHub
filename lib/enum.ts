@@ -38,3 +38,12 @@ export enum OptionDeleteMessageEnum {
   recall = "recall",
   terminate = "terminate",
 }
+
+export enum TypeNotificationEnum {
+  friend = "friend",
+  group = "group",
+  post = "post",
+  comment = "comment",
+  reply = "reply",
+  reaction = "reaction",
+}

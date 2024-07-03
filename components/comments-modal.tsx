@@ -79,7 +79,7 @@ const CommentsModal = ({ data, open, children, onOpenChange }: Props) => {
     <Dialog open={open} onOpenChange={onOpenChange}>
       {children && <DialogTrigger asChild>{children}</DialogTrigger>}
       <DialogOverlay className="z-[9999]" />
-      <DialogContent className="z-[9999] sm:w-[600px] sm:max-w-none h-[80vh] !ring-0 !ring-offset-0 !outline-none">
+      <DialogContent className="z-[9999] sm:w-[600px] sm:max-w-none flex flex-col h-[80vh] !ring-0 !ring-offset-0 !outline-none">
         <DialogHeader>
           <DialogTitle>
             <div className="flex items-center gap-x-2 select-none">

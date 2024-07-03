@@ -101,7 +101,7 @@ const ModalInvite = ({ children, open, onOpenChange }: Props) => {
       <label
         key={item.id}
         htmlFor={`friend-${item.id}`}
-        className="w-full flex items-center p-2 hover:bg-primary-foreground cursor-pointer transition rounded-lg"
+        className="w-full flex items-center p-2 hover:bg-zinc-400/50 dark:hover:bg-primary-foreground cursor-pointer transition rounded-lg"
       >
         <AvatarImg src={item.avatar} alt={item.full_name} />
         <div className="flex-1 line-clamp-1 px-2">{item.full_name}</div>
@@ -177,7 +177,7 @@ const ModalInvite = ({ children, open, onOpenChange }: Props) => {
               <ScrollArea className="h-96 pr-3">{contentFriends}</ScrollArea>
             </div>
           </div>
-          <div className="w-2/5  py-2 bg-primary-foreground/50 rounded-lg">
+          <div className="w-2/5 py-2 bg-primary-foreground/50 rounded-lg">
             <div className="text-sm mb-4 px-3">
               Đã chọn {Object.keys(selectedIds).length || 0} người bạn
             </div>

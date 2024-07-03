@@ -139,7 +139,7 @@ const PostFooter = ({
         {!!totalComments && (
           <div className="flex-1 flex justify-end items-center">
             <Button
-              className="px-2 py-1 w-fit h-[30px] text-xs rounded-full leading-normal dark:hover:bg-primary-foreground hover:underline"
+              className="px-2 py-1 w-fit h-[30px] text-xs rounded-full leading-normal hover:bg-zinc-400/50 dark:hover:bg-primary-foreground hover:underline"
               variant="outline"
               size="sm"
               onClick={onClickComment}

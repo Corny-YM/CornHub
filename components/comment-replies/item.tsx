@@ -100,11 +100,11 @@ const CommentRepliesItem = ({
         },
         (res) => {
           setCurrentUserReaction(res);
-          setTotalReactions((prev) => prev + 1);
+          if (!currentUserReaction) setTotalReactions((prev) => prev + 1);
         }
       );
     },
-    [dataReply, userId]
+    [dataReply, userId, currentUserReaction]
   );
 
   const handleClickReaction = useCallback(async () => {
@@ -124,12 +124,12 @@ const CommentRepliesItem = ({
       },
       (res) => {
         setCurrentUserReaction(res);
-        setTotalReactions((prev) => prev + 1);
+        if (!currentUserReaction) setTotalReactions((prev) => prev + 1);
       }
     );
   }, [
-    dataReply,
     userId,
+    dataReply,
     currentUserReaction,
     onStoreReaction,
     onDeleteReaction,

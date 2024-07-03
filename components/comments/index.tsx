@@ -102,11 +102,11 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
         },
         (res) => {
           setCurrentUserReaction(res);
-          setTotalReactions((prev) => prev + 1);
+          if (!currentUserReaction) setTotalReactions((prev) => prev + 1);
         }
       );
     },
-    [dataComment, dataPost, userId, onStoreReaction]
+    [dataComment, dataPost, userId, currentUserReaction, onStoreReaction]
   );
 
   const handleClickReaction = useCallback(async () => {
@@ -125,7 +125,7 @@ const CommentItem = ({ data, dataPost, className }: Props) => {
       },
       (res) => {
         setCurrentUserReaction(res);
-        setTotalReactions((prev) => prev + 1);
+        if (!currentUserReaction) setTotalReactions((prev) => prev + 1);
       }
     );
   }, [

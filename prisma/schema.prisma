@@ -190,7 +190,8 @@ model CommentReply {
   file_id Int?
   file    File? @relation("FileToCommentReply", fields: [file_id], references: [id])
 
-  reactions Reaction[] @relation("CommentReplyToReaction")
+  reactions    Reaction[]     @relation("CommentReplyToReaction")
+  notification Notification[] @relation("ReplyToNotification")
 
   @@index([post_id])
   @@index([user_id])
@@ -248,14 +249,18 @@ model Notification {
   comment_id Int?
   comment    Comment? @relation("CommentToNotification", fields: [comment_id], references: [id])
 
+  reply_id Int?
+  reply    CommentReply? @relation("ReplyToNotification", fields: [reply_id], references: [id])
+
   group_id Int?
   group    Group? @relation("GroupToNotification", fields: [group_id], references: [id])
 
-  @@index([sender_id])
-  @@index([receiver_id])
   @@index([post_id])
-  @@index([comment_id])
   @@index([group_id])
+  @@index([reply_id])
+  @@index([sender_id])
+  @@index([comment_id])
+  @@index([receiver_id])
   @@map("notifications")
 }
 

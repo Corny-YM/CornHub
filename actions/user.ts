@@ -142,6 +142,17 @@ export const acceptFriendRequest = async ({
 }): Promise<Friend> =>
   defHttp.post(`${indexApi}/${userId}/accept-friend-request`, { friendId });
 
+export const removeFriendRequest = async ({
+  userId,
+  friendId,
+}: {
+  userId: string;
+  friendId: string;
+}): Promise<Friend> =>
+  defHttp.delete(`${indexApi}/${userId}/send-friend-request`, {
+    data: { friendId },
+  });
+
 export const deniedFriendRequest = async ({
   userId,
   friendId,

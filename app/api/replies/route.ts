@@ -2,9 +2,10 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { File as IFile } from "@prisma/client";
 
+import { UsedForEnum } from "@/lib/enum";
 import prisma from "@/lib/prisma";
 import uploadFile from "@/services/uploadFile";
-import { UsedForEnum } from "@/lib/enum";
+import sendNotification from "@/services/sendNotification";
 
 export async function PUT(req: Request) {
   try {
@@ -47,6 +48,14 @@ export async function PUT(req: Request) {
         content: content || "",
         file_id: fileDB?.id,
       },
+    });
+
+    await sendNotification({
+      type: "reply",
+      post_id: comment.post_id,
+      comment_id: comment.id,
+      reply_id: reply.id,
+      group_id: post.group_id,
     });
 
     return NextResponse.json(reply);

@@ -1,8 +1,9 @@
+import { Reaction } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 
 import prisma from "@/lib/prisma";
-import { Reaction } from "@prisma/client";
+import sendNotification from "@/services/sendNotification";
 
 interface IBody {
   type: string;
@@ -86,6 +87,13 @@ export async function POST(req: Request) {
         data: { type },
       });
     }
+
+    await sendNotification({
+      type: "reaction",
+      post_id: result.post_id,
+      comment_id: result.comment_id,
+      reply_id: result.reply_id,
+    });
 
     return NextResponse.json(result);
   } catch (err) {
