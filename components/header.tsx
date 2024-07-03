@@ -13,7 +13,7 @@ import MenuItems from "@/components/menu-items";
 import Message from "@/components/icons/message";
 import UserButton from "@/components/user-button";
 import SearchModal from "@/components/search-modal";
-import Notification from "@/components/icons/notification";
+import NotificationsSheet from "@/components/notifications-sheet";
 
 const Header = () => {
   const pathname = usePathname();
@@ -61,13 +61,7 @@ const Header = () => {
             </Link>
           </Button>
         )}
-        <Button
-          className="z-50 flex justify-center items-center w-10 h-10 p-2 rounded-full outline-none hover:bg-primary/50"
-          variant="outline"
-          size="icon"
-        >
-          <Notification />
-        </Button>
+        <NotificationsSheet />
         <UserButton />
         {/* <ClerkNextJs.UserButton /> */}
       </div>
