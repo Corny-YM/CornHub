@@ -6,10 +6,10 @@ import PostItem from "@/components/post";
 import EmptyData from "@/components/empty-data";
 
 interface Props {
-  params: { postId: string; userId: string };
+  params: { postId: string; groupId: string };
 }
 
-const AccountPostIdPage = async ({ params }: Props) => {
+const GroupPostIdPage = async ({ params }: Props) => {
   const { userId } = auth();
   if (!userId) redirect("/sign-in");
 
@@ -29,7 +29,7 @@ const AccountPostIdPage = async ({ params }: Props) => {
         },
       },
     },
-    where: { id: +params.postId },
+    where: { id: +params.postId, group_id: +params.groupId },
   });
 
   if (!post) return <EmptyData />;
@@ -41,4 +41,4 @@ const AccountPostIdPage = async ({ params }: Props) => {
   );
 };
 
-export default AccountPostIdPage;
+export default GroupPostIdPage;
