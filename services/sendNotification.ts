@@ -5,10 +5,11 @@ import { User } from "@prisma/client";
 
 interface IData {
   receiver_id?: string | null;
+  group_id?: number | null;
   post_id?: number | null;
   comment_id?: number | null;
   reply_id?: number | null;
-  group_id?: number | null;
+  reaction_id?: number | null;
   type: keyof typeof TypeNotificationEnum;
 }
 
@@ -20,7 +21,15 @@ export default async function (data: IData): Promise<void> {
   const currentUser = await prisma.user.findFirst({ where: { id: userId } });
   if (!currentUser) return;
 
-  const { receiver_id, type, post_id, comment_id, reply_id, group_id } = data;
+  const {
+    type,
+    receiver_id,
+    group_id,
+    post_id,
+    comment_id,
+    reply_id,
+    reaction_id,
+  } = data;
 
   let url = "";
   let description = "";
@@ -33,21 +42,21 @@ export default async function (data: IData): Promise<void> {
         where: { id: reply_id },
       });
       receiver = res?.user!;
-      description = `<strong>${currentUser.full_name}</strong> đã tương tác phản hồi của bạn`;
+      description = `<b>${currentUser.full_name}</b> đã tương tác phản hồi của bạn`;
     } else if (comment_id) {
       const res = await prisma.comment.findFirst({
         include: { user: true },
         where: { id: comment_id },
       });
       receiver = res?.user!;
-      description = `<strong>${currentUser.full_name}</strong> đã tương tác bình luận của bạn`;
+      description = `<b>${currentUser.full_name}</b> đã tương tác bình luận của bạn`;
     } else {
       const res = await prisma.post.findFirst({
         include: { user: true },
         where: { id: post_id },
       });
       receiver = res?.user!;
-      description = `<strong>${currentUser.full_name}</strong> đã tương tác bài viết của bạn`;
+      description = `<b>${currentUser.full_name}</b> đã tương tác bài viết của bạn`;
     }
   } else if (type === TypeNotificationEnum.reply && comment_id) {
     const res = await prisma.comment.findFirst({
@@ -55,14 +64,14 @@ export default async function (data: IData): Promise<void> {
       where: { id: comment_id },
     });
     receiver = res?.user!;
-    description = `<strong>${currentUser.full_name}</strong> đã phản hồi bình luận của bạn`;
+    description = `<b>${currentUser.full_name}</b> đã phản hồi bình luận của bạn`;
   } else if (type === TypeNotificationEnum.comment && post_id) {
     const res = await prisma.post.findFirst({
       include: { user: true },
       where: { id: post_id },
     });
     receiver = res?.user!;
-    description = `<strong>${currentUser.full_name}</strong> đã bình luận bài viết của bạn`;
+    description = `<b>${currentUser.full_name}</b> đã bình luận bài viết của bạn`;
   }
 
   if (receiver_id) {
@@ -70,9 +79,9 @@ export default async function (data: IData): Promise<void> {
       where: { id: receiver_id },
     });
     if (type === TypeNotificationEnum.friend) {
-      description = `<strong>${currentUser.full_name}</strong> đã gửi cho bạn lời mời kết bạn`;
+      description = `<b>${currentUser.full_name}</b> đã gửi cho bạn lời mời kết bạn`;
     } else if (type === TypeNotificationEnum.group) {
-      description = `<strong>${currentUser.full_name}</strong> đã gửi cho bạn lời mời vào nhóm`;
+      description = `<b>${currentUser.full_name}</b> đã gửi cho bạn lời mời vào nhóm`;
     }
   }
 
@@ -85,7 +94,7 @@ export default async function (data: IData): Promise<void> {
   } else if (post_id && group_id) {
     url = `/groups/${group_id}/posts/${post_id}`;
   } else if (post_id) {
-    url = `/${receiver.id}/posts/${post_id}`;
+    url = `/account/${receiver.id}/posts/${post_id}`;
   }
 
   const existed = await prisma.notification.findFirst({
@@ -110,6 +119,7 @@ export default async function (data: IData): Promise<void> {
       post_id: post_id,
       comment_id: comment_id,
       reply_id: reply_id,
+      reaction_id: reaction_id,
     },
   });
 }

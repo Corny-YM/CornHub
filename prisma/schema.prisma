@@ -190,8 +190,8 @@ model CommentReply {
   file_id Int?
   file    File? @relation("FileToCommentReply", fields: [file_id], references: [id])
 
-  reactions    Reaction[]     @relation("CommentReplyToReaction")
-  notification Notification[] @relation("ReplyToNotification")
+  reactions     Reaction[]     @relation("CommentReplyToReaction")
+  notifications Notification[] @relation("ReplyToNotification")
 
   @@index([post_id])
   @@index([user_id])
@@ -219,11 +219,13 @@ model Reaction {
   user_id String
   user    User   @relation("UserToReaction", fields: [user_id], references: [id])
 
+  notifications Notification[] @relation("ReactionToNotification")
+
   @@unique([user_id, post_id, comment_id, reply_id])
   @@index([user_id])
   @@index([post_id])
-  @@index([comment_id])
   @@index([reply_id])
+  @@index([comment_id])
   @@map("reactions")
 }
 
@@ -243,6 +245,9 @@ model Notification {
   receiver_id String
   receiver    User   @relation("ReceiverToNotification", fields: [receiver_id], references: [id])
 
+  group_id Int?
+  group    Group? @relation("GroupToNotification", fields: [group_id], references: [id])
+
   post_id Int?
   post    Post? @relation("PostToNotification", fields: [post_id], references: [id])
 
@@ -252,8 +257,8 @@ model Notification {
   reply_id Int?
   reply    CommentReply? @relation("ReplyToNotification", fields: [reply_id], references: [id])
 
-  group_id Int?
-  group    Group? @relation("GroupToNotification", fields: [group_id], references: [id])
+  reaction_id Int?
+  reaction    Reaction? @relation("ReactionToNotification", fields: [reaction_id], references: [id])
 
   @@index([post_id])
   @@index([group_id])
@@ -261,6 +266,7 @@ model Notification {
   @@index([sender_id])
   @@index([comment_id])
   @@index([receiver_id])
+  @@index([reaction_id])
   @@map("notifications")
 }
 

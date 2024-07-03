@@ -93,6 +93,7 @@ export async function POST(req: Request) {
       post_id: result.post_id,
       comment_id: result.comment_id,
       reply_id: result.reply_id,
+      reaction_id: result.id,
     });
 
     return NextResponse.json(result);

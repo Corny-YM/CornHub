@@ -41,7 +41,7 @@ const SheetButton = ({
           <SheetTitle>{title}</SheetTitle>
           <SheetDescription>{description}</SheetDescription>
         </SheetHeader>
-        <div className="flex-1 -mx-4 px-4 overflow-hidden overflow-y-auto">
+        <div className="flex-1 -mx-6 px-4 overflow-hidden overflow-y-auto">
           {children}
         </div>
         <SheetFooter>
