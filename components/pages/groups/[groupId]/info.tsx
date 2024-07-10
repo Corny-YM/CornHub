@@ -1,16 +1,17 @@
 "use client";
 
+import Link from "next/link";
 import Image from "next/image";
 import {
+  X,
   Bell,
+  Plus,
+  Pencil,
   BellOff,
+  DoorOpen,
+  UsersRound,
   CheckCircle,
   CircleCheckBig,
-  DoorOpen,
-  Pencil,
-  Plus,
-  UsersRound,
-  X,
 } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
 import { useCallback, useMemo } from "react";
@@ -111,9 +112,12 @@ const Info = () => {
       <div className="flex-1 h-full flex flex-col justify-center pt-6 pb-4">
         <div className="text-2xl font-semibold">{groupData.group_name}</div>
         <div>
-          <a className="hover:underline w-fit" href="/">
+          <Link
+            className="hover:underline w-fit"
+            href={`/groups/${groupData.id}/members`}
+          >
             {groupData._count.groupMembers || 0} thành viên
-          </a>
+          </Link>
         </div>
         <div className="w-full flex items-center">{content}</div>
       </div>

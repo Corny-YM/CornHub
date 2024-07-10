@@ -46,6 +46,7 @@ const AppContext = createContext<Context>({
 export const AppProvider = ({ children }: Props) => {
   const { user } = useUser();
   const { isSignedIn, session } = useSession();
+
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   useEffect(() => {
@@ -90,8 +91,8 @@ export const AppProvider = ({ children }: Props) => {
     >
       <QueryClientProvider client={queryClient}>
         <SocketProvider>
-          <Toaster containerStyle={{ zIndex: 9999999999 }} />
           {children}
+          <Toaster containerStyle={{ zIndex: 9999999999 }} />
         </SocketProvider>
       </QueryClientProvider>
     </AppContext.Provider>

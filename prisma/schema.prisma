@@ -192,6 +192,7 @@ model CommentReply {
 
   reactions     Reaction[]     @relation("CommentReplyToReaction")
   notifications Notification[] @relation("ReplyToNotification")
+  reports       Report[]       @relation("CommentReplyToReport")
 
   @@index([post_id])
   @@index([user_id])
@@ -271,11 +272,12 @@ model Notification {
 }
 
 model Report {
-  id         Int      @id @default(autoincrement())
-  status     Int      @default(0) @db.TinyInt
-  report_to  String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  status      Int      @default(0) @db.TinyInt
+  report_to   String
+  description String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
   // relation
   post_id Int?
@@ -290,14 +292,18 @@ model Report {
   comment_id Int?
   comment    Comment? @relation("CommentToReport", fields: [comment_id], references: [id])
 
+  reply_id Int?
+  reply    CommentReply? @relation("CommentReplyToReport", fields: [reply_id], references: [id])
+
   group_id Int?
   group    Group? @relation("GroupToReport", fields: [group_id], references: [id])
 
   @@index([user_id])
   @@index([post_id])
+  @@index([group_id])
+  @@index([reply_id])
   @@index([sender_id])
   @@index([comment_id])
-  @@index([group_id])
   @@map("reports")
 }
 

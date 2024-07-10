@@ -1,15 +1,17 @@
 "use client";
 
 import { Ellipsis } from "lucide-react";
-import { useMemo } from "react";
 import { useAuth } from "@clerk/nextjs";
+import { useMemo, useState } from "react";
 import { Comment, User, File as IFile, Post, Group } from "@prisma/client";
 
+import { TypeReportEnum } from "@/lib/enum";
 import { useToggle } from "@/hooks/useToggle";
 import DropdownActions, {
   IDropdownAction,
 } from "@/components/dropdown-actions";
 import AlertModal from "@/components/alert-modal";
+import ReportModal from "@/components/report-modal";
 
 interface Props {
   data: Comment & { user: User; file?: IFile | null };
@@ -28,6 +30,8 @@ const Actions = ({ data, dataPost, toggleIsEdit, onDelete }: Props) => {
   const { group } = dataPost;
 
   const [confirmModal, toggleConfirmModal] = useToggle(false);
+  const [modalReport, toggleModalReport] = useToggle(false);
+  const [typeReport, setTypeReport] = useState(TypeReportEnum.admin);
 
   const isOwner = userId === user.id;
 
@@ -48,14 +52,20 @@ const Actions = ({ data, dataPost, toggleIsEdit, onDelete }: Props) => {
     } else {
       result.push({
         label: "Báo cáo bình luận",
-        onClick: () => {},
+        onClick: () => {
+          toggleModalReport(true);
+          setTypeReport(TypeReportEnum.admin);
+        },
       });
     }
 
     if (group && !isOwner && !isGroupOwnerComment) {
       result.push({
         label: "Báo cáo bình luận với quản trị viên",
-        onClick: () => {},
+        onClick: () => {
+          toggleModalReport(true);
+          setTypeReport(TypeReportEnum.group);
+        },
       });
     }
 
@@ -74,6 +84,16 @@ const Actions = ({ data, dataPost, toggleIsEdit, onDelete }: Props) => {
         size="icon"
         actions={actions}
         icon={<Ellipsis size={20} />}
+      />
+      <ReportModal
+        data={{
+          report_to: typeReport,
+          group_id: dataPost.group_id,
+          post_id: dataPost.id,
+          comment_id: data.id,
+        }}
+        open={modalReport}
+        onOpenChange={toggleModalReport}
       />
     </>
   );

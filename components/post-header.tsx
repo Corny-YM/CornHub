@@ -13,10 +13,11 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Group, Post, User, File as IFile } from "@prisma/client";
 
+import { TypeReportEnum } from "@/lib/enum";
 import { useToggle } from "@/hooks/useToggle";
 import { destroy, update } from "@/actions/post";
 import { cn, getRelativeTime } from "@/lib/utils";
@@ -26,6 +27,7 @@ import DropdownActions, {
 } from "@/components/dropdown-actions";
 import AvatarImg from "@/components/avatar-img";
 import AlertModal from "@/components/alert-modal";
+import ReportModal from "@/components/report-modal";
 import PostingModal from "@/components/posting-modal";
 
 interface Props {
@@ -55,6 +57,8 @@ const PostHeader = ({
 
   const [confirmDelete, toggleConfirmDelete] = useToggle(false);
   const [modalUpdate, toggleModalUpdate] = useToggle(false);
+  const [modalReport, toggleModalReport] = useToggle(false);
+  const [typeReport, setTypeReport] = useState(TypeReportEnum.admin);
 
   const { mutate: mutateUpdate, isPending: isPendingUpdate } = useMutation({
     mutationKey: ["store", "post", userId, id],
@@ -141,6 +145,10 @@ const PostHeader = ({
         groupActions.push({
           label: "Báo cáo bài viết với quản trị viên nhóm",
           icon: <ShieldAlert className="mr-2" size={20} />,
+          onClick: () => {
+            toggleModalReport(true);
+            setTypeReport(TypeReportEnum.group);
+          },
         });
       }
     }
@@ -166,6 +174,10 @@ const PostHeader = ({
         {
           label: "Báo cáo bài viết",
           icon: <MessageSquareWarning className="mr-2" size={20} />,
+          onClick: () => {
+            toggleModalReport(true);
+            setTypeReport(TypeReportEnum.admin);
+          },
         },
         {
           label: `Chặn trang cá nhân của ${user.full_name}`,
@@ -288,6 +300,16 @@ const PostHeader = ({
         data={data}
         toggleOpen={toggleModalUpdate}
         onSuccess={onSuccessUpdate}
+      />
+
+      <ReportModal
+        data={{
+          report_to: typeReport,
+          post_id: data.id,
+          group_id: data.group_id,
+        }}
+        open={modalReport}
+        onOpenChange={toggleModalReport}
       />
     </div>
   );
