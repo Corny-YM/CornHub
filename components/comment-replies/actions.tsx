@@ -1,8 +1,8 @@
 "use client";
 
-import { Ellipsis } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
 import { useMemo, useState } from "react";
+import { Ellipsis, MessageSquareWarning, ShieldAlert } from "lucide-react";
 import { User, Post, Group, CommentReply, File as IFile } from "@prisma/client";
 
 import { TypeReportEnum } from "@/lib/enum";
@@ -38,8 +38,6 @@ const Actions = ({ data, dataPost, toggleIsEdit, onDelete }: Props) => {
   const actions = useMemo(() => {
     const result: IDropdownAction[] = [];
 
-    const isGroupOwnerComment = dataPost.user_id === group?.owner_id;
-
     if (isOwner) {
       result.push(
         { label: "Chỉnh sửa", onClick: () => toggleIsEdit?.(true) },
@@ -52,6 +50,7 @@ const Actions = ({ data, dataPost, toggleIsEdit, onDelete }: Props) => {
     } else {
       result.push({
         label: "Báo cáo bình luận",
+        icon: <MessageSquareWarning className="mr-2" size={20} />,
         onClick: () => {
           toggleModalReport(true);
           setTypeReport(TypeReportEnum.admin);
@@ -59,9 +58,10 @@ const Actions = ({ data, dataPost, toggleIsEdit, onDelete }: Props) => {
       });
     }
 
-    if (group && !isOwner && !isGroupOwnerComment) {
+    if (group && !isOwner) {
       result.push({
         label: "Báo cáo bình luận với quản trị viên",
+        icon: <ShieldAlert className="mr-2" size={20} />,
         onClick: () => {
           toggleModalReport(true);
           setTypeReport(TypeReportEnum.group);

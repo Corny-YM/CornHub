@@ -73,11 +73,11 @@ const ModalInfoDetails = ({ open, onOpenChange }: Props) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      group_name: groupData?.group_name || "",
       status: groupData?.status,
-      approve_members: groupData?.approve_members,
-      approve_posts: groupData?.approve_posts,
       description: groupData?.description,
+      group_name: groupData?.group_name || "",
+      approve_posts: groupData?.approve_posts,
+      approve_members: groupData?.approve_members,
     },
   });
 
@@ -231,7 +231,13 @@ const ModalInfoDetails = ({ open, onOpenChange }: Props) => {
                 </div>
               </div>
               <div className="h-fit w-full flex items-center justify-end gap-x-2">
-                <Button variant="outline" onClick={() => onOpenChange(false)}>
+                <Button
+                  variant="outline"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onOpenChange(false);
+                  }}
+                >
                   Đóng
                 </Button>
                 <Button disabled={disabled}>Lưu thay đổi</Button>
