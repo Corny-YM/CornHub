@@ -2,26 +2,26 @@
 
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { Group, Post, User, File as IFile } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Group, Post, User, File as IFile } from "@prisma/client";
 import { Earth, ImagePlus, Lock, UsersRound } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { useToggle } from "@/hooks/useToggle";
 import { store, update } from "@/actions/post";
 import { useAppContext } from "@/providers/app-provider";
 import {
   Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
   DialogTitle,
+  DialogHeader,
+  DialogFooter,
+  DialogContent,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import SelectActions, { ISelectAction } from "@/components/select-actions";
 import PostingPreviewFile from "@/components/posting-preview-file";
 import CustomEditor from "@/components/custom-editor";
-import { useToggle } from "@/hooks/useToggle";
 import AlertModal from "./alert-modal";
 
 interface Props {
@@ -150,10 +150,18 @@ const PostingModal = ({
   }, []);
   const handleStorePost = useCallback(() => {
     if (!currentUser) return;
+    if (file) {
+      const size = file.size / (1024 * 1024);
+      if (size > 10) return toast.error("File quá 10MB!");
+    }
     mutateStore({ groupId, content, status, file, userId: currentUser.id });
   }, [content, status, file, currentUser, mutateStore]);
   const handleUpdatePost = useCallback(() => {
     if (!currentUser || !data) return;
+    if (file) {
+      const size = file.size / (1024 * 1024);
+      if (size > 10) return toast.error("File quá 10MB!");
+    }
     mutateUpdate({
       postId: data.id,
       data: { groupId, content, status, file, userId: currentUser.id },

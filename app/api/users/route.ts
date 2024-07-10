@@ -16,29 +16,42 @@ export async function POST(req: Request) {
       return new NextResponse("User email is required", { status: 400 });
     }
 
-    const { last_sign_in } = user;
+    const {
+      id,
+      email,
+      avatar,
+      full_name,
+      last_name,
+      first_name,
+      last_sign_in,
+    } = user;
 
-    let userAccount = await prisma.user.findFirst({
-      where: { email: user.email },
+    const query = `
+      INSERT INTO Users (id, email, first_name, last_name, full_name, avatar, last_sign_in, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE
+      last_sign_in = VALUES(last_sign_in),
+      updated_at = NOW();
+    `;
+
+    // Execute the raw SQL query
+    await prisma.$executeRawUnsafe(
+      query,
+      id,
+      email,
+      first_name,
+      last_name,
+      full_name,
+      avatar,
+      last_sign_in,
+      new Date(),
+      new Date()
+    );
+
+    // Fetch the updated or inserted user
+    const userAccount = await prisma.user.findUnique({
+      where: { email },
     });
-
-    if (userAccount) {
-      userAccount = await prisma.user.update({
-        where: { email: userAccount.email },
-        data: { last_sign_in: last_sign_in },
-      });
-    } else {
-      userAccount = await prisma.user.create({ data: user });
-    }
-
-    // Somehow this is working but still this error
-    // const data = await prisma.user.upsert({
-    //   where: { email: user.email },
-    //   // Update the user if it exists
-    //   update: { last_sign_in },
-    //   // Create a new user if it doesn't exist
-    //   create: user,
-    // });
 
     return NextResponse.json(userAccount);
   } catch (err) {

@@ -253,7 +253,16 @@ const PostHeader = ({
           ) : isGroupOwnerPost ? (
             <Badge className="mr-2 px-1 text-[10px]">Admin</Badge>
           ) : null}
-          <div className="">{getRelativeTime(created_at)}</div>
+          <Link
+            className="hover:underline"
+            href={
+              group_id
+                ? `/groups/${group_id}/posts/${id}`
+                : `/account/${user.id}/posts/${id}`
+            }
+          >
+            {getRelativeTime(created_at)}
+          </Link>
         </div>
       </div>
 

@@ -1,11 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Group, Post, User, File as IFile, Reaction } from "@prisma/client";
 
 import { cn } from "@/lib/utils";
 import { useToggle } from "@/hooks/useToggle";
+import { Button } from "@/components/ui/button";
 import Video from "@/components/video";
 import PostFooter from "@/components/post-footer";
 import PostHeader from "@/components/post-header";
@@ -28,6 +29,8 @@ interface Props {
   onSuccessDelete?: () => void;
 }
 
+const limitContent = 1000;
+
 const PostItem = ({
   data,
   className,
@@ -38,8 +41,11 @@ const PostItem = ({
   onSuccessDelete,
 }: Props) => {
   const [dataPost, setDataPost] = useState(data);
-  const [modalReactions, toggleModalReactions] = useToggle(false);
+  const [showFullContent, toggleShowFullContent] = useToggle(
+    !((dataPost.content || "").length > limitContent)
+  );
   const [modalComments, toggleModalComments] = useToggle(false);
+  const [modalReactions, toggleModalReactions] = useToggle(false);
 
   useEffect(() => {
     setDataPost(data);
@@ -50,6 +56,14 @@ const PostItem = ({
   const path = useMemo(() => {
     return file?.path;
   }, [file]);
+
+  const content = useMemo(
+    () =>
+      showFullContent
+        ? dataPost.content
+        : dataPost.content?.slice(0, limitContent) + " ...",
+    [(dataPost.content, showFullContent)]
+  );
 
   return (
     <div className={cn("post-item", isModal && "popup", className)}>
@@ -71,15 +85,25 @@ const PostItem = ({
       {/* Content */}
       <div className="flex flex-col w-full text-sm">
         {/* content */}
-        <div
-          className={cn("px-4 pb-4 pt-1", isModal && "px-0")}
-          dangerouslySetInnerHTML={{ __html: dataPost.content || "" }}
-        />
+        <div className="px-4 pb-4 pt-1">
+          <span
+            className={cn("post-content", isModal && "px-0")}
+            dangerouslySetInnerHTML={{ __html: content || "" }}
+          />
+          <Button
+            className="w-fit h-fit px-2 mt-1 hover:bg-primary/50"
+            size="sm"
+            variant="outline"
+            onClick={() => toggleShowFullContent()}
+          >
+            {showFullContent ? "Ẩn bớt" : "Đọc thêm"}
+          </Button>
+        </div>
 
         {file && path && (
           <div className="flex w-full px-12 bg-primary-foreground/40 mb-2">
-            <div className="relative w-full aspect-square flex justify-center items-center">
-              {type === "image" && (
+            {type === "image" && (
+              <div className="relative w-full aspect-square flex justify-center items-center">
                 <Image
                   className="absolute w-full h-full object-cover"
                   src={path}
@@ -88,15 +112,17 @@ const PostItem = ({
                   priority
                   sizes="100%"
                 />
-              )}
-              {type === "video" && (
+              </div>
+            )}
+            {type === "video" && (
+              <div className="relative w-full aspect-video flex justify-center items-center">
                 <Video
                   className="absolute object-cover"
                   src={path}
                   type={`${file.type}/${file.ext}`}
                 />
-              )}
-            </div>
+              </div>
+            )}
           </div>
         )}
       </div>

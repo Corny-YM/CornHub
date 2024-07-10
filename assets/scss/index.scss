@@ -72,6 +72,12 @@ input {
   }
 }
 
+.post-content {
+  a {
+    @apply text-blue-400 hover:underline;
+  }
+}
+
 @keyframes s3 {
   100% {
     transform: rotate(1turn);
