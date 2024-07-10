@@ -90,14 +90,16 @@ const PostItem = ({
             className={cn("post-content", isModal && "px-0")}
             dangerouslySetInnerHTML={{ __html: content || "" }}
           />
-          <Button
-            className="w-fit h-fit px-2 mt-1 hover:bg-primary/50"
-            size="sm"
-            variant="outline"
-            onClick={() => toggleShowFullContent()}
-          >
-            {showFullContent ? "Ẩn bớt" : "Đọc thêm"}
-          </Button>
+          {(dataPost.content || "").length > limitContent && (
+            <Button
+              className="w-fit h-fit px-2 mt-1 hover:bg-primary/50"
+              size="sm"
+              variant="outline"
+              onClick={() => toggleShowFullContent()}
+            >
+              {showFullContent ? "Ẩn bớt" : "Đọc thêm"}
+            </Button>
+          )}
         </div>
 
         {file && path && (

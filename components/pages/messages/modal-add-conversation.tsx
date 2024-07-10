@@ -2,6 +2,7 @@
 
 import { User } from "@prisma/client";
 import { useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 
 import { useMutates } from "@/hooks/mutations/message/useMutates";
@@ -18,7 +19,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import SelectFriends from "./select-friends";
-import { useRouter } from "next/navigation";
 
 interface Props {
   open: boolean;

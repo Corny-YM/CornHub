@@ -23,7 +23,7 @@ const SidebarLeft = ({}: Props) => {
   const pathname = usePathname();
   const { userId } = useAuth();
   const { isConnected } = useSocket();
-  const { toggleModalAdd } = useMessageContext();
+  const { toggleModalAdd, toggleModalSearch } = useMessageContext();
 
   const conversationRef = useRef<ElementRef<"div">>(null);
   const topRef = useRef<ElementRef<"div">>(null);
@@ -67,11 +67,14 @@ const SidebarLeft = ({}: Props) => {
           </Button>
         </div>
         <div className="relative w-full">
-          <Input
-            className="!ring-0 !ring-offset-0 rounded-full overflow-hidden pl-10"
-            placeholder="Tìm kiếm trên CornHub"
-          />
-          <Search className="absolute top-1/2 left-2 -translate-y-1/2" />
+          <Button
+            className="w-full flex items-center justify-start focus-visible:ring-0 focus-visible:ring-offset-0 rounded-3xl px-3 text-base !cursor-pointer dark:hover:bg-primary/50 hover:bg-primary/40 transition"
+            variant="outline"
+            onClick={() => toggleModalSearch(true)}
+          >
+            <Search className="mr-1" size={20} />
+            <div className="opacity-50">Tìm kiếm trên CornHub</div>
+          </Button>
         </div>
 
         {status === "pending" && (

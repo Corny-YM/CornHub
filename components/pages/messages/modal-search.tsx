@@ -3,6 +3,7 @@
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 import { Group, User } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
 import { ChangeEvent, useCallback, useMemo, useState } from "react";
@@ -31,7 +32,8 @@ interface Props {
   onOpenChange?: (val: boolean) => void;
 }
 
-const SearchModal = ({ open, children, onOpenChange }: Props) => {
+const ModalSearch = ({ open, children, onOpenChange }: Props) => {
+  const router = useRouter();
   const { userId } = useAuth();
   const [inputValue, setInputValue] = useState("");
   const [users, setUsers] = useState<User[]>([]);
@@ -64,6 +66,18 @@ const SearchModal = ({ open, children, onOpenChange }: Props) => {
     setInputValue(val);
   }, []);
 
+  const handleClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      const target = e.currentTarget as HTMLDivElement;
+      const id = target.dataset.id;
+      if (!id) return;
+      onOpenChange?.(false);
+      router.push(`/messages/${id}`);
+    },
+    [router]
+  );
+
   const contentUsers = useMemo(() => {
     if (!users.length) return null;
     return (
@@ -73,8 +87,10 @@ const SearchModal = ({ open, children, onOpenChange }: Props) => {
           {users.map((user) => (
             <Link
               key={user.email}
+              data-id={user.id}
               className="w-full flex items-center p-2 rounded-lg cursor-pointer hover:bg-primary-foreground/50"
-              href={`/account/${user.id}`}
+              href={`/messages/${user.id}`}
+              onClick={handleClick}
             >
               <AvatarImg className="mr-2" src={user.avatar} />
               <div>{user.full_name}</div>
@@ -167,4 +183,4 @@ const SearchModal = ({ open, children, onOpenChange }: Props) => {
   );
 };
 
-export default SearchModal;
+export default ModalSearch;

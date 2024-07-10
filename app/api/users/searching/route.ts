@@ -17,6 +17,7 @@ export async function GET(req: Request) {
 
     const users = await prisma.user.findMany({
       where: {
+        id: { not: userId },
         OR: [
           { full_name: { contains: searchKey! } },
           { first_name: { contains: searchKey! } },
