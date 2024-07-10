@@ -34,11 +34,6 @@ export enum TypeMessageEnum {
   file = "file",
 }
 
-export enum TypeReportEnum {
-  admin = "admin",
-  group = "admin_group",
-}
-
 export enum OptionDeleteMessageEnum {
   recall = "recall",
   terminate = "terminate",
@@ -51,4 +46,17 @@ export enum TypeNotificationEnum {
   comment = "comment",
   reply = "reply",
   reaction = "reaction",
+}
+
+export enum ReportToEnum {
+  admin = "admin",
+  group = "admin_group",
+}
+
+export enum TypeReportEnum {
+  user = "user",
+  group = "group",
+  post = "post",
+  comment = "comment",
+  reply = "reply",
 }

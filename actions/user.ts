@@ -34,6 +34,9 @@ interface IUpdateData extends Record<string, any> {
   birth?: string | null;
 }
 
+export const show = async (userId: string): Promise<User> =>
+  defHttp.get(`/users/${userId}`);
+
 export const update = async (
   data: IUpdateData
 ): Promise<User & { userDetails: UserDetail[] }> => {

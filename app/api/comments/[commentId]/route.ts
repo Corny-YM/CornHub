@@ -4,9 +4,39 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { File as IFile } from "@prisma/client";
 
+import { UsedForEnum } from "@/lib/enum";
 import prisma from "@/lib/prisma";
 import uploadFile from "@/services/uploadFile";
-import { UsedForEnum } from "@/lib/enum";
+
+export async function GET(
+  req: Request,
+  { params }: { params: { commentId: string } }
+) {
+  try {
+    const { userId } = auth();
+    if (!userId) return new NextResponse("Unauthenticated", { status: 401 });
+
+    const comment = await prisma.comment.findFirst({
+      include: {
+        user: true,
+        file: true,
+        reactions: { where: { user_id: userId, reply_id: null }, take: 1 },
+        _count: {
+          select: {
+            reactions: { where: { reply_id: null } },
+            commentReplies: true,
+          },
+        },
+      },
+      where: { id: +params.commentId },
+    });
+
+    return NextResponse.json(comment);
+  } catch (err) {
+    console.log("[COMMENT_ID_GET]", err);
+    return new NextResponse("Internal error", { status: 500 });
+  }
+}
 
 export async function PUT(
   req: Request,

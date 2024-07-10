@@ -36,12 +36,6 @@ type CommentReplyWithInfoDetails = CommentReply & {
 interface Props {
   className?: string;
   data: CommentReplyWithInfoDetails;
-  dataComment: Comment & {
-    user: User;
-    file?: IFile | null;
-    reactions: Reaction[];
-    _count: { reactions: number };
-  };
   dataPost: Post & {
     user: User;
     group: Group | null;
@@ -49,12 +43,7 @@ interface Props {
   };
 }
 
-const CommentRepliesItem = ({
-  data,
-  dataComment,
-  dataPost,
-  className,
-}: Props) => {
+const CommentRepliesItem = ({ data, dataPost, className }: Props) => {
   const { userId } = useAuth();
 
   const {

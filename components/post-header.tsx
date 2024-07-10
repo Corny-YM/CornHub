@@ -17,7 +17,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Group, Post, User, File as IFile } from "@prisma/client";
 
-import { TypeReportEnum } from "@/lib/enum";
+import { ReportToEnum } from "@/lib/enum";
 import { useToggle } from "@/hooks/useToggle";
 import { destroy, update } from "@/actions/post";
 import { cn, getRelativeTime } from "@/lib/utils";
@@ -58,7 +58,7 @@ const PostHeader = ({
   const [confirmDelete, toggleConfirmDelete] = useToggle(false);
   const [modalUpdate, toggleModalUpdate] = useToggle(false);
   const [modalReport, toggleModalReport] = useToggle(false);
-  const [typeReport, setTypeReport] = useState(TypeReportEnum.admin);
+  const [typeReport, setTypeReport] = useState(ReportToEnum.admin);
 
   const { mutate: mutateUpdate, isPending: isPendingUpdate } = useMutation({
     mutationKey: ["store", "post", userId, id],
@@ -147,7 +147,7 @@ const PostHeader = ({
           icon: <ShieldAlert className="mr-2" size={20} />,
           onClick: () => {
             toggleModalReport(true);
-            setTypeReport(TypeReportEnum.group);
+            setTypeReport(ReportToEnum.group);
           },
         });
       }
@@ -176,7 +176,7 @@ const PostHeader = ({
           icon: <MessageSquareWarning className="mr-2" size={20} />,
           onClick: () => {
             toggleModalReport(true);
-            setTypeReport(TypeReportEnum.admin);
+            setTypeReport(ReportToEnum.admin);
           },
         },
         {

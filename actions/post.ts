@@ -20,6 +20,18 @@ interface IPostData extends Record<string, any> {
 
 const indexApi = "posts";
 
+export const show = async (
+  postId: number
+): Promise<
+  Post & {
+    user: User;
+    group: Group | null;
+    file: IFile | null;
+    reactions: Reaction[];
+    _count: { comments: number; reactions: number };
+  }
+> => defHttp.get(`${indexApi}/${postId}`);
+
 export const store = async (
   data: IPostData
 ): Promise<Post & { user: User; group: Group | null; file: IFile | null }> => {

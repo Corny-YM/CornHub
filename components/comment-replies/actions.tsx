@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { Ellipsis, MessageSquareWarning, ShieldAlert } from "lucide-react";
 import { User, Post, Group, CommentReply, File as IFile } from "@prisma/client";
 
-import { TypeReportEnum } from "@/lib/enum";
+import { ReportToEnum } from "@/lib/enum";
 import { useToggle } from "@/hooks/useToggle";
 import DropdownActions, {
   IDropdownAction,
@@ -31,7 +31,7 @@ const Actions = ({ data, dataPost, toggleIsEdit, onDelete }: Props) => {
 
   const [confirmModal, toggleConfirmModal] = useToggle(false);
   const [modalReport, toggleModalReport] = useToggle(false);
-  const [typeReport, setTypeReport] = useState(TypeReportEnum.admin);
+  const [typeReport, setTypeReport] = useState(ReportToEnum.admin);
 
   const isOwner = userId === user.id;
 
@@ -53,7 +53,7 @@ const Actions = ({ data, dataPost, toggleIsEdit, onDelete }: Props) => {
         icon: <MessageSquareWarning className="mr-2" size={20} />,
         onClick: () => {
           toggleModalReport(true);
-          setTypeReport(TypeReportEnum.admin);
+          setTypeReport(ReportToEnum.admin);
         },
       });
     }
@@ -64,7 +64,7 @@ const Actions = ({ data, dataPost, toggleIsEdit, onDelete }: Props) => {
         icon: <ShieldAlert className="mr-2" size={20} />,
         onClick: () => {
           toggleModalReport(true);
-          setTypeReport(TypeReportEnum.group);
+          setTypeReport(ReportToEnum.group);
         },
       });
     }

@@ -1,4 +1,4 @@
-import { CommentReply } from "@prisma/client";
+import { CommentReply, Reaction, User, File as IFile } from "@prisma/client";
 
 import defHttp from "@/lib/defHttp";
 
@@ -10,6 +10,17 @@ export interface IReplyData extends Record<string, any> {
   content?: string;
   file?: File;
 }
+
+export const show = async (
+  replyId: number
+): Promise<
+  CommentReply & {
+    user: User;
+    file?: IFile;
+    reactions: Reaction[];
+    _count: { reactions: number; commentReplies: number };
+  }
+> => defHttp.get(`${indexApi}/${replyId}`);
 
 export const store = async (data: IReplyData): Promise<CommentReply> => {
   const formData = new FormData();

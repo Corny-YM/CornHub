@@ -1,10 +1,10 @@
 import { Report } from "@prisma/client";
 
 import defHttp from "@/lib/defHttp";
-import { TypeReportEnum } from "@/lib/enum";
+import { ReportToEnum } from "@/lib/enum";
 
 export interface IStoreData {
-  report_to: TypeReportEnum;
+  report_to: ReportToEnum;
   sender_id: string;
   post_id?: number | null;
   user_id?: string | null;

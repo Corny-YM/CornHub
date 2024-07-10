@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { TypeFileEnum } from "@/lib/enum";
 import { getFiles } from "@/actions/group";
 import { useAppContext } from "@/providers/app-provider";
+import { useGroupContext } from "@/providers/group-provider";
 import {
   Dialog,
   DialogTitle,
@@ -20,7 +21,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import CardFile from "@/components/card-file";
 import EmptyData from "@/components/empty-data";
 import Loading from "@/components/icons/loading";
-import { useGroupContext } from "@/providers/group-provider";
 
 interface Props {
   open: boolean;

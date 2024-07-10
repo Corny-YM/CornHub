@@ -22,14 +22,15 @@ const Tabs = ({}: Props) => {
   );
 
   const btnTabs = useMemo(() => {
-    if (!isGroupOwner || !groupData.approve_posts) return tabs;
-    return [
-      ...tabs,
-      {
-        url: `/pending/posts`,
-        label: "Kiểm duyệt bài viết",
-      },
-    ];
+    const arr = [...tabs];
+
+    if (isGroupOwner) {
+      if (groupData.approve_posts)
+        arr.push({ url: `/pending/posts`, label: "Kiểm duyệt bài viết" });
+      arr.push({ url: `/reports`, label: "Báo cáo" });
+    }
+
+    return arr;
   }, [isGroupOwner, groupData]);
 
   return (

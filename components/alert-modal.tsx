@@ -35,7 +35,7 @@ const AlertModal = ({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
       <AlertDialogOverlay className="!z-[99999] bg-neutral-600/10" />
-      <AlertDialogContent className="z-[99999]">
+      <AlertDialogContent className="!z-[99999]">
         <AlertDialogHeader>
           <AlertDialogTitle>Bạn có hoàn toàn chắc chắn không?</AlertDialogTitle>
           <AlertDialogDescription>

@@ -17,6 +17,17 @@ export interface ICommentData extends Record<string, any> {
   file?: File;
 }
 
+export const show = async (
+  commentId: number
+): Promise<
+  Comment & {
+    user: User;
+    file?: IFile;
+    reactions: Reaction[];
+    _count: { reactions: number; commentReplies: number };
+  }
+> => defHttp.get(`${indexApi}/${commentId}`);
+
 export const store = async (data: ICommentData): Promise<Comment> => {
   const formData = new FormData();
   Object.keys(data).forEach((key) => {

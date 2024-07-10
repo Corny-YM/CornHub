@@ -44,7 +44,7 @@ const actions: ISelectAction[] = [
 ];
 
 const formSchema = z.object({
-  group_name: z.string().min(5).max(20),
+  group_name: z.string().min(5).max(50),
   status: z.boolean().nullable().optional(),
   approve_members: z.boolean().nullable().optional(),
   approve_posts: z.boolean().nullable().optional(),

@@ -6,7 +6,7 @@ import { useAuth } from "@clerk/nextjs";
 import { useMutation } from "@tanstack/react-query";
 
 import { store } from "@/actions/report";
-import { TypeReportEnum } from "@/lib/enum";
+import { ReportToEnum } from "@/lib/enum";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,7 @@ import {
 
 interface Props {
   data: {
-    report_to: TypeReportEnum;
+    report_to: ReportToEnum;
     user_id?: string | null;
     post_id?: number | null;
     group_id?: number | null;
@@ -57,7 +57,7 @@ const ReportModal = ({ open, data, onOpenChange }: Props) => {
   );
 
   const title = useMemo(() => {
-    if (report_to === TypeReportEnum.admin) return "Báo cáo tới Admin";
+    if (report_to === ReportToEnum.admin) return "Báo cáo tới Admin";
     return "Báo cáo tới quản trị viên nhóm";
   }, [report_to]);
 
