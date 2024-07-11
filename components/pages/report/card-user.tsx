@@ -23,9 +23,8 @@ const CardUser = ({ data }: Props) => {
   const [modalConfirm, toggleModalConfirm] = useToggle();
 
   const handleConfirm = useCallback(async () => {
-    console.log(is_banned);
-    // if (is_banned) await onUnBanUser(id);
-    // else await onBanUser(id);
+    if (is_banned) await onUnBanUser(id);
+    else await onBanUser(id);
   }, [id, is_banned]);
 
   return (
