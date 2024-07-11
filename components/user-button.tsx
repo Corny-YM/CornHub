@@ -1,20 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
-import { DoorOpen } from "lucide-react";
 import { SignOutButton } from "@clerk/nextjs";
+import { DoorOpen, Shield } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { useAppContext } from "@/providers/app-provider";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import AvatarImg from "./avatar-img";
+import AvatarImg from "@/components/avatar-img";
 
 interface Props {
   className?: string;
@@ -29,7 +29,7 @@ const UserButton = ({ className }: Props) => {
       <DropdownMenuTrigger asChild>
         <Button
           className={cn(
-            "flex justify-center items-center rounded-full",
+            "flex justify-center items-center rounded-full !ring-0 !ring-offset-0",
             className
           )}
           variant="outline"
@@ -48,11 +48,25 @@ const UserButton = ({ className }: Props) => {
             href={`/account/${currentUser.id}`}
           >
             <AvatarImg
-              className="relative flex justify-center items-center w-9 h-9 my-2 mr-3 overflow-hidden rounded-full"
+              className="relative flex justify-center items-center w-10 h-10 my-2 mr-3 overflow-hidden rounded-full"
               src={currentUser?.avatar}
             />
             <div className="font-semibold">
               {currentUser?.full_name || "---"}
+            </div>
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem className={cn("cursor-pointer p-0", className)}>
+          <Link
+            className="w-full h-fit flex items-center px-2 rounded-md transition select-none cursor-pointer"
+            href={`/admin`}
+          >
+            <div className="flex justify-center items-center w-10 h-10 overflow-hidden rounded-full mr-2">
+              <Shield className="text-primary" />
+            </div>
+            <div className="">
+              Quản trị <Badge className="ml-2">CornHub</Badge>
             </div>
           </Link>
         </DropdownMenuItem>
@@ -63,7 +77,7 @@ const UserButton = ({ className }: Props) => {
               className="w-full flex items-center justify-start px-2"
               variant="ghost"
             >
-              <div className="flex justify-center items-center w-9 h-9 overflow-hidden rounded-full mr-2">
+              <div className="flex justify-center items-center w-10 h-10 overflow-hidden rounded-full mr-2">
                 <DoorOpen />
               </div>
 

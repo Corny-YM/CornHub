@@ -36,6 +36,12 @@ export default function RootLayout({ children }: Props) {
   return (
     <ClerkProvider appearance={{ baseTheme: dark }}>
       <html lang="en">
+        <head>
+          <link
+            rel="icon"
+            href="/Logo-CornHub/Logo%20Files/For%20Web/Favicons/browser.png"
+          />
+        </head>
         <body
           className={cn(
             "min-h-screen bg-background font-sans antialiased",

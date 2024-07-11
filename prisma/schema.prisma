@@ -26,6 +26,7 @@ model User {
   birth_year   Int?
   birth_month  Int?
   birth_day    Int?
+  is_admin     Boolean   @default(false)
   verified     Boolean   @default(false)
   last_sign_in DateTime?
   created_at   DateTime  @default(now())

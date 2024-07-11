@@ -15,9 +15,15 @@ import UserButton from "@/components/user-button";
 import SearchModal from "@/components/search-modal";
 import NotificationsSheet from "@/components/notifications-sheet";
 
-const Header = () => {
+interface Props {
+  isAdmin?: boolean;
+}
+
+const Header = ({ isAdmin }: Props) => {
   const pathname = usePathname();
+
   const [modalSearch, toggleModalSearch] = useToggle(false);
+
   return (
     <div
       className={cn(
@@ -33,18 +39,20 @@ const Header = () => {
         </Link>
 
         {/* Search bar */}
-        <Button
-          className="rounded-full cursor-pointer hover:bg-primary/50"
-          variant="outline"
-          size="icon"
-          onClick={() => toggleModalSearch(true)}
-        >
-          <Search size={20} />
-        </Button>
+        {!isAdmin && (
+          <Button
+            className="rounded-full cursor-pointer hover:bg-primary/50"
+            variant="outline"
+            size="icon"
+            onClick={() => toggleModalSearch(true)}
+          >
+            <Search size={20} />
+          </Button>
+        )}
       </div>
 
       {/* Menu Items */}
-      <MenuItems />
+      {!isAdmin && <MenuItems />}
 
       {/* More */}
       <div className="flex items-center gap-2 h-full">
