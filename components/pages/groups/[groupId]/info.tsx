@@ -12,11 +12,14 @@ import {
   UsersRound,
   CheckCircle,
   CircleCheckBig,
+  MessageSquareWarning,
+  Ellipsis,
 } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
-import { useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useCallback, useMemo, useState } from "react";
 
+import { ReportToEnum } from "@/lib/enum";
 import { getMembers } from "@/actions/group";
 import { useToggle } from "@/hooks/useToggle";
 import { useMutates } from "@/hooks/mutations/group/useMutates";
@@ -27,6 +30,7 @@ import AlertModal from "@/components/alert-modal";
 import DropdownActions from "@/components/dropdown-actions";
 import ModalInvite from "@/components/pages/groups/[groupId]/modal-invite";
 import NoAvatar from "@/public/no-avatar.jpg";
+import ReportModal from "@/components/report-modal";
 
 const Info = () => {
   const { userId } = useAuth();
@@ -58,6 +62,8 @@ const Info = () => {
 
   const [openModalInvite, toggleOpenModalInvite] = useToggle(false);
   const [openModalLeaveGroup, toggleOpenModalLeaveGroup] = useToggle(false);
+  const [modalReport, toggleModalReport] = useToggle(false);
+  const [typeReport, setTypeReport] = useState(ReportToEnum.admin);
 
   const { data, isLoading } = useQuery({
     queryKey: ["group", "members", groupData.id],
@@ -194,6 +200,23 @@ const Info = () => {
             Chỉnh sửa nhóm
           </Button>
         )}
+        {!isGroupOwner && (
+          <DropdownActions
+            size="icon"
+            icon={<Ellipsis />}
+            actions={[
+              {
+                label: "Báo cáo nhóm",
+                destructive: true,
+                icon: <MessageSquareWarning className="mr-2" size={20} />,
+                onClick: () => {
+                  toggleModalReport(true);
+                  setTypeReport(ReportToEnum.admin);
+                },
+              },
+            ]}
+          />
+        )}
       </div>
 
       {/* Modals */}
@@ -203,6 +226,15 @@ const Info = () => {
         open={openModalLeaveGroup}
         onOpenChange={toggleOpenModalLeaveGroup}
         onClick={handleLeaveGroup}
+      />
+
+      <ReportModal
+        data={{
+          report_to: typeReport,
+          group_id: groupData.id,
+        }}
+        open={modalReport}
+        onOpenChange={toggleModalReport}
       />
     </div>
   );

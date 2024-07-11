@@ -1,26 +1,9 @@
-import { auth } from "@clerk/nextjs/server";
-
 import { ReportToEnum } from "@/lib/enum";
 import prisma from "@/lib/prisma";
 import EmptyData from "@/components/empty-data";
 import CardReport from "@/components/reports/card-report";
-import { redirect } from "next/navigation";
 
-interface Props {
-  params: { groupId: string };
-}
-
-const ReportsPage = async ({ params }: Props) => {
-  const { userId } = auth();
-
-  const group = await prisma.group.findFirst({
-    where: { id: +params.groupId },
-  });
-
-  if (!userId || !group) redirect("/groups/join");
-
-  if (userId !== group.owner_id) redirect(`/groups/${group.id}`);
-
+const AdminReportsPage = async () => {
   const reports = await prisma.report.findMany({
     include: {
       sender: true,
@@ -30,7 +13,7 @@ const ReportsPage = async ({ params }: Props) => {
       comment: true,
       reply: true,
     },
-    where: { group_id: +params.groupId, report_to: ReportToEnum.group },
+    where: { report_to: ReportToEnum.admin },
     orderBy: { created_at: "desc" },
   });
 
@@ -48,4 +31,4 @@ const ReportsPage = async ({ params }: Props) => {
   );
 };
 
-export default ReportsPage;
+export default AdminReportsPage;

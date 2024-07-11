@@ -7,17 +7,21 @@ import {
   Pencil,
   SquareX,
   BellOff,
+  BellRing,
+  Ellipsis,
   UserPlus,
   UserCheck,
   SquareCheck,
   MessageCircle,
-  BellRing,
+  MessageSquareWarning,
 } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { ILucideIcon } from "@/types";
+import { ReportToEnum } from "@/lib/enum";
+import { useToggle } from "@/hooks/useToggle";
 import { getFriendStatus } from "@/actions/friend";
 import {
   unfollow,
@@ -33,6 +37,7 @@ import { Button } from "@/components/ui/button";
 import DropdownActions, {
   IDropdownAction,
 } from "@/components/dropdown-actions";
+import ReportModal from "@/components/report-modal";
 
 interface IAction {
   id: string;
@@ -48,6 +53,9 @@ interface IAction {
 const InfoActions = () => {
   const { userId } = useAuth();
   const { accountData, isOwner, toggleModalEdit } = useAccountContext();
+
+  const [modalReport, toggleModalReport] = useToggle(false);
+  const [typeReport, setTypeReport] = useState(ReportToEnum.admin);
 
   const {
     data: dataFriendStatus,
@@ -342,6 +350,33 @@ const InfoActions = () => {
           />
         );
       })}
+
+      {!isOwner && (
+        <DropdownActions
+          size="icon"
+          icon={<Ellipsis />}
+          actions={[
+            {
+              label: "Báo cáo người dùng",
+              destructive: true,
+              icon: <MessageSquareWarning className="mr-2" size={20} />,
+              onClick: () => {
+                toggleModalReport(true);
+                setTypeReport(ReportToEnum.admin);
+              },
+            },
+          ]}
+        />
+      )}
+
+      <ReportModal
+        data={{
+          report_to: typeReport,
+          user_id: accountData.id,
+        }}
+        open={modalReport}
+        onOpenChange={toggleModalReport}
+      />
     </div>
   );
 };

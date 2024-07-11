@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Flag, LayoutDashboard, ThumbsUp, Users } from "lucide-react";
+import { Flag, LayoutDashboard, ThumbsUp, User, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
@@ -24,8 +24,13 @@ const SidebarLeft = () => {
       },
       {
         href: "/admin/users",
-        icon: Users,
+        icon: User,
         label: "Người dùng",
+      },
+      {
+        href: "/admin/groups",
+        icon: Users,
+        label: "Nhóm",
       },
       {
         href: "/admin/reports",

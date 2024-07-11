@@ -109,6 +109,7 @@ const CardMember = ({ groupId, data }: Props) => {
     });
   }, [groupId, isGroupOwner, onLeave]);
 
+  // TODO: kick user
   const handleKick = useCallback(() => {}, []);
 
   return (

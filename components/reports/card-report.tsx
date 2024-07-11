@@ -10,6 +10,7 @@ import {
   CommentReply,
 } from "@prisma/client";
 import { useMemo } from "react";
+import { CircleCheck, X } from "lucide-react";
 
 import { TypeReportEnum } from "@/lib/enum";
 import { useToggle } from "@/hooks/useToggle";
@@ -17,7 +18,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import AvatarImg from "@/components/avatar-img";
 import ModalReportDetail from "@/components/reports/modal-report-detail";
-import { X } from "lucide-react";
 
 interface Props {
   data: Report & {
@@ -39,6 +39,7 @@ const CardReport = ({ data }: Props) => {
     comment_id,
     reply_id,
     description,
+    status,
   } = data;
 
   const [modalDetail, toggleModalDetail] = useToggle();
@@ -61,6 +62,15 @@ const CardReport = ({ data }: Props) => {
 
   return (
     <div className="relative w-full h-fit flex flex-col px-4 py-3 rounded-lg overflow-hidden bg-zinc-200/50 dark:bg-primary-foreground/50">
+      {/* Status */}
+      <div className="absolute left-2 top-2">
+        {!!status && (
+          <div className="">
+            <CircleCheck className="text-green-400" size={20} />
+          </div>
+        )}
+      </div>
+
       {/* Icon remove report */}
       <div className="absolute top-1 right-1">
         <Button

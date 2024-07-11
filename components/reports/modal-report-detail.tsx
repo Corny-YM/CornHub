@@ -80,7 +80,7 @@ const ModalReportDetail = ({
           </DialogHeader>
 
           {/* content */}
-          <div className="h-full flex flex-col overflow-hidden overflow-y-auto">
+          <div className="w-full h-full flex flex-col overflow-hidden overflow-y-auto">
             <ScrollArea className="max-h-full -mx-6 px-6">{content}</ScrollArea>
           </div>
 

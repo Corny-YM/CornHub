@@ -27,11 +27,13 @@ const AdminPage = async () => {
     <div className="w-full grid grid-cols-3 gap-2">
       <CardTotal
         title="Tổng số người dùng"
+        href="/admin/users"
         total={userTotal}
         icon={<UserRound size={20} />}
       />
       <CardTotal
         title="Tổng số nhóm"
+        href="/admin/groups"
         total={groupTotal}
         icon={<UsersRound size={20} />}
       />

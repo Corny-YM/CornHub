@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 
 interface Props {
+  href?: string;
   title: string;
   total: number;
   className?: string;
@@ -21,12 +22,22 @@ interface Props {
   icon?: React.ReactNode;
 }
 
-const CardTotal = ({ title, icon, total, description, className }: Props) => {
+const CardTotal = ({
+  href,
+  icon,
+  total,
+  title,
+  description,
+  className,
+}: Props) => {
   return (
     <Card className={cn("w-full flex flex-col justify-between", className)}>
       <CardHeader className="p-4">
         <CardTitle className="text-lg flex items-center space-x-2">
-          <div>{title}</div> <Badge variant="secondary" className="p-2">{icon}</Badge>
+          <div>{title}</div>{" "}
+          <Badge variant="secondary" className="p-2">
+            {icon}
+          </Badge>
         </CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
@@ -36,7 +47,7 @@ const CardTotal = ({ title, icon, total, description, className }: Props) => {
             {formatAmounts(total)}
           </Badge>
           <Button variant="link">
-            <Link href="/admin">Xem chi tiết</Link>
+            <Link href={href || "/admin"}>Xem chi tiết</Link>
           </Button>
         </div>
       </CardContent>
