@@ -10,6 +10,7 @@ import { useMutates } from "@/hooks/mutations/report/useMutates";
 import { Button } from "@/components/ui/button";
 import NoAvatar from "@/public/no-avatar.jpg";
 import AlertModal from "@/components/alert-modal";
+import { cn } from "@/lib/utils";
 
 interface Props {
   data: User;
@@ -47,20 +48,15 @@ const CardUser = ({ data }: Props) => {
         >
           {full_name}
         </Link>
-        <div className="flex flex-col gap-1">
-          <Button
-            className="w-full hover:bg-primary/50"
-            variant="outline"
-            size="sm"
-            asChild
-          >
+        <div className="flex flex-col gap-2">
+          <Button className="w-full" size="sm" asChild>
             <Link href={`/account/${id}`} target="_blank">
               Xem trang cá nhân
             </Link>
           </Button>
           <Button
-            className="w-full"
-            variant={is_banned ? "secondary" : "destructive"}
+            className={cn("w-full", is_banned && "hover:bg-primary/50")}
+            variant={is_banned ? "outline" : "destructive"}
             size="sm"
             onClick={() => toggleModalConfirm(true)}
           >
