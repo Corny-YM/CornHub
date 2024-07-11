@@ -1,11 +1,12 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { Flag, LayoutDashboard, ThumbsUp, User, Users } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useMemo } from "react";
+import { usePathname } from "next/navigation";
+import { Flag, LayoutDashboard, ThumbsUp, User, Users } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 const SidebarLeft = () => {
   const pathname = usePathname();
@@ -13,27 +14,27 @@ const SidebarLeft = () => {
   const nav = useMemo(() => {
     return [
       {
-        href: "/admin",
+        href: "/",
         icon: LayoutDashboard,
         label: "Trang chủ",
       },
       {
-        href: "/admin/interact",
+        href: "/interact",
         icon: ThumbsUp,
         label: "Tương tác",
       },
       {
-        href: "/admin/users",
+        href: "/users",
         icon: User,
         label: "Người dùng",
       },
       {
-        href: "/admin/groups",
+        href: "/groups",
         icon: Users,
         label: "Nhóm",
       },
       {
-        href: "/admin/reports",
+        href: "/reports",
         icon: Flag,
         label: "Báo cáo",
       },
@@ -57,7 +58,7 @@ const SidebarLeft = () => {
             size="sm"
             asChild
           >
-            <Link href={href}>
+            <Link href={`/admin${href}`}>
               <Icon className="mr-2" size={20} />
               {label}
             </Link>
