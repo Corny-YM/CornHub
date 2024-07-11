@@ -1,23 +1,23 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { MonitorPlay, UsersRound, Warehouse } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import { Contact, MonitorPlay, UsersRound, Warehouse } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 
-interface Props {}
+interface Props {
+  className?: string;
+}
 
 const items = [
-  { id: "home", url: "/", icon: Warehouse },
-  { id: "watch", url: "/watch", icon: MonitorPlay },
-  { id: "groups", url: "/groups", icon: UsersRound },
+  { id: "home", label: "Trang chủ", url: "/", icon: Warehouse },
+  { id: "watch", label: "Watch", url: "/watch", icon: MonitorPlay },
+  { id: "groups", label: "Nhóm", url: "/groups", icon: UsersRound },
+  { id: "friends", label: "Bạn bè", url: "/friends", icon: Contact },
 ];
 
-const MenuItems = ({}: Props) => {
-  const router = useRouter();
-
+const MenuItems = ({ className }: Props) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
@@ -32,39 +32,39 @@ const MenuItems = ({}: Props) => {
   }, [mounted]);
 
   if (!mounted) return null;
-  return (
-    <div className="absolute right-0 left-0 flex items-center justify-center h-full">
-      {items.map((item) => {
-        const { id, url, icon: Icon } = item;
-        return (
-          <div
-            key={id}
-            className="relative flex justify-center items-center w-28 h-full py-1 select-none"
-          >
-            <Link
-              className={cn(
-                "flex justify-center items-center w-full h-full",
-                "cursor-pointer rounded-md transition",
-                selectedItem === id
-                  ? "text-primary"
-                  : "dark:hover:bg-primary/20 hover:bg-primary/50"
-              )}
-              href={url}
-            >
-              <Icon />
-            </Link>
-            <div
-              className={cn(
-                "absolute bottom-0 left-0 right-0 h-[3px] invisible",
-                "bg-primary rounded-tl-md rounded-tr-md",
-                selectedItem === id && "visible"
-              )}
-            />
-          </div>
-        );
-      })}
-    </div>
-  );
+  return items.map((item) => {
+    const { id, url, label, icon: Icon } = item;
+    return (
+      <div
+        key={id}
+        className={cn(
+          "relative flex justify-center items-center w-20 lg:w-28 h-full py-1 select-none",
+          className
+        )}
+      >
+        <Link
+          className={cn(
+            "flex justify-center items-center w-full h-full",
+            "cursor-pointer rounded-md transition p-3 md:py-0",
+            selectedItem === id
+              ? "text-primary dark:hover:bg-primary-foreground/50 hover:bg-zinc-400/50"
+              : "dark:hover:bg-primary/20 hover:bg-primary/50"
+          )}
+          href={url}
+        >
+          <Icon />
+          <div className="flex md:hidden ml-2 md:ml-0">{label}</div>
+        </Link>
+        <div
+          className={cn(
+            "absolute bottom-0 left-0 right-0 h-[3px] invisible",
+            "bg-primary rounded-tl-md rounded-tr-md",
+            selectedItem === id && "visible"
+          )}
+        />
+      </div>
+    );
+  });
 };
 
 export default MenuItems;

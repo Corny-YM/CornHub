@@ -15,6 +15,7 @@ import { Button, ButtonProps } from "@/components/ui/button";
 
 interface Props {
   open?: boolean;
+  side?: "top" | "bottom" | "left" | "right";
   title?: string;
   description?: string;
   children: React.ReactNode;
@@ -25,6 +26,7 @@ interface Props {
 
 const SheetButton = ({
   open,
+  side = "right",
   title,
   children,
   activator,
@@ -36,7 +38,7 @@ const SheetButton = ({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetTrigger asChild>{activator}</SheetTrigger>
       <SheetOverlay className="z-[99999]" />
-      <SheetContent className="z-[99999] w-full flex flex-col">
+      <SheetContent className="z-[99999] w-full flex flex-col" side={side}>
         <SheetHeader>
           <SheetTitle>{title}</SheetTitle>
           <SheetDescription>{description}</SheetDescription>

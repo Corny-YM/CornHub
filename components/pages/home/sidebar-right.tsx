@@ -19,7 +19,7 @@ const SidebarRight = async ({ userId }: Props) => {
   });
 
   return (
-    <div className="side-bar">
+    <div className="side-bar__right">
       <div className="flex flex-col w-full">
         <div className="mx-4 font-semibold mb-2 dark:text-slate-400">
           Người liên hệ

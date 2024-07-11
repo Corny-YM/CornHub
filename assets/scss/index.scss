@@ -13,7 +13,24 @@ input {
 }
 
 .side-bar {
-  @apply sticky top-14 h-[calc(100vh-56px)] basis-80 flex flex-col overflow-hidden overflow-y-auto py-4;
+  @apply flex flex-col overflow-hidden overflow-y-auto;
+  @apply lg:basis-80 h-[calc(100vh-56px)] py-4 z-[999];
+  @apply dark:bg-[#09090b] bg-white shadow-lg lg:shadow-none transition-all;
+
+  @apply fixed lg:sticky;
+  @apply lg:top-14 max-lg:-translate-x-full;
+
+  /* width */
+  &::-webkit-scrollbar {
+    display: none !important;
+  }
+}
+.side-bar__right {
+  @apply flex flex-col overflow-hidden overflow-y-auto;
+  @apply xl:basis-80 h-[calc(100vh-56px)] py-4 z-[999];
+  @apply dark:bg-[#09090b] bg-white shadow-lg lg:shadow-none transition-all;
+
+  @apply fixed xl:sticky hidden xl:flex;
 
   /* width */
   &::-webkit-scrollbar {

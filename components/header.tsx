@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Search } from "lucide-react";
+import { Menu, Search } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
@@ -14,6 +14,7 @@ import Message from "@/components/icons/message";
 import UserButton from "@/components/user-button";
 import SearchModal from "@/components/search-modal";
 import NotificationsSheet from "@/components/notifications-sheet";
+import SheetButton from "./sheet-button";
 
 interface Props {
   isAdmin?: boolean;
@@ -32,7 +33,7 @@ const Header = ({ isAdmin }: Props) => {
         "border-b border-solid dark:border-neutral-600/50 border-neutral-200/50"
       )}
     >
-      <div className="flex items-center h-full gap-2 z-20">
+      <div className="flex items-center h-full gap-1 md:gap-2 z-20">
         {/* Logo */}
         <Link href="/" className="flex justify-center items-center h-12">
           <Logo />
@@ -49,10 +50,31 @@ const Header = ({ isAdmin }: Props) => {
             <Search size={20} />
           </Button>
         )}
+        <SheetButton
+          title="Menu"
+          side="left"
+          activator={
+            <Button
+              className="flex md:hidden rounded-full cursor-pointer hover:bg-primary/50"
+              variant="outline"
+              size="icon"
+            >
+              <Menu size={20} />
+            </Button>
+          }
+        >
+          <div className="flex flex-col space-y-2">
+            <MenuItems className="w-full" />
+          </div>
+        </SheetButton>
       </div>
 
       {/* Menu Items */}
-      {!isAdmin && <MenuItems />}
+      {!isAdmin && (
+        <div className="absolute right-0 left-0 hidden md:flex items-center justify-center h-full">
+          <MenuItems />
+        </div>
+      )}
 
       {/* More */}
       <div className="flex items-center gap-2 h-full">
