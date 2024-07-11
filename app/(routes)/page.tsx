@@ -10,7 +10,6 @@ import Header from "@/components/header";
 import NewFeeds from "@/components/pages/home/new-feeds";
 import SidebarLeft from "@/components/pages/home/sidebar-left";
 import SidebarRight from "@/components/pages/home/sidebar-right";
-import AvatarImg from "@/components/avatar-img";
 
 const HomePage = async () => {
   const { userId } = auth();

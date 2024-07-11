@@ -23,22 +23,24 @@ const CardUser = ({ data }: Props) => {
   const [modalConfirm, toggleModalConfirm] = useToggle();
 
   const handleConfirm = useCallback(async () => {
-    if (is_banned) await onUnBanUser(id);
-    else await onBanUser(id);
+    console.log(is_banned);
+    // if (is_banned) await onUnBanUser(id);
+    // else await onBanUser(id);
   }, [id, is_banned]);
 
   return (
-    <div className="w-full h-fit flex flex-col items-center justify-start overflow-hidden rounded-lg shadow dark:bg-neutral-800 bg-[#f0f2f5]">
+    <div className="w-full flex flex-col items-center justify-start overflow-hidden rounded-lg shadow dark:bg-neutral-800 bg-[#f0f2f5]">
       <div className="flex justify-center items-center relative w-full h-auto aspect-square">
         <Image
           className="absolute w-full h-full"
           src={avatar || NoAvatar}
           alt={full_name || "avatar-friends"}
-          fill
           sizes="100%"
+          fill
+          priority
         />
       </div>
-      <div className="w-full flex flex-col p-3 gap-y-1">
+      <div className="w-full flex-1 flex flex-col justify-between p-3 gap-y-1">
         <Link
           className="font-medium hover:underline break-words line-clamp-2 leading-normal pb-1"
           href={`/account/${id}`}
@@ -46,24 +48,26 @@ const CardUser = ({ data }: Props) => {
         >
           {full_name}
         </Link>
-        <Button
-          className="w-full hover:bg-primary/50"
-          variant="outline"
-          size="sm"
-          asChild
-        >
-          <Link href={`/account/${id}`} target="_blank">
-            Xem trang cá nhân
-          </Link>
-        </Button>
-        <Button
-          className="w-full"
-          variant={is_banned ? "secondary" : "destructive"}
-          size="sm"
-          onClick={() => toggleModalConfirm(true)}
-        >
-          {is_banned ? "Bỏ cấm" : "Cấm"}
-        </Button>
+        <div className="flex flex-col gap-1">
+          <Button
+            className="w-full hover:bg-primary/50"
+            variant="outline"
+            size="sm"
+            asChild
+          >
+            <Link href={`/account/${id}`} target="_blank">
+              Xem trang cá nhân
+            </Link>
+          </Button>
+          <Button
+            className="w-full"
+            variant={is_banned ? "secondary" : "destructive"}
+            size="sm"
+            onClick={() => toggleModalConfirm(true)}
+          >
+            {is_banned ? "Bỏ cấm" : "Cấm"}
+          </Button>
+        </div>
       </div>
 
       <AlertModal

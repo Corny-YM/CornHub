@@ -40,10 +40,14 @@ const ModalReportDetail = ({
   onOpenChange,
 }: Props) => {
   const {
+    isPendingBanUser,
+    isPendingUnBanUser,
     isPendingRemovePost,
     isPendingRemoveGroup,
     isPendingRemoveReply,
     isPendingRemoveComment,
+    onBanUser,
+    onUnBanUser,
     onRemovePost,
     onRemoveGroup,
     onRemoveReply,
@@ -54,11 +58,15 @@ const ModalReportDetail = ({
 
   const disabled = useMemo(
     () =>
+      isPendingBanUser ||
+      isPendingUnBanUser ||
       isPendingRemovePost ||
       isPendingRemoveGroup ||
       isPendingRemoveReply ||
       isPendingRemoveComment,
     [
+      isPendingBanUser,
+      isPendingUnBanUser,
       isPendingRemovePost,
       isPendingRemoveGroup,
       isPendingRemoveReply,
@@ -81,6 +89,7 @@ const ModalReportDetail = ({
 
   const handleReport = useCallback(async () => {
     if (type === TypeReportEnum.user) {
+      await onBanUser(data.user_id!);
     } else if (type === TypeReportEnum.reply) {
       await onRemoveReply(data.reply_id!);
     } else if (type === TypeReportEnum.comment) {

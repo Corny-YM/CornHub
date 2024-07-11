@@ -36,7 +36,7 @@ export const useMutates = (data?: Report) => {
   const { mutateAsync: mutateAsyncUnBanUser, isPending: isPendingUnBanUser } =
     useMutation({
       mutationKey: ["user", "un-ban"],
-      mutationFn: banUser,
+      mutationFn: unBanUser,
       onSuccess() {
         toast.success("Bỏ cấm người dùng thành công");
         onSuccess();
@@ -49,7 +49,7 @@ export const useMutates = (data?: Report) => {
   const { mutateAsync: mutateAsyncBanUser, isPending: isPendingBanUser } =
     useMutation({
       mutationKey: ["user", "ban"],
-      mutationFn: unBanUser,
+      mutationFn: banUser,
       onSuccess() {
         toast.success("Cấm người dùng thành công");
         onSuccess();
