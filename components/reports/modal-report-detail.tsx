@@ -118,7 +118,9 @@ const ModalReportDetail = ({
               variant="destructive"
               onClick={() => toggleModalConfirm(true)}
             >
-              Xóa {title?.toLowerCase()}
+              {type === TypeReportEnum.user
+                ? "Cấm người dùng"
+                : `Xóa ${title?.toLowerCase()}}`}
             </Button>
           </DialogFooter>
         </DialogContent>

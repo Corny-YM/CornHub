@@ -2,10 +2,14 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useCallback } from "react";
 import { Group } from "@prisma/client";
 
+import { useToggle } from "@/hooks/useToggle";
 import { Button } from "@/components/ui/button";
 import NoCover from "@/public/no-background.jpg";
+import AlertModal from "@/components/alert-modal";
+import { useMutates } from "@/hooks/mutations/report/useMutates";
 
 interface Props {
   data: Group;
@@ -13,6 +17,13 @@ interface Props {
 
 const CardGroup = ({ data }: Props) => {
   const { id, group_name, cover } = data;
+  const { isPendingRemoveGroup, onRemoveGroup } = useMutates();
+
+  const [modalConfirm, toggleModalConfirm] = useToggle();
+
+  const handleRemove = useCallback(async () => {
+    await onRemoveGroup(data.id);
+  }, [data]);
 
   return (
     <div className="p-4 w-full flex flex-col items-center justify-center overflow-hidden rounded-lg shadow dark:bg-neutral-800 bg-[#f0f2f5]">
@@ -39,7 +50,23 @@ const CardGroup = ({ data }: Props) => {
         >
           <Link href={`/groups/${id}`}>Xem nhóm</Link>
         </Button>
+        <Button
+          className="flex-1"
+          variant="destructive"
+          size="sm"
+          onClick={() => toggleModalConfirm(true)}
+        >
+          Xóa
+        </Button>
       </div>
+
+      <AlertModal
+        destructive
+        open={modalConfirm}
+        disabled={isPendingRemoveGroup}
+        onOpenChange={toggleModalConfirm}
+        onClick={handleRemove}
+      />
     </div>
   );
 };

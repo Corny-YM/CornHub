@@ -11,12 +11,13 @@ import { destroy as removePost } from "@/actions/post";
 import { destroy as removeGroup } from "@/actions/group";
 import { destroy as removeReply } from "@/actions/replies";
 import { destroy as removeComment } from "@/actions/comments";
+import { banUser, unBanUser } from "@/actions/admin";
 
-export const useMutates = (data: Report) => {
+export const useMutates = (data?: Report) => {
   const router = useRouter();
 
   const { mutate: mutateUpdateReport } = useMutation({
-    mutationKey: ["report", "update", data.id],
+    mutationKey: ["report", "update", data?.id],
     mutationFn: update,
     onSuccess() {
       router.refresh();
@@ -28,8 +29,35 @@ export const useMutates = (data: Report) => {
 
   const onSuccess = () => {
     router.refresh();
-    mutateUpdateReport({ id: data.id, status: 1 });
+    if (data) mutateUpdateReport({ id: data.id, status: 1 });
   };
+
+  // USER
+  const { mutateAsync: mutateAsyncUnBanUser, isPending: isPendingUnBanUser } =
+    useMutation({
+      mutationKey: ["user", "un-ban"],
+      mutationFn: banUser,
+      onSuccess() {
+        toast.success("Bỏ cấm người dùng thành công");
+        onSuccess();
+      },
+      onError() {
+        toast.error("Bỏ cấm người dùng thất bại. Vui lòng thử lại sau");
+      },
+    });
+
+  const { mutateAsync: mutateAsyncBanUser, isPending: isPendingBanUser } =
+    useMutation({
+      mutationKey: ["user", "ban"],
+      mutationFn: unBanUser,
+      onSuccess() {
+        toast.success("Cấm người dùng thành công");
+        onSuccess();
+      },
+      onError() {
+        toast.error("Cấm người dùng thất bại. Vui lòng thử lại sau");
+      },
+    });
 
   // REPLY
   const {
@@ -93,6 +121,20 @@ export const useMutates = (data: Report) => {
     },
   });
 
+  // USER
+  const onBanUser = useCallback(
+    async (id: string, callback?: Function | null) => {
+      await mutateAsyncBanUser(id).then((e) => callback?.());
+    },
+    []
+  );
+  const onUnBanUser = useCallback(
+    async (id: string, callback?: Function | null) => {
+      await mutateAsyncUnBanUser(id).then((e) => callback?.());
+    },
+    []
+  );
+
   // REPLY
   const onRemoveReply = useCallback(
     async (id: number, callback?: Function | null) => {
@@ -126,10 +168,14 @@ export const useMutates = (data: Report) => {
   );
 
   return {
+    isPendingBanUser,
+    isPendingUnBanUser,
     isPendingRemovePost,
     isPendingRemoveGroup,
     isPendingRemoveReply,
     isPendingRemoveComment,
+    onBanUser,
+    onUnBanUser,
     onRemovePost,
     onRemoveGroup,
     onRemoveReply,
