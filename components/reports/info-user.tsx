@@ -8,8 +8,9 @@ import { show } from "@/actions/user";
 import EmptyData from "@/components/empty-data";
 import Loading from "@/components/icons/loading";
 import NoBackground from "@/public/no-background.jpg";
-import AvatarImg from "../avatar-img";
+import AvatarImg from "@/components/avatar-img";
 import CardUserDetail from "./card-user-detail";
+
 
 interface Props {
   id: string;

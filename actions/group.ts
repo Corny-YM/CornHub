@@ -15,6 +15,11 @@ interface IUpdateData extends Record<string, any> {
 
 const indexApi = "groups";
 
+export const show = async (
+  groupId: number
+): Promise<Group & { owner: User; _count: { groupMembers: number } }> =>
+  defHttp.get(`/${indexApi}/${groupId}`);
+
 export const store = async (data: any): Promise<Group> =>
   await defHttp.post(indexApi, data);
 
@@ -28,7 +33,7 @@ export const update = async ({
   const formData = new FormData();
   Object.keys(data).forEach((key) => {
     const value = data?.[key];
-    formData.append(key, value);
+    if (value) formData.append(key, value);
   });
   return await defHttp.put(`${indexApi}/${groupId}`, formData);
 };

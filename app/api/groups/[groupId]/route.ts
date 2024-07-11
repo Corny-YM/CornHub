@@ -1,10 +1,30 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-
-import uploadFile from "@/services/uploadFile";
-import prisma from "@/lib/prisma";
-import { UsedForEnum } from "@/lib/enum";
 import { File as IFile } from "@prisma/client";
+
+import { UsedForEnum } from "@/lib/enum";
+import prisma from "@/lib/prisma";
+import uploadFile from "@/services/uploadFile";
+
+export async function GET(
+  req: Request,
+  { params }: { params: { groupId: string } }
+) {
+  try {
+    const { userId } = auth();
+    if (!userId) return new NextResponse("Unauthenticated", { status: 401 });
+
+    const group = await prisma.group.findFirst({
+      include: { owner: true, _count: { select: { groupMembers: true } } },
+      where: { id: +params.groupId },
+    });
+
+    return NextResponse.json(group);
+  } catch (err) {
+    console.log("[GROUP_ID_GET]", err);
+    return new NextResponse("Internal error", { status: 500 });
+  }
+}
 
 export async function PUT(
   req: Request,
