@@ -108,3 +108,11 @@ export const userLeaveGroup = async ({
 
 export const userDeniedGroupRequest = async (groupId: number) =>
   await defHttp.post(`${indexApi}/denied-group-request`, { groupId });
+
+export const kickMember = async ({
+  groupId,
+  userId,
+}: {
+  groupId: number;
+  userId: string;
+}) => await defHttp.post(`${indexApi}/${groupId}/kick`, { userId });

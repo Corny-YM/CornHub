@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 
 import {
+  kickMember,
   userJoinGroup,
   userLeaveGroup,
   userUnfollowGroup,
@@ -77,6 +78,19 @@ export const useMutates = ({ groupId, userId }: Props) => {
     },
   });
 
+  const { mutateAsync: mutateAsyncKickMember, isPending: isPendingKick } =
+    useMutation({
+      mutationKey: ["group", "leave", groupId, userId],
+      mutationFn: kickMember,
+      onSuccess() {
+        toast.success("Rời nhóm thành công");
+        router.refresh();
+      },
+      onError() {
+        toast.error("Rời nhóm thất bại. Vui lòng thử lại sau");
+      },
+    });
+
   const { mutateAsync: mutateAsyncLeaveGroup, isPending: isPendingLeave } =
     useMutation({
       mutationKey: ["group", "leave", groupId, userId],
@@ -120,6 +134,16 @@ export const useMutates = ({ groupId, userId }: Props) => {
     [userId, groupId]
   );
 
+  const onKick = useCallback(
+    async (callback?: Function | null) => {
+      if (!userId || !groupId) return;
+      await mutateAsyncKickMember({ userId, groupId: groupId }).then((e) =>
+        callback?.()
+      );
+    },
+    [userId, groupId]
+  );
+
   const onLeave = useCallback(
     async (callback?: Function | null) => {
       if (!userId || !groupId) return;
@@ -139,11 +163,13 @@ export const useMutates = ({ groupId, userId }: Props) => {
   );
 
   return {
+    isPendingKick,
     isPendingJoin,
     isPendingLeave,
     isPendingUnfollow,
     isPendingFollowing,
     isPendingDeniedRequest,
+    onKick,
     onJoin,
     onLeave,
     onUnfollow,

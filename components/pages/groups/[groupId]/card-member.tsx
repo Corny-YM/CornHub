@@ -39,9 +39,11 @@ const CardMember = ({ groupId, data }: Props) => {
     useGroupContext();
 
   const {
+    isPendingKick,
     isPendingLeave,
     isPendingUnfollow,
     isPendingFollowing,
+    onKick,
     onLeave,
     onUnfollow,
     onFollowing,
@@ -109,8 +111,12 @@ const CardMember = ({ groupId, data }: Props) => {
     });
   }, [groupId, isGroupOwner, onLeave]);
 
-  // TODO: kick user
-  const handleKick = useCallback(() => {}, []);
+  const handleKick = useCallback(async () => {
+    if (!isGroupOwner) return;
+    await onKick(() => {
+      router.refresh();
+    });
+  }, [groupId, isGroupOwner, onKick]);
 
   return (
     <div className="w-full min-h-11 flex items-center p-2 rounded-lg overflow-hidden shadow-lg dark:bg-neutral-800/50 bg-[#f0f2f5]">
@@ -152,7 +158,7 @@ const CardMember = ({ groupId, data }: Props) => {
       <AlertModal
         destructive
         open={modalKick}
-        disabled={isPendingLeave}
+        disabled={isPendingKick}
         onOpenChange={toggleModalKick}
         onClick={handleKick}
       />
