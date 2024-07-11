@@ -91,19 +91,28 @@ export async function DELETE(
     const { userId } = auth();
     if (!userId) return new NextResponse("Unauthenticated", { status: 401 });
 
+    const user = await prisma.user.findFirst({
+      where: { id: userId, is_admin: true },
+    });
+
     let reply = await prisma.commentReply.findFirstOrThrow({
-      include: { file: true },
+      include: { file: true, post: { include: { group: true } } },
       where: { id: +params.replyId },
     });
 
-    if (reply.user_id !== userId)
-      return new NextResponse("You do not have permission", { status: 404 });
+    const hasPermission =
+      user?.is_admin ||
+      reply.user_id === userId ||
+      reply.post.group?.owner_id === userId;
+    if (!hasPermission)
+      return new NextResponse("You do not have permission", { status: 401 });
 
     // Unlink & Delete files from folder & database
     const files: IFile[] = [];
     if (reply.file) files.push(reply.file);
     await unlinkFiles(files);
 
+    await prisma.notification.deleteMany({ where: { reply_id: reply.id } });
     await prisma.reaction.deleteMany({ where: { reply_id: reply.id } });
 
     const res = await prisma.commentReply.delete({ where: { id: reply.id } });

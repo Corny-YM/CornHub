@@ -73,6 +73,7 @@ async function adminLeave(groupId: number) {
   await prisma.groupRequest.deleteMany({ where: { group_id: groupId } });
 
   // Delete post => delete reactions, reports, comments, reply, files
+  await prisma.notification.deleteMany({ where: { post_id: { in: ids } } });
   await prisma.reaction.deleteMany({ where: { post_id: { in: ids } } });
   await prisma.commentReply.deleteMany({ where: { post_id: { in: ids } } });
   await prisma.comment.deleteMany({ where: { post_id: { in: ids } } });

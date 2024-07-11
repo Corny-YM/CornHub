@@ -8,6 +8,9 @@ import { useMutation } from "@tanstack/react-query";
 
 import { update } from "@/actions/report";
 import { destroy as removePost } from "@/actions/post";
+import { destroy as removeGroup } from "@/actions/group";
+import { destroy as removeReply } from "@/actions/replies";
+import { destroy as removeComment } from "@/actions/comments";
 
 export const useMutates = (data: Report) => {
   const router = useRouter();
@@ -28,6 +31,39 @@ export const useMutates = (data: Report) => {
     mutateUpdateReport({ id: data.id, status: 1 });
   };
 
+  // REPLY
+  const {
+    mutateAsync: mutateAsyncRemoveReply,
+    isPending: isPendingRemoveReply,
+  } = useMutation({
+    mutationKey: ["reply", "remove"],
+    mutationFn: removeReply,
+    onSuccess() {
+      toast.success("Xóa phản hồi thành công");
+      onSuccess();
+    },
+    onError() {
+      toast.error("Xóa phản hồi thất bại. Vui lòng thử lại sau");
+    },
+  });
+
+  // COMMENT
+  const {
+    mutateAsync: mutateAsyncRemoveComment,
+    isPending: isPendingRemoveComment,
+  } = useMutation({
+    mutationKey: ["comment", "remove"],
+    mutationFn: removeComment,
+    onSuccess() {
+      toast.success("Xóa bình luận thành công");
+      onSuccess();
+    },
+    onError() {
+      toast.error("Xóa bình luận thất bại. Vui lòng thử lại sau");
+    },
+  });
+
+  // POST
   const { mutateAsync: mutateAsyncRemovePost, isPending: isPendingRemovePost } =
     useMutation({
       mutationKey: ["post", "remove"],
@@ -41,15 +77,62 @@ export const useMutates = (data: Report) => {
       },
     });
 
+  // GROUP
+  const {
+    mutateAsync: mutateAsyncRemoveGroup,
+    isPending: isPendingRemoveGroup,
+  } = useMutation({
+    mutationKey: ["group", "remove"],
+    mutationFn: removeGroup,
+    onSuccess() {
+      toast.success("Xóa nhóm thành công");
+      onSuccess();
+    },
+    onError() {
+      toast.error("Xóa nhóm thất bại. Vui lòng thử lại sau");
+    },
+  });
+
+  // REPLY
+  const onRemoveReply = useCallback(
+    async (id: number, callback?: Function | null) => {
+      await mutateAsyncRemoveReply(id).then((e) => callback?.());
+    },
+    []
+  );
+
+  // COMMENT
+  const onRemoveComment = useCallback(
+    async (id: number, callback?: Function | null) => {
+      await mutateAsyncRemoveComment(id).then((e) => callback?.());
+    },
+    []
+  );
+
+  // POST
   const onRemovePost = useCallback(
-    async (postId: number, callback?: Function | null) => {
-      await mutateAsyncRemovePost(postId).then((e) => callback?.());
+    async (id: number, callback?: Function | null) => {
+      await mutateAsyncRemovePost(id).then((e) => callback?.());
+    },
+    []
+  );
+
+  // GROUP
+  const onRemoveGroup = useCallback(
+    async (id: number, callback?: Function | null) => {
+      await mutateAsyncRemoveGroup(id).then((e) => callback?.());
     },
     []
   );
 
   return {
     isPendingRemovePost,
+    isPendingRemoveGroup,
+    isPendingRemoveReply,
+    isPendingRemoveComment,
     onRemovePost,
+    onRemoveGroup,
+    onRemoveReply,
+    onRemoveComment,
   } as const;
 };

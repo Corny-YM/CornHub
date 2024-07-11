@@ -1,3 +1,5 @@
+import path from "path";
+import fs from "node:fs/promises";
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { File as IFile } from "@prisma/client";
@@ -81,5 +83,83 @@ export async function PUT(
   } catch (err) {
     console.log("[GROUP_PUT]", err);
     return new NextResponse("Internal error", { status: 500 });
+  }
+}
+
+export async function DELETE(
+  req: Request,
+  { params }: { params: { groupId: string } }
+) {
+  try {
+    const { userId } = auth();
+    if (!userId) return new NextResponse("Unauthenticated", { status: 401 });
+
+    const user = await prisma.user.findFirst({
+      where: { id: userId, is_admin: true },
+    });
+
+    const group = await prisma.group.findFirstOrThrow({
+      where: { id: +params.groupId },
+    });
+
+    const hasPermission = user?.is_admin || group?.owner_id === userId;
+
+    if (!hasPermission)
+      return new NextResponse("You do not have permission", { status: 401 });
+
+    const res = await removeGroup(group.id);
+
+    return NextResponse.json(res);
+  } catch (err) {
+    console.log("[REPLY_ID_DELETE]", err);
+    return new NextResponse("Internal error", { status: 500 });
+  }
+}
+
+async function removeGroup(groupId: number) {
+  const groupPost = await prisma.post.findMany({
+    include: { file: true },
+    where: { group_id: groupId },
+  });
+
+  const ids: number[] = [];
+  const promiseDelete: Promise<void>[] = [];
+  groupPost.forEach((post) => {
+    ids.push(post.id);
+    const file = post.file;
+    if (!file) return;
+    const item = deleteFile(file.id, file.path);
+    promiseDelete.push(item);
+  });
+
+  // Delete group => empty data first
+  await prisma.groupMember.deleteMany({ where: { group_id: groupId } });
+  await prisma.groupFollower.deleteMany({ where: { group_id: groupId } });
+  await prisma.groupRequest.deleteMany({ where: { group_id: groupId } });
+
+  // Delete post => delete reactions, reports, comments, reply, files
+  await prisma.notification.deleteMany({ where: { post_id: { in: ids } } });
+  await prisma.reaction.deleteMany({ where: { post_id: { in: ids } } });
+  await prisma.commentReply.deleteMany({ where: { post_id: { in: ids } } });
+  await prisma.comment.deleteMany({ where: { post_id: { in: ids } } });
+
+  await Promise.all(promiseDelete);
+
+  await prisma.post.deleteMany({
+    where: { id: { in: ids } },
+  });
+
+  const group = await prisma.group.delete({ where: { id: groupId } });
+  return group;
+}
+
+async function deleteFile(id: number, url: string) {
+  try {
+    const filePath = path.join(process.cwd(), "public", url);
+    await fs.unlink(filePath);
+    await prisma.file.deleteMany({ where: { id: id } });
+  } catch (error) {
+    console.log("[FILE_DELETE_ERROR]", error);
+    // Handle error, e.g., file might not exist, log it, etc.
   }
 }

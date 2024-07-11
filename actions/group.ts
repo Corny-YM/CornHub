@@ -38,6 +38,9 @@ export const update = async ({
   return await defHttp.put(`${indexApi}/${groupId}`, formData);
 };
 
+export const destroy = async (groupId: number): Promise<Group> =>
+  defHttp.delete(`${indexApi}/${groupId}`);
+
 export const removeCover = async (groupId: number): Promise<Group> =>
   defHttp.delete(`${indexApi}/${groupId}/remove/cover`);
 

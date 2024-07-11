@@ -57,19 +57,21 @@ const UserButton = ({ className }: Props) => {
           </Link>
         </DropdownMenuItem>
 
-        <DropdownMenuItem className={cn("cursor-pointer p-0", className)}>
-          <Link
-            className="w-full h-fit flex items-center px-2 rounded-md transition select-none cursor-pointer"
-            href={`/admin`}
-          >
-            <div className="flex justify-center items-center w-10 h-10 overflow-hidden rounded-full mr-2">
-              <Shield className="text-primary" />
-            </div>
-            <div className="">
-              Quản trị <Badge className="ml-2">CornHub</Badge>
-            </div>
-          </Link>
-        </DropdownMenuItem>
+        {!!currentUser.is_admin && (
+          <DropdownMenuItem className={cn("cursor-pointer p-0", className)}>
+            <Link
+              className="w-full h-fit flex items-center px-2 rounded-md transition select-none cursor-pointer"
+              href={`/admin`}
+            >
+              <div className="flex justify-center items-center w-10 h-10 overflow-hidden rounded-full mr-2">
+                <Shield className="text-primary" />
+              </div>
+              <div className="">
+                Quản trị <Badge className="ml-2">CornHub</Badge>
+              </div>
+            </Link>
+          </DropdownMenuItem>
+        )}
 
         <DropdownMenuItem className={cn("cursor-pointer p-0", className)}>
           <SignOutButton>

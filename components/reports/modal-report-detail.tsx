@@ -39,9 +39,32 @@ const ModalReportDetail = ({
   title,
   onOpenChange,
 }: Props) => {
-  const { isPendingRemovePost, onRemovePost } = useMutates(data);
+  const {
+    isPendingRemovePost,
+    isPendingRemoveGroup,
+    isPendingRemoveReply,
+    isPendingRemoveComment,
+    onRemovePost,
+    onRemoveGroup,
+    onRemoveReply,
+    onRemoveComment,
+  } = useMutates(data);
 
   const [modalConfirm, toggleModalConfirm] = useToggle();
+
+  const disabled = useMemo(
+    () =>
+      isPendingRemovePost ||
+      isPendingRemoveGroup ||
+      isPendingRemoveReply ||
+      isPendingRemoveComment,
+    [
+      isPendingRemovePost,
+      isPendingRemoveGroup,
+      isPendingRemoveReply,
+      isPendingRemoveComment,
+    ]
+  );
 
   const content = useMemo(() => {
     if (type === TypeReportEnum.user)
@@ -59,10 +82,13 @@ const ModalReportDetail = ({
   const handleReport = useCallback(async () => {
     if (type === TypeReportEnum.user) {
     } else if (type === TypeReportEnum.reply) {
+      await onRemoveReply(data.reply_id!);
     } else if (type === TypeReportEnum.comment) {
+      await onRemoveComment(data.comment_id!);
     } else if (type === TypeReportEnum.post) {
       await onRemovePost(data.post_id!);
     } else if (type === TypeReportEnum.group) {
+      await onRemoveGroup(data.group_id!);
     }
     onOpenChange(false);
   }, [type]);
@@ -101,7 +127,7 @@ const ModalReportDetail = ({
       <AlertModal
         destructive
         open={modalConfirm}
-        disabled={isPendingRemovePost}
+        disabled={disabled}
         onOpenChange={toggleModalConfirm}
         onClick={handleReport}
       />
