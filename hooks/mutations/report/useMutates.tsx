@@ -15,14 +15,17 @@ export const useMutates = (data: Report) => {
   const { mutate: mutateUpdateReport } = useMutation({
     mutationKey: ["report", "update", data.id],
     mutationFn: update,
+    onSuccess() {
+      router.refresh();
+    },
     onError() {
       toast.error("Cập nhật report thất bại. Vui lòng thử lại sau");
     },
   });
 
   const onSuccess = () => {
-    mutateUpdateReport({ id: data.id, status: 1 });
     router.refresh();
+    mutateUpdateReport({ id: data.id, status: 1 });
   };
 
   const { mutateAsync: mutateAsyncRemovePost, isPending: isPendingRemovePost } =

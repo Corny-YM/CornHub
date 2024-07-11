@@ -25,3 +25,23 @@ export async function POST(
     return new NextResponse("Internal error", { status: 500 });
   }
 }
+
+export async function DELETE(
+  req: Request,
+  { params }: { params: { reportId: string } }
+) {
+  try {
+    const { userId } = auth();
+
+    if (!userId) return new NextResponse("Unauthorized", { status: 401 });
+
+    const report = await prisma.report.delete({
+      where: { id: +params.reportId },
+    });
+
+    return NextResponse.json(report);
+  } catch (err) {
+    console.log("[REPORT_ID_DELETE]", err);
+    return new NextResponse("Internal error", { status: 500 });
+  }
+}

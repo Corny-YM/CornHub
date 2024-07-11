@@ -24,3 +24,6 @@ export const update = async (data: {
   status: 1 | 0;
 }): Promise<Report> =>
   defHttp.post(`${indexApi}/${data.id}`, { status: data.status });
+
+export const destroy = async (id: number): Promise<Report> =>
+  defHttp.delete(`${indexApi}/${id}`);

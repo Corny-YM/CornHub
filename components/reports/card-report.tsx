@@ -1,15 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import { useCallback, useMemo } from "react";
 import { User, Report } from "@prisma/client";
 import { CircleCheck, X } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
 
+import { destroy } from "@/actions/report";
 import { TypeReportEnum } from "@/lib/enum";
 import { useToggle } from "@/hooks/useToggle";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import AvatarImg from "@/components/avatar-img";
+import AlertModal from "@/components/alert-modal";
 import ModalReportDetail from "@/components/reports/modal-report-detail";
 
 interface Props {
@@ -17,6 +22,8 @@ interface Props {
 }
 
 const CardReport = ({ data }: Props) => {
+  const router = useRouter();
+
   const {
     sender,
     user_id,
@@ -29,6 +36,23 @@ const CardReport = ({ data }: Props) => {
   } = data;
 
   const [modalDetail, toggleModalDetail] = useToggle();
+  const [modalConfirm, toggleModalConfirm] = useToggle();
+
+  const { mutate, isPending } = useMutation({
+    mutationKey: ["report", "update", data.id],
+    mutationFn: destroy,
+    onSuccess() {
+      toast.success("Xóa report thành công");
+      router.refresh();
+    },
+    onError() {
+      toast.error("Xóa report thất bại. Vui lòng thử lại sau");
+    },
+  });
+
+  const handleRemoveReport = useCallback(() => {
+    mutate(data.id);
+  }, [data]);
 
   const reportType = useMemo(() => {
     if (user_id) return TypeReportEnum.user;
@@ -62,6 +86,8 @@ const CardReport = ({ data }: Props) => {
         <Button
           className="rounded-full p-2 h-fit w-fit hover:bg-destructive"
           variant="outline"
+          disabled={isPending}
+          onClick={() => toggleModalConfirm(true)}
         >
           <X size={16} />
         </Button>
@@ -109,6 +135,13 @@ const CardReport = ({ data }: Props) => {
         title={reportTypeTitle}
         open={modalDetail}
         onOpenChange={toggleModalDetail}
+      />
+
+      <AlertModal
+        destructive
+        open={modalConfirm}
+        onOpenChange={toggleModalConfirm}
+        onClick={handleRemoveReport}
       />
     </div>
   );
