@@ -15,10 +15,14 @@ input {
 .side-bar {
   @apply flex flex-col overflow-hidden overflow-y-auto;
   @apply lg:basis-80 h-[calc(100vh-56px)] py-4 z-[999];
-  @apply dark:bg-[#09090b] bg-white shadow-lg lg:shadow-none transition-all;
+  @apply dark:bg-[#09090b] bg-white shadow-lg lg:shadow-none transition;
 
   @apply fixed lg:sticky;
   @apply lg:top-14 max-lg:-translate-x-full;
+
+  &.active {
+    @apply translate-x-0 w-80;
+  }
 
   /* width */
   &::-webkit-scrollbar {
@@ -28,7 +32,7 @@ input {
 .side-bar__right {
   @apply flex flex-col overflow-hidden overflow-y-auto;
   @apply xl:basis-80 h-[calc(100vh-56px)] py-4 z-[999];
-  @apply dark:bg-[#09090b] bg-white shadow-lg lg:shadow-none transition-all;
+  @apply dark:bg-[#09090b] bg-white shadow-lg lg:shadow-none transition;
 
   @apply fixed xl:sticky hidden xl:flex;
 

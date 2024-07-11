@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback } from "react";
-import { Contact, UserPlus } from "lucide-react";
+import { ElementRef, useCallback, useRef } from "react";
+import { AppWindow, Contact, UserPlus } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { useToggle } from "@/hooks/useToggle";
 import { useFriendContext } from "@/providers/friends-provider";
 import { Button } from "@/components/ui/button";
 
@@ -16,6 +17,9 @@ const actions = [
 const SidebarLeft = () => {
   const { pathname } = useFriendContext();
 
+  const [active, toggleActive] = useToggle();
+  const sidebarRef = useRef<ElementRef<"div">>(null);
+
   const hasSelected = useCallback(
     (url: string) => {
       const isRoot = pathname?.split("/")?.length === 2;
@@ -26,30 +30,49 @@ const SidebarLeft = () => {
   );
 
   return (
-    <div className="side-bar">
-      <div className="w-full flex flex-col px-2 pb-4">
-        <div className="font-semibold text-xl mb-4 px-2">Bạn bè</div>
+    <>
+      <div
+        className={cn(
+          "z-50 absolute top-16 left-2 transition",
+          active && "left-[328px]"
+        )}
+      >
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={() => {
+            toggleActive();
+            sidebarRef.current?.classList.toggle("active");
+          }}
+        >
+          <AppWindow size={20} />
+        </Button>
+      </div>
+      <div ref={sidebarRef} className="side-bar">
+        <div className="w-full flex flex-col px-2 pb-4">
+          <div className="font-semibold text-xl mb-4 px-2">Bạn bè</div>
 
-        <div className="w-full flex flex-col gap-y-2">
-          {actions.map(({ label, url, icon: Icon }) => (
-            <Button
-              key={url}
-              className={cn(
-                "w-full flex items-center justify-start",
-                hasSelected(url) && "bg-primary/50 hover:bg-primary/60"
-              )}
-              variant="outline"
-              asChild
-            >
-              <Link key={url} href={`/friends/${url}`}>
-                <Icon className="mr-2" size={20} />
-                {label}
-              </Link>
-            </Button>
-          ))}
+          <div className="w-full flex flex-col gap-y-2">
+            {actions.map(({ label, url, icon: Icon }) => (
+              <Button
+                key={url}
+                className={cn(
+                  "w-full flex items-center justify-start",
+                  hasSelected(url) && "bg-primary/50 hover:bg-primary/60"
+                )}
+                variant="outline"
+                asChild
+              >
+                <Link key={url} href={`/friends/${url}`}>
+                  <Icon className="mr-2" size={20} />
+                  {label}
+                </Link>
+              </Button>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
