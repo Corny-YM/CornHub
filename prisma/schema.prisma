@@ -41,7 +41,6 @@ model User {
   senderNotifications   Notification[]       @relation("SenderToNotification")
   receiverNotifications Notification[]       @relation("ReceiverToNotification")
   senderReports         Report[]             @relation("SenderToReport")
-  userReports           Report[]             @relation("UserToReport")
   friends               Friend[]             @relation("UserToFriend")
   friendUserInfo        Friend[]
   senderFriendRequest   FriendRequest[]      @relation("SenderToFriendRequest")
@@ -104,7 +103,6 @@ model Group {
 
   posts         Post[]          @relation("GroupToPost")
   notifications Notification[]  @relation("GroupToNotification")
-  reports       Report[]        @relation("GroupToReport")
   groupMembers  GroupMember[]   @relation("GroupToGroupMember")
   groupFollower GroupFollower[]
   groupRequests GroupRequest[]  @relation("GroupToGroupRequest")
@@ -132,7 +130,6 @@ model Post {
   file_id  Int?
   file     File?  @relation("FileToPost", fields: [file_id], references: [id])
 
-  reports        Report[]       @relation("PostToReport")
   comments       Comment[]      @relation("PostToComment")
   reactions      Reaction[]     @relation("PostToReaction")
   notifications  Notification[] @relation("PostToNotification")
@@ -163,7 +160,6 @@ model Comment {
   // 
   reactions      Reaction[]     @relation("CommentToReaction")
   notifications  Notification[] @relation("CommentToNotification")
-  reports        Report[]       @relation("CommentToReport")
   commentReplies CommentReply[] @relation("CommentToCommentReply")
 
   @@index([post_id])
@@ -193,7 +189,6 @@ model CommentReply {
 
   reactions     Reaction[]     @relation("CommentReplyToReaction")
   notifications Notification[] @relation("ReplyToNotification")
-  reports       Report[]       @relation("CommentReplyToReport")
 
   @@index([post_id])
   @@index([user_id])
@@ -280,31 +275,17 @@ model Report {
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
-  // relation
-  post_id Int?
-  post    Post? @relation("PostToReport", fields: [post_id], references: [id])
+  user_id    String?
+  group_id   Int?
+  post_id    Int?
+  comment_id Int?
+  reply_id   Int?
 
+  // relation
   sender_id String
   sender    User   @relation("SenderToReport", fields: [sender_id], references: [id])
 
-  user_id String?
-  user    User?   @relation("UserToReport", fields: [user_id], references: [id])
-
-  comment_id Int?
-  comment    Comment? @relation("CommentToReport", fields: [comment_id], references: [id])
-
-  reply_id Int?
-  reply    CommentReply? @relation("CommentReplyToReport", fields: [reply_id], references: [id])
-
-  group_id Int?
-  group    Group? @relation("GroupToReport", fields: [group_id], references: [id])
-
-  @@index([user_id])
-  @@index([post_id])
-  @@index([group_id])
-  @@index([reply_id])
   @@index([sender_id])
-  @@index([comment_id])
   @@map("reports")
 }
 

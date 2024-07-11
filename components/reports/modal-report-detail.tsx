@@ -39,7 +39,7 @@ const ModalReportDetail = ({
   title,
   onOpenChange,
 }: Props) => {
-  const { isPendingRemovePost, onRemovePost } = useMutates();
+  const { isPendingRemovePost, onRemovePost } = useMutates(data);
 
   const [modalConfirm, toggleModalConfirm] = useToggle();
 

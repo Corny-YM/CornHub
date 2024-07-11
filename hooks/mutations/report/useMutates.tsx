@@ -2,13 +2,28 @@
 
 import toast from "react-hot-toast";
 import { useCallback } from "react";
+import { Report } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 
+import { update } from "@/actions/report";
 import { destroy as removePost } from "@/actions/post";
 
-export const useMutates = () => {
+export const useMutates = (data: Report) => {
   const router = useRouter();
+
+  const { mutate: mutateUpdateReport } = useMutation({
+    mutationKey: ["report", "update", data.id],
+    mutationFn: update,
+    onError() {
+      toast.error("Cập nhật report thất bại. Vui lòng thử lại sau");
+    },
+  });
+
+  const onSuccess = () => {
+    mutateUpdateReport({ id: data.id, status: 1 });
+    router.refresh();
+  };
 
   const { mutateAsync: mutateAsyncRemovePost, isPending: isPendingRemovePost } =
     useMutation({
@@ -16,7 +31,7 @@ export const useMutates = () => {
       mutationFn: removePost,
       onSuccess() {
         toast.success("Xóa bài viết thành công");
-        router.refresh();
+        onSuccess();
       },
       onError() {
         toast.error("Xóa bài viết thất bại. Vui lòng thử lại sau");

@@ -18,3 +18,9 @@ const indexApi = "reports";
 
 export const store = async (data: IStoreData): Promise<Report> =>
   defHttp.post(indexApi, data);
+
+export const update = async (data: {
+  id: number;
+  status: 1 | 0;
+}): Promise<Report> =>
+  defHttp.post(`${indexApi}/${data.id}`, { status: data.status });

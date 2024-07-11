@@ -1,15 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import {
-  User,
-  Post,
-  Group,
-  Report,
-  Comment,
-  CommentReply,
-} from "@prisma/client";
 import { useMemo } from "react";
+import { User, Report } from "@prisma/client";
 import { CircleCheck, X } from "lucide-react";
 
 import { TypeReportEnum } from "@/lib/enum";
@@ -20,14 +13,7 @@ import AvatarImg from "@/components/avatar-img";
 import ModalReportDetail from "@/components/reports/modal-report-detail";
 
 interface Props {
-  data: Report & {
-    sender: User;
-    user?: User | null;
-    group?: Group | null;
-    post?: Post | null;
-    comment?: Comment | null;
-    reply?: CommentReply | null;
-  };
+  data: Report & { sender: User };
 }
 
 const CardReport = ({ data }: Props) => {
@@ -96,19 +82,25 @@ const CardReport = ({ data }: Props) => {
 
       {/* Type report */}
       <div className="w-full flex justify-between items-center mt-2">
-        <div className="w-full flex items-center space-x-2">
+        <div className="flex items-center space-x-2">
           <div className="">Báo cáo:</div>
           <Badge className="h-fit" variant="destructive">
             {reportTypeTitle}
           </Badge>
         </div>
-        <Button
-          className="h-fit rounded-full px-2 py-1 hover:bg-primary-foreground/80 dark:hover:bg-primary/50 hover:text-white"
-          variant="outline"
-          onClick={() => toggleModalDetail(true)}
-        >
-          Chi tiết
-        </Button>
+        {!data.status ? (
+          <Button
+            className="h-fit rounded-full px-2 py-1 hover:bg-primary-foreground/80 dark:hover:bg-primary/50 hover:text-white"
+            variant="outline"
+            onClick={() => toggleModalDetail(true)}
+          >
+            Chi tiết
+          </Button>
+        ) : (
+          <Badge className="w-fit h-fit" variant="outline">
+            Đã xử lý
+          </Badge>
+        )}
       </div>
 
       <ModalReportDetail

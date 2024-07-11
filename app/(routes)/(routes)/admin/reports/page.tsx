@@ -5,14 +5,7 @@ import CardReport from "@/components/reports/card-report";
 
 const AdminReportsPage = async () => {
   const reports = await prisma.report.findMany({
-    include: {
-      sender: true,
-      user: true,
-      group: true,
-      post: true,
-      comment: true,
-      reply: true,
-    },
+    include: { sender: true },
     where: { report_to: ReportToEnum.admin },
     orderBy: { created_at: "desc" },
   });
