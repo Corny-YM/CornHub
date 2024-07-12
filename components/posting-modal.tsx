@@ -16,6 +16,7 @@ import {
   DialogHeader,
   DialogFooter,
   DialogContent,
+  DialogOverlay,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -212,7 +213,8 @@ const PostingModal = ({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:w-[600px] sm:max-w-none flex flex-col">
+      <DialogOverlay className="z-[9999]"/>
+      <DialogContent className="z-[9999] sm:w-[600px] sm:max-w-none flex flex-col">
         <DialogHeader>
           <DialogTitle>Tạo bài viết</DialogTitle>
         </DialogHeader>

@@ -14,7 +14,7 @@ input {
 
 .side-bar {
   @apply flex flex-col overflow-hidden overflow-y-auto;
-  @apply lg:basis-80 h-[calc(100vh-56px)] py-4 z-[999];
+  @apply lg:basis-80 h-[calc(100vh-56px)] py-4;
   @apply dark:bg-[#09090b] bg-white shadow-lg lg:shadow-none transition;
 
   @apply fixed lg:sticky;
@@ -27,7 +27,7 @@ input {
   }
 
   &.active {
-    @apply translate-x-0 w-80;
+    @apply translate-x-0 w-80 z-[999];
   }
 
   /* width */
@@ -37,10 +37,14 @@ input {
 }
 .side-bar__right {
   @apply flex flex-col overflow-hidden overflow-y-auto;
-  @apply xl:basis-80 h-[calc(100vh-56px)] py-4 z-[999];
+  @apply xl:basis-80 h-[calc(100vh-56px)] py-4;
   @apply dark:bg-[#09090b] bg-white shadow-lg lg:shadow-none transition;
 
   @apply fixed xl:sticky hidden xl:flex;
+
+  &.active {
+    @apply translate-x-0 w-80 z-[999];
+  }
 
   /* width */
   &::-webkit-scrollbar {
