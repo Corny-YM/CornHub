@@ -20,6 +20,12 @@ input {
   @apply fixed lg:sticky;
   @apply lg:top-14 max-lg:-translate-x-full;
 
+  &.messages {
+    @apply fixed md:sticky md:top-14;
+    @apply md:basis-80 md:shadow-none;
+    @apply translate-x-0 max-md:-translate-x-full;
+  }
+
   &.active {
     @apply translate-x-0 w-80;
   }

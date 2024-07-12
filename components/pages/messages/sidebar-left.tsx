@@ -1,28 +1,27 @@
 "use client";
 
 import Link from "next/link";
+import {
+  Search,
+  Loader2,
+  AppWindow,
+  ServerCrash,
+  MessageSquareDiff,
+} from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { ElementRef, Fragment, useMemo, useRef } from "react";
-import {
-  AppWindow,
-  Loader2,
-  MessageSquareDiff,
-  Search,
-  ServerCrash,
-} from "lucide-react";
 
-import { cn, getRelativeTime } from "@/lib/utils";
+import { useToggle } from "@/hooks/useToggle";
 import { index } from "@/actions/conversation";
+import { cn, getRelativeTime } from "@/lib/utils";
 import { TypeConversationEnum } from "@/lib/enum";
 import { useSocket } from "@/providers/socket-provider";
 import { useMessageContext } from "@/providers/message-provider";
 import { useConversationSocket } from "@/hooks/useConversationSocket";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import AvatarImg from "@/components/avatar-img";
-import { useToggle } from "@/hooks/useToggle";
 
 interface Props {}
 
@@ -81,7 +80,7 @@ const SidebarLeft = ({}: Props) => {
           <AppWindow size={20} />
         </Button>
       </div>
-      <div ref={sidebarRef} className="side-bar lg:basis-[360px]">
+      <div ref={sidebarRef} className="side-bar messages lg:basis-[360px]">
         <div className="w-full h-full flex flex-col px-2 border-r border-r-stone-600/30">
           <div className="text-2xl font-bold mb-4 flex items-center justify-between">
             <div>Đoạn chat</div>
