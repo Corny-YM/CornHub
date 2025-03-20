@@ -50,8 +50,8 @@ const SheetButton = ({
           <SheetClose asChild>
             <Button variant="outline">Đóng</Button>
           </SheetClose>
-          {footerActions?.map((action) => (
-            <Button {...action} />
+          {footerActions?.map((action, index) => (
+            <Button key={index} {...action} />
           ))}
         </SheetFooter>
       </SheetContent>

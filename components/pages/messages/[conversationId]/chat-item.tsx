@@ -25,13 +25,11 @@ import ModalReacted from "./modal-reacted";
 import PopoverReactions from "./popover-reactions";
 
 interface Props {
-  data?: IMessage;
+  data: IMessage;
   isOwner?: boolean;
 }
 
 const ChatItem = ({ data, isOwner }: Props) => {
-  if (!data) return null;
-
   const {
     file,
     sender,

@@ -40,4 +40,6 @@ const InputSelect = forwardRef<HTMLButtonElement, Props>(
   }
 );
 
+InputSelect.displayName = "InputSelect";
+
 export default InputSelect;

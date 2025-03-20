@@ -65,12 +65,7 @@ const CommentRepliesList = ({
     if (!commentReplyData || !commentReplyData.length) return <EmptyData />;
 
     return commentReplyData.map((reply) => (
-      <CommentRepliesItem
-        key={reply.id}
-        data={reply}
-        dataPost={dataPost}
-        dataComment={dataComment}
-      />
+      <CommentRepliesItem key={reply.id} data={reply} dataPost={dataPost} />
     ));
   }, [dataComment, dataPost, commentReplyData, isLoading]);
 

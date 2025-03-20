@@ -11,7 +11,6 @@ import UserInputSending from "@/components/user-input-sending";
 
 const ChatInput = () => {
   const { conversationData, call, callVideo } = useConversationContext();
-  if (call || callVideo) return null;
 
   const { isPendingStoreMessage, onStoreMessage } = useMutates();
 
@@ -52,6 +51,7 @@ const ChatInput = () => {
     [conversationData]
   );
 
+  if (call || callVideo) return null;
   return (
     <div className="w-full flex items-center space-x-2 mt-2">
       <Button

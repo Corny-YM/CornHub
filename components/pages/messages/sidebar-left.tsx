@@ -65,7 +65,7 @@ const SidebarLeft = ({}: Props) => {
     <>
       <div
         className={cn(
-          "z-50 absolute top-16 left-2 transition",
+          "block md:hidden z-50 absolute top-16 left-2 transition",
           active && "left-[328px]"
         )}
       >

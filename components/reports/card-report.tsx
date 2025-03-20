@@ -103,7 +103,9 @@ const CardReport = ({ data }: Props) => {
             </Link>
           </Badge>
         </div>
-        <div className="leading-normal font-semibold">"{description}"</div>
+        <div className="leading-normal font-semibold">
+          &ldquo;{description}&rdquo;
+        </div>
       </div>
 
       {/* Type report */}

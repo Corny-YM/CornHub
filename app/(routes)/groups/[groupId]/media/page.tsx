@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useMemo, useRef, useState } from "react";
-import { ImagePlus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 import { cn } from "@/lib/utils";
@@ -14,9 +13,11 @@ import EmptyData from "@/components/empty-data";
 import CardFile from "@/components/card-file";
 
 const GroupIdMediaPage = () => {
-  const { groupData, isGroupOwner } = useGroupContext();
+  const { groupData } = useGroupContext();
 
-  const [type, setType] = useState(TypeFileEnum.image);
+  const [type, setType] = useState<TypeFileEnum.image | TypeFileEnum.video>(
+    TypeFileEnum.image
+  );
 
   const [file, setFile] = useState<File | null>(null);
   const inputFileRef = useRef<HTMLInputElement | null>(null);

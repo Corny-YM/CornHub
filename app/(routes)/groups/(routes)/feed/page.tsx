@@ -45,7 +45,7 @@ const GroupFeedPage = async ({}: Props) => {
           {/* List Posts */}
           <div className="w-full flex flex-col mt-4">
             {posts.map((post) => (
-              <PostItem data={post} />
+              <PostItem key={post.id} data={post} />
             ))}
           </div>
         </div>
